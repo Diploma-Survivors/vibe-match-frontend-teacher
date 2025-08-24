@@ -101,7 +101,7 @@ export default function ProblemTable({
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="space-y-3">
-                      <Link href={`/problems/${problem.id}/edit`}>
+                      <Link href={`/problems/${problem.id}`}>
                         <button
                           type="button"
                           className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"

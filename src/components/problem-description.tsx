@@ -1288,10 +1288,6 @@ export default function ProblemDescription({
               <MemoryStick className="w-4 h-4" />
               <span className="text-sm">256MB</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
-              <FileText className="w-4 h-4" />
-              <span className="text-sm">{problem.points} điểm</span>
-            </div>
           </div>
         </div>
 
