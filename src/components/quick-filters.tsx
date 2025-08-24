@@ -39,14 +39,12 @@ export default function QuickFilters({
         return `Tên: ${value}`;
       case "difficulty":
         return `Độ khó: ${value}`;
-      case "category":
+      case "topic":
         return `Dạng: ${value}`;
-      case "subject":
+      case "tags":
         return `Môn: ${value}`;
-      case "chapter":
-        return `Chương: ${value}`;
-      case "problemType":
-        return `Loại: ${value}`;
+      case "accessRange":
+        return `Phạm vi: ${value}`;
       default:
         return value;
     }
