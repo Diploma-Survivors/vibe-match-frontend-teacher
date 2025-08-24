@@ -11,6 +11,9 @@ import SortControls, {
 import { mockProblems } from "@/lib/data/mock-problems";
 import type { Problem, ProblemFilters } from "@/types/problem";
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -20,68 +23,71 @@ export default function ProblemsPage() {
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
-  // Filter and sort problems
-  const filteredAndSortedProblems = useMemo(() => {
-    // First filter
-    const filtered = mockProblems.filter((problem) => {
-      if (
-        filters.id &&
-        !problem.id.toLowerCase().includes(filters.id.toLowerCase())
-      ) {
+  // First, fix the filtering to handle tags array
+const filteredAndSortedProblems = useMemo(() => {
+  // First filter
+  const filtered = mockProblems.filter((problem) => {
+    if (
+      filters.id &&
+      !problem.id.toLowerCase().includes(filters.id.toLowerCase())
+    ) {
+      return false;
+    }
+    if (
+      filters.title &&
+      !problem.title.toLowerCase().includes(filters.title.toLowerCase())
+    ) {
+      return false;
+    }
+    if (filters.difficulty && problem.difficulty !== filters.difficulty) {
+      return false;
+    }
+    if (filters.topic && problem.topic !== filters.topic) {
+      return false;
+    }
+    // Handle tags array filtering
+    if (filters.tags && filters.tags.length > 0) {
+      const hasMatchingTag = filters.tags.some(tag => 
+        problem.tags?.includes(tag)
+      );
+      if (!hasMatchingTag) {
         return false;
       }
-      if (
-        filters.title &&
-        !problem.title.toLowerCase().includes(filters.title.toLowerCase())
-      ) {
-        return false;
-      }
-      if (filters.difficulty && problem.difficulty !== filters.difficulty) {
-        return false;
-      }
-      if (filters.category && problem.category !== filters.category) {
-        return false;
-      }
-      if (filters.subject && problem.subject !== filters.subject) {
-        return false;
-      }
-      if (filters.chapter && problem.chapter !== filters.chapter) {
-        return false;
-      }
-      if (filters.problemType && problem.problemType !== filters.problemType) {
-        return false;
-      }
-      return true;
-    });
+    }
+    if (filters.accessRange && problem.accessRange !== filters.accessRange) {
+      return false;
+    }
+    return true;
+  });
 
-    // Then sort
-    filtered.sort((a, b) => {
-      let aValue: string | number = a[sortField];
-      let bValue: string | number = b[sortField];
+// Then sort - fix the type assertion
+filtered.sort((a, b) => {
+  let aValue: string | number = a[sortField];
+  let bValue: string | number = b[sortField];
 
-      // Handle special sorting for difficulty
-      if (sortField === "difficulty") {
-        const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
-        aValue =
-          difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
-        bValue =
-          difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
-      }
+  // Handle special sorting for difficulty
+  if (sortField === "difficulty") {
+    const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
+    aValue =
+      difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
+    bValue =
+      difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
+  }
 
-      // Handle string sorting
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
+  // Handle string sorting
+  if (typeof aValue === "string" && typeof bValue === "string") {
+    aValue = aValue.toLowerCase();
+    bValue = bValue.toLowerCase();
+  }
 
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      }
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    });
+  if (sortOrder === "asc") {
+    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+  }
+  return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+});
 
-    return filtered;
-  }, [filters, sortField, sortOrder]);
+  return filtered;
+}, [filters, sortField, sortOrder]);
 
   // Paginate filtered and sorted problems
   const paginatedProblems = useMemo(() => {
@@ -146,7 +152,15 @@ export default function ProblemsPage() {
                 Khám phá và chinh phục hàng ngàn bài tập lập trình
               </p>
             </div>
-            <ProblemStats problems={filteredAndSortedProblems} />
+            <div className="flex items-center gap-4">
+              <Link href="/problems/create">
+                <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tạo bài tập mới
+                </Button>
+              </Link>
+              <ProblemStats problems={filteredAndSortedProblems} />
+            </div>
           </div>
         </div>
       </div>
