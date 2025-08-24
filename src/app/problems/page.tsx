@@ -10,18 +10,26 @@ import SortControls, {
 } from "@/components/sort-controls";
 import { mockProblems } from "@/lib/data/mock-problems";
 import type { Problem, ProblemFilters } from "@/types/problem";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
+const mockFetchwithPromise = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+}
+
 export default function ProblemsPage() {
+  mockFetchwithPromise();
+
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>("id");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");         
+
+
 
   // First, fix the filtering to handle tags array
 const filteredAndSortedProblems = useMemo(() => {
@@ -159,7 +167,6 @@ filtered.sort((a, b) => {
                   Tạo bài tập mới
                 </Button>
               </Link>
-              <ProblemStats problems={filteredAndSortedProblems} />
             </div>
           </div>
         </div>

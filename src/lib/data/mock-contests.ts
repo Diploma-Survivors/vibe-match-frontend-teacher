@@ -2,7 +2,7 @@ import type { Contest } from "@/types/contest";
 
 export const mockContests: Contest[] = [
   {
-    id: "contest_001",
+    id: "1",
     name: "Vibe Match Programming Contest #1",
     description: "Cuộc thi lập trình dành cho sinh viên năm nhất, tập trung vào các thuật toán cơ bản và cấu trúc dữ liệu.",
     startTime: "2025-08-25T09:00:00",
@@ -17,7 +17,7 @@ export const mockContests: Contest[] = [
     createdAt: "2025-08-15T10:30:00",
   },
   {
-    id: "contest_002",
+    id: "2",
     name: "Advanced Algorithms Challenge",
     description: "Cuộc thi dành cho các lập trình viên có kinh nghiệm, bao gồm các bài toán về đồ thị và quy hoạch động.",
     startTime: "2025-08-20T14:00:00",
@@ -32,7 +32,7 @@ export const mockContests: Contest[] = [
     createdAt: "2025-08-10T16:45:00",
   },
   {
-    id: "contest_003",
+    id: "3",
     name: "Data Structure Mastery",
     description: "Kiểm tra kiến thức về cấu trúc dữ liệu: mảng, danh sách liên kết, ngăn xếp, hàng đợi.",
     startTime: "2025-08-15T08:00:00",
@@ -47,7 +47,7 @@ export const mockContests: Contest[] = [
     createdAt: "2025-08-05T09:15:00",
   },
   {
-    id: "contest_004",
+    id: "4",
     name: "Beginner Friendly Contest",
     description: "Cuộc thi dành cho người mới bắt đầu học lập trình, các bài toán đơn giản và dễ hiểu.",
     startTime: "2025-08-28T10:00:00",
@@ -62,7 +62,7 @@ export const mockContests: Contest[] = [
     createdAt: "2025-08-18T14:20:00",
   },
   {
-    id: "contest_005",
+    id: "5",
     name: "Math & Logic Challenge",
     description: "Tập trung vào các bài toán toán học và logic, phù hợp cho việc rèn luyện tư duy.",
     startTime: "2025-08-12T13:00:00",
@@ -77,7 +77,7 @@ export const mockContests: Contest[] = [
     createdAt: "2025-08-01T11:00:00",
   },
   {
-    id: "contest_006",
+    id: "6",
     name: "Speed Coding Marathon",
     description: "Cuộc thi tốc độ coding, thời gian ngắn nhưng nhiều bài tập thú vị.",
     startTime: "2025-08-30T15:00:00",

@@ -128,7 +128,7 @@ export default function ProblemDetailsPage() {
           onSave={handleSave}
           isSaving={false}
           title="Chi tiết bài tập"
-          subtitle={`ID: ${problemId} - Xem thông tin bài tập`}
+          subtitle={``}
         />
       </div>
     </div>
