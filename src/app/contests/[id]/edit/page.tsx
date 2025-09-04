@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { mockContests } from "@/lib/data/mock-contests";
 import { mockProblems } from "@/lib/data/mock-problems";
 import { Contest } from "@/types/contest";
+import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   Save,
@@ -22,13 +23,8 @@ import {
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 
-interface ContestEditPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function ContestEditPage({ params }: ContestEditPageProps) {
+export default function ContestEditPage() {
+  const params = useParams();
   const router = useRouter();
   const contest = mockContests.find((c) => c.id === params.id);
 

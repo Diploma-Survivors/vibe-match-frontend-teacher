@@ -26,12 +26,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 
-interface ContestDetailPageProps {
-  params: {
-    id: string;
-  };
-}
 
 // Mock participants data
 const mockParticipants = [
@@ -82,7 +78,8 @@ const mockParticipants = [
   },
 ];
 
-export default function ContestDetailPage({ params }: ContestDetailPageProps) {
+export default function ContestDetailPage() {
+  const params = useParams();
   const contest = mockContests.find((c) => c.id === params.id);
 
   if (!contest) {
