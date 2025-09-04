@@ -118,9 +118,7 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
               <Hash className="w-4 h-4" />
               <span className="text-sm">Điểm số</span>
             </div>
-            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-              {problem.points}
-            </span>
+
           </div>
         </div>
       </div>

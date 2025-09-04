@@ -364,7 +364,7 @@ export default function HomePage() {
               {[
                 {
                   step: "01",
-                  title: "Connect Wallet",
+                  title: "",
                   description:
                     "Register using your Solana wallet (like Phantom).",
                 },

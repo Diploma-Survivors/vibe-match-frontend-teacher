@@ -15,9 +15,7 @@ export type SortField =
   | "id"
   | "title"
   | "difficulty"
-  | "points"
   | "acceptanceRate"
-  | "submissionCount";
 export type SortOrder = "asc" | "desc";
 
 interface SortControlsProps {

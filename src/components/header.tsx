@@ -46,19 +46,9 @@ export default function Header() {
     { name: "Home", href: "/", onClick: undefined },
     { name: "Problems", href: "/problems", onClick: undefined },
     {
-      name: "Why Solana",
-      href: "/#why-solana",
-      onClick: () => scrollToSection("why-solana"),
-    },
-    {
-      name: "Features",
-      href: "/#features",
-      onClick: () => scrollToSection("features"),
-    },
-    {
-      name: "Audience",
-      href: "/#audience",
-      onClick: () => scrollToSection("audience"),
+      name: "Contests",
+      href: "/contests",
+      onClick: undefined,
     },
   ];
 
@@ -78,7 +68,7 @@ export default function Header() {
           </div>
           <Button className="flex items-center gap-2 bg-black hover:bg-black/90 text-white">
             <Wallet size={18} />
-            Connect Wallet
+            Vũ Thế Vỹ
           </Button>
         </div>
       </nav>
@@ -140,7 +130,7 @@ export default function Header() {
           className="flex items-center gap-2 bg-black hover:bg-black/90 text-white"
         >
           <Wallet size={18} />
-          {walletConnected ? "Connected" : "Connect Wallet"}
+          {walletConnected ? "Vu The Vy"  : "Vu "}
         </Button>
       </div>
     </nav>
