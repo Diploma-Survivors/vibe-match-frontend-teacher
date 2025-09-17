@@ -3,7 +3,7 @@ export interface Problem {
   title: string;
   group: string;
   category: string;
-  difficulty: "Dễ" | "Trung bình" | "Khó";
+  difficulty: ProblemDifficulty;
   acceptanceRate: number;
   submissionCount: number;
   tags: string[];
@@ -19,18 +19,45 @@ export interface TestCase {
   isSample: boolean;
 }
 
+export interface TestcaseSample {
+  input: string;
+  output: string;
+}
+
 export interface ProblemData {
-  name: string;
+  title: string;
   description: string;
   inputDescription: string;
   outputDescription: string;
-  timeLimit: string;
-  memoryLimit: string;
-  difficulty: string;
-  topic: string;
-  tags: string[];
-  accessRange: string;
-  testCases: TestCase[];
+  maxScore: number;
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  difficulty: ProblemDifficulty;
+  tags: string[]; // Array of tag IDs
+  topics: string[]; // Array of topic IDs
+  testcase: string; // Main testcase ID
+  testcaseSamples: TestcaseSample[];
+}
+
+export enum ProblemDifficulty {
+  EASY = "easy",
+  MEDIUM = "medium",
+  HARD = "hard",
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Topic {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ProblemFilters {
@@ -43,31 +70,13 @@ export interface ProblemFilters {
 }
 
 export const DIFFICULTY_OPTIONS = [
-  { value: "all", label: "Tất cả" },
-  { value: "Dễ", label: "Dễ" },
-  { value: "Trung bình", label: "Trung bình" },
-  { value: "Khó", label: "Khó" },
+  { value: "easy", label: "Dễ" },
+  { value: "medium", label: "Trung bình" },
+  { value: "hard", label: "Khó" },
 ];
 
-export const TOPIC_OPTIONS = [
-  { value: "all", label: "Lập trình cơ bản" },
-  { value: "Cấu trúc dữ liệu", label: "Cấu trúc dữ liệu" },
-  { value: "Thuật toán", label: "Thuật toán" },
-];
-
-export const TAG_OPTIONS = [
-  { value: "all", label: "Tất cả" },
-  { value: "toán học", label: "Toán học" },
-  { value: "số học", label: "Số học" },
-  { value: "chia hết", label: "Chia hết" },
-  { value: "số nguyên tố", label: "Số nguyên tố" },
-  { value: "sinh đôi", label: "Sinh đôi" },
-  { value: "mảng", label: "Mảng" },
-  { value: "trung bình", label: "Trung bình" },
-  { value: "sắp xếp", label: "Sắp xếp" },
-  { value: "tìm kiếm", label: "Tìm kiếm" },
-];
-
+// Remove TOPIC_OPTIONS and TAG_OPTIONS as they will be fetched from backend
+// Keep ACCESS_RANGE_OPTIONS for potential future use
 export const ACCESS_RANGE_OPTIONS = [
   { value: "all", label: "Tất cả" },
   { value: "public", label: "Public" },

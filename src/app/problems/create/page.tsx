@@ -1,43 +1,70 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import ProblemForm from "@/components/problem-form";
-import { ProblemData } from "@/types/problem";
+import ProblemForm from "@/components/problem-form-new";
+import { ProblemData, ProblemDifficulty } from "@/types/problem";
+import { problemApi } from "@/lib/apis/problem-api";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
 
   const initialData: ProblemData = {
-    name: "",
+    title: "",
     description: "",
     inputDescription: "",
     outputDescription: "",
-    timeLimit: "1000",
-    memoryLimit: "256",
-    difficulty: "",
-    topic: "",
+    maxScore: 100,
+    timeLimitMs: 1000,
+    memoryLimitKb: 262144,
+    difficulty: ProblemDifficulty.EASY,
     tags: [],
-    accessRange: "",
-    testCases: [
+    topics: [],
+    testcase: "",
+    testcaseSamples: [
       {
-        id: "1",
         input: "",
-        expectedOutput: "",
-        isSample: true,
+        output: "",
       },
     ],
   };
 
   const handleSave = async (data: ProblemData) => {
     setIsSaving(true);
-    // Simulate saving
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Saving problem:", data);
-    setIsSaving(false);
-    // Here you would typically save to your backend
+    try {
+      // STEP 2: Create problem with /problems endpoint using testcase ID from step 1
+      // Sends: title, description, inputDescription, outputDescription, maxScore,
+      // timeLimitMs, memoryLimitKb, difficulty, tagIds, topicIds, testcaseId, testcaseSamples
+      const result = await problemApi.createProblem(data, data.testcase);
+      console.log("Problem created successfully:", result);
+
+      // STEP 3: Handle deep linking response
+      if (result.id) {
+        try {
+          await problemApi.sendDeepLinkingResponse(result.id);
+          console.log("Deep linking response sent successfully");
+        } catch (dlError) {
+          console.error("Failed to send deep linking response:", dlError);
+          // Continue even if deep linking fails
+        }
+
+        // Redirect to the newly created problem's detail page
+        // router.push(`/problems/${result.id}`);
+      } else {
+        // Fallback to problems list if no ID is returned
+        router.push("/problems");
+      }
+    } catch (error) {
+      console.error("Failed to create problem:", error);
+      // You might want to show a toast notification here
+      alert("Failed to create problem. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

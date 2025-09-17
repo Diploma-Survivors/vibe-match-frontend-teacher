@@ -11,23 +11,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  ACCESS_RANGE_OPTIONS,
-  TOPIC_OPTIONS,
-  TAG_OPTIONS,
   DIFFICULTY_OPTIONS,
   ProblemData,
-  TestCase,
+  TestcaseSample,
+  Tag,
+  Topic,
 } from "@/types/problem";
+import { problemApi } from "@/lib/apis/problem-api";
 import { Plus, Save, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ProblemFormProps {
-  initialData: ProblemData;
-  mode: "create" | "edit" | "view";
-  onSave: (data: ProblemData) => Promise<void>;
-  isSaving?: boolean;
-  title: string;
-  subtitle: string;
+  readonly initialData: ProblemData;
+  readonly mode: "create" | "edit" | "view";
+  readonly onSave: (data: ProblemData) => Promise<void>;
+  readonly isSaving?: boolean;
+  readonly title: string;
+  readonly subtitle: string;
 }
 
 export default function ProblemForm({
@@ -39,18 +39,34 @@ export default function ProblemForm({
   subtitle,
 }: ProblemFormProps) {
   const [problemData, setProblemData] = useState<ProblemData>(initialData);
-  const [currentTestPage, setCurrentTestPage] = useState(1);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const isReadOnly = mode === "view";
 
-  // Test case pagination constants
-  const testCasesPerPage = 3;
-  const totalTestPages = Math.ceil(problemData.testCases.length / testCasesPerPage);
-  const startTestIndex = (currentTestPage - 1) * testCasesPerPage;
-  const endTestIndex = Math.min(startTestIndex + testCasesPerPage, problemData.testCases.length);
-  const currentTestCases = problemData.testCases.slice(startTestIndex, endTestIndex);
+  // Load tags and topics on component mount
+  useEffect(() => {
+    const loadDependencies = async () => {
+      try {
+        const [tags, topics] = await Promise.all([
+          problemApi.getTags(),
+          problemApi.getTopics(),
+        ]);
+        setAvailableTags(tags);
+        setAvailableTopics(topics);
+      } catch (error) {
+        console.error("Failed to load tags and topics:", error);
+        // You might want to show a toast notification here
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleInputChange = (field: keyof ProblemData, value: string | string[]) => {
+    loadDependencies();
+  }, []);
+
+  const handleInputChange = (field: keyof ProblemData, value: any) => {
     if (isReadOnly) return;
     setProblemData((prev) => ({
       ...prev,
@@ -58,43 +74,503 @@ export default function ProblemForm({
     }));
   };
 
-  const handleTagChange = (tag: string) => {
+  const handleTagChange = (tagId: string) => {
     if (isReadOnly) return;
     setProblemData((prev) => {
       const currentTags = prev.tags || [];
-      const isSelected = currentTags.includes(tag);
+      const isSelected = currentTags.includes(tagId);
       
       if (isSelected) {
         return {
           ...prev,
-          tags: currentTags.filter(t => t !== tag)
+          tags: currentTags.filter(t => t !== tagId)
         };
       } else {
         return {
           ...prev,
-          tags: [...currentTags, tag]
+          tags: [...currentTags, tagId]
         };
       }
     });
   };
 
-  const handleTestCaseChange = (
-    id: string,
-    field: keyof TestCase,
-    value: string | boolean
+  const handleTopicChange = (topicId: string) => {
+    if (isReadOnly) return;
+    setProblemData((prev) => {
+      const currentTopics = prev.topics || [];
+      const isSelected = currentTopics.includes(topicId);
+      
+      if (isSelected) {
+        return {
+          ...prev,
+          topics: currentTopics.filter(t => t !== topicId)
+        };
+      } else {
+        return {
+          ...prev,
+          topics: [...currentTopics, topicId]
+        };
+      }
+    });
+  };
+
+  const handleTestcaseSampleChange = (
+    index: number,
+    field: keyof TestcaseSample,
+    value: string
   ) => {
     if (isReadOnly) return;
     setProblemData((prev) => ({
       ...prev,
-      testCases: prev.testCases.map((testCase) =>
-        testCase.id === id ? { ...testCase, [field]: value } : testCase
+      testcaseSamples: prev.testcaseSamples.map((sample, i) =>
+        i === index ? { ...sample, [field]: value } : sample
       ),
     }));
   };
 
-  const addTestCase = () => {
+  const addTestcaseSample = () => {
     if (isReadOnly) return;
-    const newId = (problemData.testCases.length + 1).toString();
+    setProblemData((prev) => ({
+      ...prev,
+      testcaseSamples: [
+        ...prev.testcaseSamples,
+        {
+          input: "",
+          output: "",
+        },
+      ],
+    }));
+  };
+
+  const removeTestcaseSample = (index: number) => {
+    if (isReadOnly || problemData.testcaseSamples.length <= 1) return;
+    setProblemData((prev) => ({
+      ...prev,
+      testcaseSamples: prev.testcaseSamples.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSave = () => {
+    onSave(problemData);
+  };
+
+  const getTagName = (tagId: string) => {
+    const tag = availableTags.find(t => t.id === tagId);
+    return tag?.name || tagId;
+  };
+
+  const getTopicName = (topicId: string) => {
+    const topic = availableTopics.find(t => t.id === topicId);
+    return topic?.name || topicId;
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="text-center">
+          <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2"></div>
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Header Info */}
+      <div className="text-center">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+          {title}
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 text-lg">
+          {subtitle}
+        </p>
+      </div>
+
+      {/* Basic Information */}
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            Thông tin cơ bản
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Problem Title */}
+          <div className="space-y-2">
+            <label htmlFor="problem-title" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Tiêu đề bài tập <span className="text-red-500">*</span>
+            </label>
+            <Input
+              id="problem-title"
+              placeholder="Nhập tiêu đề bài tập (3-128 ký tự)..."
+              value={problemData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
+              disabled={isReadOnly}
+              minLength={3}
+              maxLength={128}
+            />
+          </div>
+
+          {/* Problem Description */}
+          <div className="space-y-2">
+            <label htmlFor="problem-description" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mô tả bài toán <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="problem-description"
+              placeholder="Nhập mô tả chi tiết về bài toán (16-512 ký tự)..."
+              value={problemData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              className="w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
+              disabled={isReadOnly}
+              minLength={16}
+              maxLength={512}
+            />
+          </div>
+
+          {/* Input Description */}
+          <div className="space-y-2">
+            <label htmlFor="input-description" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mô tả đầu vào <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="input-description"
+              placeholder="Mô tả định dạng và ý nghĩa của đầu vào (8-512 ký tự)..."
+              value={problemData.inputDescription}
+              onChange={(e) => handleInputChange("inputDescription", e.target.value)}
+              className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
+              disabled={isReadOnly}
+              minLength={8}
+              maxLength={512}
+            />
+          </div>
+
+          {/* Output Description */}
+          <div className="space-y-2">
+            <label htmlFor="output-description" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mô tả đầu ra <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="output-description"
+              placeholder="Mô tả định dạng và ý nghĩa của đầu ra (3-512 ký tự)..."
+              value={problemData.outputDescription}
+              onChange={(e) => handleInputChange("outputDescription", e.target.value)}
+              className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
+              disabled={isReadOnly}
+              minLength={3}
+              maxLength={512}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Constraints and Scoring */}
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            Điểm số và Giới hạn
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Max Score */}
+            <div className="space-y-2">
+              <label htmlFor="max-score" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Điểm tối đa <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="max-score"
+                type="number"
+                placeholder="100"
+                value={problemData.maxScore}
+                onChange={(e) => handleInputChange("maxScore", parseInt(e.target.value) || 0)}
+                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
+                disabled={isReadOnly}
+                min={1}
+              />
+            </div>
+
+            {/* Time Limit */}
+            <div className="space-y-2">
+              <label htmlFor="time-limit" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Giới hạn thời gian (ms) <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="time-limit"
+                type="number"
+                placeholder="1000"
+                value={problemData.timeLimitMs}
+                onChange={(e) => handleInputChange("timeLimitMs", parseInt(e.target.value) || 0)}
+                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
+                disabled={isReadOnly}
+                min={1}
+              />
+            </div>
+
+            {/* Memory Limit */}
+            <div className="space-y-2">
+              <label htmlFor="memory-limit" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Giới hạn bộ nhớ (KB) <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="memory-limit"
+                type="number"
+                placeholder="262144"
+                value={problemData.memoryLimitKb}
+                onChange={(e) => handleInputChange("memoryLimitKb", parseInt(e.target.value) || 0)}
+                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
+                disabled={isReadOnly}
+                min={1}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Problem Classification */}
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            Phân loại bài tập
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Difficulty */}
+          <div className="space-y-2">
+            <label htmlFor="difficulty" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mức độ khó <span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={problemData.difficulty}
+              onValueChange={(value: 'easy' | 'medium' | 'hard') => handleInputChange("difficulty", value)}
+              disabled={isReadOnly}
+            >
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
+                <SelectValue placeholder="Chọn mức độ khó" />
+              </SelectTrigger>
+              <SelectContent>
+                {DIFFICULTY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Topics */}
+          <div className="space-y-2">
+            <span className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Chủ đề <span className="text-red-500">*</span>
+            </span>
+            <div className="max-h-40 overflow-y-auto border rounded-xl bg-slate-50 dark:bg-slate-700/50 p-2">
+              {availableTopics.map((topic) => (
+                <button
+                  key={topic.id}
+                  type="button"
+                  className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-lg cursor-pointer w-full text-left"
+                  onClick={() => handleTopicChange(topic.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleTopicChange(topic.id);
+                    }
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={problemData.topics?.includes(topic.id) || false}
+                    onChange={() => {}}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    disabled={isReadOnly}
+                  />
+                  <span className="text-sm">{topic.name}</span>
+                </button>
+              ))}
+            </div>
+            
+            {/* Display selected topics */}
+            {problemData.topics && problemData.topics.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {problemData.topics.map((topicId) => (
+                  <span
+                    key={topicId}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md text-xs"
+                  >
+                    {getTopicName(topicId)}
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => handleTopicChange(topicId)}
+                        className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            <span className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Tags
+            </span>
+            <div className="max-h-40 overflow-y-auto border rounded-xl bg-slate-50 dark:bg-slate-700/50 p-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  className="flex items-center space-x-2 p-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-lg cursor-pointer w-full text-left"
+                  onClick={() => handleTagChange(tag.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleTagChange(tag.id);
+                    }
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={problemData.tags?.includes(tag.id) || false}
+                    onChange={() => {}}
+                    className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    disabled={isReadOnly}
+                  />
+                  <span className="text-sm">{tag.name}</span>
+                </button>
+              ))}
+            </div>
+            
+            {/* Display selected tags */}
+            {problemData.tags && problemData.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {problemData.tags.map((tagId) => (
+                  <span
+                    key={tagId}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md text-xs"
+                  >
+                    {getTagName(tagId)}
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => handleTagChange(tagId)}
+                        className="ml-1 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Test Case Samples */}
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-between">
+            Test Case Mẫu
+            {!isReadOnly && (
+              <Button
+                onClick={addTestcaseSample}
+                size="sm"
+                className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-lg"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Thêm Test Case
+              </Button>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {problemData.testcaseSamples.map((sample, index) => (
+              <div
+                key={`testcase-${index}`}
+                className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-slate-700 dark:text-slate-300">
+                    Test Case {index + 1}
+                  </h4>
+                  {!isReadOnly && problemData.testcaseSamples.length > 1 && (
+                    <Button
+                      onClick={() => removeTestcaseSample(index)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor={`input-${index}`} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Đầu vào
+                    </label>
+                    <textarea
+                      id={`input-${index}`}
+                      placeholder="Nhập dữ liệu đầu vào..."
+                      value={sample.input}
+                      onChange={(e) => handleTestcaseSampleChange(index, "input", e.target.value)}
+                      className="w-full h-20 p-3 rounded-lg border-0 bg-white dark:bg-slate-600 focus:ring-2 focus:ring-green-500 resize-none"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor={`output-${index}`} className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Đầu ra mong đợi
+                    </label>
+                    <textarea
+                      id={`output-${index}`}
+                      placeholder="Nhập kết quả mong đợi..."
+                      value={sample.output}
+                      onChange={(e) => handleTestcaseSampleChange(index, "output", e.target.value)}
+                      className="w-full h-20 p-3 rounded-lg border-0 bg-white dark:bg-slate-600 focus:ring-2 focus:ring-green-500 resize-none"
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Save Button */}
+      {!isReadOnly && (
+        <div className="flex justify-center pt-8">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                {mode === "create" ? "Tạo bài tập" : "Cập nhật bài tập"}
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
     setProblemData((prev) => ({
       ...prev,
       testCases: [
