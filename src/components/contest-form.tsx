@@ -25,6 +25,9 @@ import {
   BarChart3
 } from "lucide-react";
 import { useState } from "react";
+import ProblemForm from "./problem-form";
+import { ProblemData } from "@/types/problem";
+import ProblemList from "./problem-list";
 
 interface ContestData {
   name: string;
@@ -61,8 +64,58 @@ export default function ContestForm({
   const [contestData, setContestData] = useState<ContestData>(initialData);
   const [showProblemModal, setShowProblemModal] = useState(false);
   const [problemSearch, setProblemSearch] = useState("");
+  const [showNewProblemModal, setShowNewProblemModal] = useState(false);
+  const [isCreatingProblem, setIsCreatingProblem] = useState(false);
+  const [showProblemDetailModal, setShowProblemDetailModal] = useState(false);
+  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
+  const [problemData, setProblemData] = useState<ProblemData | null>(null);
+  const [isLoadingProblemDetail, setIsLoadingProblemDetail] = useState(false);
+
 
   const isReadOnly = mode === "view";
+
+  // Add this handler function
+  const handleViewProblemDetail = async (problemId: string) => {
+    setSelectedProblemId(problemId);
+    setIsLoadingProblemDetail(true);
+    setShowProblemDetailModal(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Find the problem in our mock data
+      const problem = mockProblems.find(p => p.id === problemId);
+      
+      if (problem) {
+        // Convert to ProblemData format
+        setProblemData({
+          name: problem.title,
+          description: "Detailed description would be here",
+          inputDescription: "Input format details",
+          outputDescription: "Output format details",
+          timeLimit:  "1000",
+          memoryLimit: "256",
+          difficulty: problem.difficulty,
+          topic: problem.topic,
+          tags: problem.tags,
+          accessRange: problem.accessRange || "public",
+          testCases: [
+            {
+              id: "1",
+              input: "Sample input",
+              expectedOutput: "Sample output",
+              isSample: true
+            }
+          ]
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching problem details:", error);
+    } finally {
+      setIsLoadingProblemDetail(false);
+    }
+  };
 
   const handleInputChange = (field: keyof ContestData, value: string | number | string[]) => {
     if (isReadOnly) return;
@@ -82,6 +135,31 @@ export default function ContestForm({
     }
     setShowProblemModal(false);
     setProblemSearch("");
+  };
+
+  const handleCreateProblem = async (newProblemData: ProblemData) => {
+    try {
+      setIsCreatingProblem(true);
+      
+      // Here you would typically make an API call to create the problem
+      // For example: const response = await fetch('/api/problems', {method: 'POST', body: JSON.stringify(newProblemData)})
+      
+      // Simulate API call with a timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock a response with a generated ID
+      const newProblemId = `p-${Date.now().toString(36)}`;
+      
+      // Add the new problem to the contest
+      handleAddProblem(newProblemId);
+      
+      // Close the modal
+      setShowNewProblemModal(false);
+    } catch (error) {
+      console.error("Error creating problem:", error);
+    } finally {
+      setIsCreatingProblem(false);
+    }
   };
 
   const handleRemoveProblem = (problemId: string) => {
@@ -418,13 +496,22 @@ export default function ContestForm({
               Danh sách bài tập ({contestData.problems.length})
             </CardTitle>
             {!isReadOnly && (
+              <div>
+              <Button
+                className="cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                onClick={() => setShowNewProblemModal(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Tạo bài tập mới
+              </Button>
               <Button
                 onClick={() => setShowProblemModal(true)}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                className="ml-3 cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm bài tập
               </Button>
+              </div>
             )}
           </div>
         </CardHeader>
@@ -518,12 +605,40 @@ export default function ContestForm({
         </div>
       )}
 
+      {showNewProblemModal && !isReadOnly && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                Tạo bài tập mới
+              </h2>
+              <Button
+                onClick={() => setShowNewProblemModal(false)}
+                variant="ghost"
+                size="sm"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              <ProblemForm
+                mode="create"
+                onSave={handleCreateProblem}
+                isSaving={isCreatingProblem}
+                title="Tạo bài tập mới"
+                subtitle="Nhập thông tin chi tiết về bài tập mới"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Problem Selection Modal */}
       {showProblemModal && !isReadOnly && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-              <div className="flex items-center justify-between mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-2 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                   Chọn bài tập
                 </h2>
@@ -535,62 +650,107 @@ export default function ContestForm({
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  placeholder="Tìm kiếm bài tập..."
-                  value={problemSearch}
-                  onChange={(e) => setProblemSearch(e.target.value)}
-                  className="pl-10 h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
-                />
-              </div>
+
             </div>
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div className="space-y-3">
-                {filteredProblems.map((problem) => (
-                  <div
-                    key={problem.id}
-                    className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md ${
-                      contestData.problems.includes(problem.id)
-                        ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700"
-                        : "bg-slate-50 border-slate-200 dark:bg-slate-700/30 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700/50"
-                    }`}
-                    onClick={() => handleAddProblem(problem.id)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-400 font-bold text-xs">
-                          {problem.id.slice(-2)}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-800 dark:text-slate-100">
-                          {problem.title}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded">
-                            {problem.difficulty}
-                          </span>
-                          <span className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-1 rounded">
-                            {problem.topic}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {contestData.problems.includes(problem.id) && (
-                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+            <div className="px-2 overflow-y-auto no-top-offset ">
+              <ProblemList 
+              mode="select"
+              onProblemSelect={handleAddProblem} 
+              onProblemView={handleViewProblemDetail}
+              />
             </div>
           </div>
         </div>
       )}
+
+      {/* Problem Detail Modal */}
+      {showProblemDetailModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                Chi tiết bài tập
+              </h2>
+              <div>
+                {selectedProblemId && (
+                  <Button
+                    onClick={() => {
+                      if (selectedProblemId) {
+                        handleAddProblem(selectedProblemId);
+                        setShowProblemDetailModal(false);
+                      }
+                    }}
+                    className="mr-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  >
+                    Chọn bài tập này
+                  </Button>
+                )}            
+                <Button
+                  onClick={() => setShowProblemDetailModal(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full w-8 h-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {isLoadingProblemDetail ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : problemData ? (
+                <ProblemForm
+                  initialData={problemData}
+                  mode="view"
+                  isSaving={false}
+                  title="Chi tiết bài tập"
+                  subtitle="Thông tin chi tiết về bài tập này"
+                />
+              ) : (
+                <div className="text-center text-slate-500 py-10">
+                  Không thể tải thông tin bài tập. Vui lòng thử lại sau.
+                </div>
+              )}
+            </div>
+            <div className="p-6 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+              <Button 
+                onClick={() => setShowProblemDetailModal(false)}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-800 mr-2"
+              >
+                Đóng
+              </Button>
+              {/* {selectedProblemId && (
+                <Button 
+                  onClick={() => {
+                    if (selectedProblemId) {
+                      handleAddProblem(selectedProblemId);
+                      setShowProblemDetailModal(false);
+                    }
+                  }}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                >
+                  Chọn bài tập này
+                </Button>
+              )} */}
+              <Button
+                  onClick={() => {
+                    if (selectedProblemId) {
+                      handleAddProblem(selectedProblemId);
+                      setShowProblemDetailModal(false);
+                    }
+                  }}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                >
+                  Chọn bài tập này
+                </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }

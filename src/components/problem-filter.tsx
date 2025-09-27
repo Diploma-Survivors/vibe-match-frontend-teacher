@@ -17,7 +17,7 @@ import {
   ACCESS_RANGE_OPTIONS,
   TAG_OPTIONS
 } from "@/types/problem";
-import { RotateCcw, Search } from "lucide-react";
+import { Filter, RotateCcw, Search, X } from "lucide-react";
 import React, { useState } from "react";
 
 interface ProblemFilterProps {
@@ -33,11 +33,17 @@ export default function ProblemFilter({
   onSearch,
   onReset,
 }: ProblemFilterProps) {
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const handleFilterChange = (key: keyof ProblemFilters, value: string | string[]) => {
     onFiltersChange({
       ...filters,
       [key]: value,
     });
+  };
+
+  const toggleFilters = () => {
+    console.log("Toggling filter visibility", !isFilterExpanded);
+    setIsFilterExpanded(!isFilterExpanded);
   };
 
   return (
@@ -53,19 +59,38 @@ export default function ProblemFilter({
               Bộ lọc tìm kiếm
             </h3>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all duration-200"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Đặt lại
-          </Button>
+          
+
+          {/* Mobile Filter Toggle Button */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleFilters}
+              className="xl:hidden text-green-600 dark:text-emerald-500 hover:text-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-xl transition-all duration-200"
+            >
+              {isFilterExpanded ? (
+                <X className="w-4 h-4 mr-1" />
+              ) : (
+                <Filter className="w-4 h-4 mr-1" />
+              )}
+              {isFilterExpanded ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onReset}
+              className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all duration-200"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Đặt lại
+            </Button>
+          </div>
         </div>
 
-        <div className="space-y-4">
-          {/* Mã bài */}
+        {/* Filter Fields - Hidden by default on mobile */}
+        <div className={`space-y-4 xl:block ${isFilterExpanded ? 'block' : 'hidden'}`}>          {/* Mã bài */}
           <div className="space-y-2">
             <label
               htmlFor="problem-id"

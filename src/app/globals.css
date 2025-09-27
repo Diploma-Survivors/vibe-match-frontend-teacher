@@ -174,3 +174,8 @@
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 85, 99, 0.8);
 }
+
+.no-top-offset .xl\:top-32 {
+  top: auto !important; /* overrides xl:top-32 */
+}
+

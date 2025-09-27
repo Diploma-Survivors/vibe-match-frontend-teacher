@@ -22,9 +22,9 @@ import { Plus, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface ProblemFormProps {
-  initialData: ProblemData;
+  initialData?: ProblemData;
   mode: "create" | "edit" | "view";
-  onSave: (data: ProblemData) => Promise<void>;
+  onSave?: (data: ProblemData) => Promise<void>;
   isSaving?: boolean;
   title: string;
   subtitle: string;
@@ -38,7 +38,29 @@ export default function ProblemForm({
   title,
   subtitle,
 }: ProblemFormProps) {
-  const [problemData, setProblemData] = useState<ProblemData>(initialData);
+  
+  const [problemData, setProblemData] = useState<ProblemData>(
+    initialData ?? {
+      name: "",
+      description: "",
+      inputDescription: "",
+      outputDescription: "",
+      timeLimit: "1000",
+      memoryLimit: "256",
+      difficulty: "Dễ",
+      topic: "implementation",
+      tags: [],
+      accessRange: "public",
+      testCases: [
+        {
+          id: "1",
+          input: "",
+          expectedOutput: "",
+          isSample: true,
+        },
+      ],
+    }
+  );
   const [currentTestPage, setCurrentTestPage] = useState(1);
 
   const isReadOnly = mode === "view";
@@ -118,7 +140,7 @@ export default function ProblemForm({
   };
 
   const handleSave = () => {
-    onSave(problemData);
+    onSave?.(problemData);
   };
 
   return (

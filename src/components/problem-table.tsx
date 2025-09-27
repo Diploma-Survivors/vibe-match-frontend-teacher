@@ -9,16 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Problem } from "@/types/problem";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Problem, ProblemData } from "@/types/problem";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import ProblemForm from "./problem-form";
 
 interface ProblemTableProps {
   problems: Problem[];
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  selectionMode?: boolean;
+  onProblemSelect?: (problemId: string) => void;
+  onProblemView?: (problemId: string) => void;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -45,7 +49,21 @@ export default function ProblemTable({
   currentPage,
   totalPages,
   onPageChange,
+  selectionMode = false,
+  onProblemSelect,
+  onProblemView,
 }: ProblemTableProps) {
+  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
+  const [showProblemDetail, setShowProblemDetail] = useState(false);
+  const [problemData, setProblemData] = useState<ProblemData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleProblemClick = (problemId: string) => {
+    if (selectionMode && onProblemView) {
+      onProblemView(problemId);
+    }
+  };
+
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
       {/* Table Header */}
@@ -60,24 +78,32 @@ export default function ProblemTable({
           <Table className="w-full">
             <TableHeader>
               <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
-                <TableHead className="w-16 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
+                {selectionMode && (
+                  <TableHead className="w-16 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   <input
                     type="checkbox"
                     className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
                   />
                 </TableHead>
+                )}
                 <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   STT
                 </TableHead>
                 <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 w-96">
                   Bài tập
                 </TableHead>
-                <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Topic
-                </TableHead>
-                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
+                {!selectionMode && (
+                  <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
+                    Topic
+                  </TableHead>
+                  )}
+                  {!selectionMode && (
+                  <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   % AC
-                </TableHead>
+                  </TableHead>   
+                    )}
+                              
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -86,12 +112,14 @@ export default function ProblemTable({
                   key={problem.id}
                   className="border-b border-slate-100/50 dark:border-slate-700/30 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-all duration-200 group"
                 >
-                  <TableCell className="text-center px-4 py-4">
+                  {selectionMode && (
+                    <TableCell className="text-center px-4 py-4">
                     <input
                       type="checkbox"
                       className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
                     />
                   </TableCell>
+                  )}
                   <TableCell className="text-center px-4 py-4">
                     <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
                       <code className="text-green-700 dark:text-green-300 font-bold text-sm">
@@ -101,14 +129,24 @@ export default function ProblemTable({
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="space-y-3">
-                      <Link href={`/problems/${problem.id}`}>
+                    {selectionMode ? (
                         <button
                           type="button"
                           className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+                          onClick={() => handleProblemClick(problem.id)}
                         >
                           {problem.title}
                         </button>
-                      </Link>
+                      ) : (
+                        <Link href={`/problems/${problem.id}`}>
+                          <button
+                            type="button"
+                            className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+                          >
+                            {problem.title}
+                          </button>
+                        </Link>
+                      )}
                       <div className="flex items-center gap-3 flex-wrap">
                         <div
                           className={`${getDifficultyColor(problem.difficulty)} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
@@ -133,14 +171,17 @@ export default function ProblemTable({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-4 py-4">
+                  {!selectionMode && (
+                    <TableCell className="text-center px-4 py-4">
                     <div className="space-y-2">
                       <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
                         {problem.topic}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-4 py-4">
+                  )}
+                  {!selectionMode && (
+                    <TableCell className="text-center px-4 py-4">
                     <div
                       className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${
                         problem.acceptanceRate >= 70
@@ -153,6 +194,8 @@ export default function ProblemTable({
                       {problem.acceptanceRate.toFixed(1)}%
                     </div>
                   </TableCell>
+                  )}
+                  
                 </TableRow>
               ))}
             </TableBody>
