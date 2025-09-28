@@ -20,7 +20,8 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const DEDICATED_PAGES_REGEX = /^\/problems\/(?:create|[^\/]+(?:\/(create|edit))?)$/;
+const dedicatedPagesPattern = process.env.DEDICATED_PAGES_PATTERN || 
+  "/problems/(?:create|[^/]+(?:/(create|edit))?)";
 
 
 export function AppProvider({ children, initialUser, initialIssuer }: AppProviderProps) {
@@ -28,12 +29,16 @@ export function AppProvider({ children, initialUser, initialIssuer }: AppProvide
   const [issuer, setIssuer] = useState<"local" | "moodle">(initialIssuer);
   const [isLoading, setIsLoading] = useState(false);
 
-
+  console.log("Initial Issuer:", initialIssuer);
 
   const pathname = usePathname();
 
+  const DEDICATED_PAGES_REGEX = new RegExp(`^${dedicatedPagesPattern}$`);
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
+  console.log("Current Pathname:", pathname);
+  console.log("Is in Dedicated Pages:", isInDedicatedPages);
   const shouldHideNavigation = issuer === "moodle" && isInDedicatedPages;
+  console.log("Should Hide Navigation:", shouldHideNavigation);
 
   const clearUserData = () => {
     setUser(null);

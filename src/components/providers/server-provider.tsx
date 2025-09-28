@@ -29,7 +29,7 @@ export async function ServerProvider({ children }: ServerProviderProps) {
         roles: decoded.roles || [],
       };
 
-      initialIssuer = decoded.iss?.includes("local") ? "local" : "moodle";
+      initialIssuer = decoded.iss?.includes(process.env.LOCAL_ISSUER_IDENTIFIER || "local_issuer") ? "local" : "moodle";
     } catch (err) {
       console.error("❌ Failed to decode access token:", err);
     }
