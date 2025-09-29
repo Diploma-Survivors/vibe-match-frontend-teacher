@@ -5,6 +5,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     accessToken?: string
     refreshToken?: string
+    deviceId?: string
     redirect?: string
     callbackUrl?: string
   }
@@ -12,6 +13,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user?: User
     accessToken?: string
+    deviceId?: string
     redirect?: string
   }
 }
@@ -20,6 +22,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     accessToken?: string
     refreshToken?: string
+    deviceId?: string
     accessTokenExpires?: number
     userId?: string | number
     error?: string

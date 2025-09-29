@@ -64,13 +64,34 @@ export default function ProblemTable({
     }
   };
 
+  const handleProblemSelection = (problemId: string) => {
+    setSelectedProblemId(problemId);
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedProblemId && onProblemSelect) {
+      onProblemSelect(selectedProblemId);
+    }
+  };
+
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50">
-        <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
-          📚 Danh sách bài tập
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
+            📚 Danh sách bài tập
+          </h3>
+          {selectionMode && (
+            <Button
+              onClick={handleConfirmSelection}
+              disabled={!selectedProblemId}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-lg"
+            >
+              Chọn bài tập
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto max-w-full">
@@ -80,11 +101,8 @@ export default function ProblemTable({
               <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
                 {selectionMode && (
                   <TableHead className="w-16 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
-                  />
-                </TableHead>
+                    Chọn
+                  </TableHead>
                 )}
                 <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   STT
@@ -96,13 +114,13 @@ export default function ProblemTable({
                   <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                     Topic
                   </TableHead>
-                  )}
-                  {!selectionMode && (
+                )}
+                {!selectionMode && (
                   <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  % AC
-                  </TableHead>   
-                    )}
-                              
+                    % AC
+                  </TableHead>
+                )}
+
 
               </TableRow>
             </TableHeader>
@@ -114,11 +132,15 @@ export default function ProblemTable({
                 >
                   {selectionMode && (
                     <TableCell className="text-center px-4 py-4">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
-                    />
-                  </TableCell>
+                      <input
+                        type="radio"
+                        name="problem-selection"
+                        value={problem.id}
+                        checked={selectedProblemId === problem.id}
+                        onChange={() => handleProblemSelection(problem.id)}
+                        className="w-4 h-4 text-green-600 focus:ring-green-500 border-2 border-slate-300"
+                      />
+                    </TableCell>
                   )}
                   <TableCell className="text-center px-4 py-4">
                     <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
@@ -129,7 +151,7 @@ export default function ProblemTable({
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="space-y-3">
-                    {selectionMode ? (
+                      {selectionMode ? (
                         <button
                           type="button"
                           className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
@@ -154,7 +176,7 @@ export default function ProblemTable({
                           {problem.difficulty}
                         </div>
                         <div className="flex flex-wrap gap-1">
-                          {problem.tags.slice(0, 2).map((tag) => (
+                          {/* {problem.tags.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
                               className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg"
@@ -166,36 +188,35 @@ export default function ProblemTable({
                             <span className="text-xs text-slate-500 dark:text-slate-400">
                               +{problem.tags.length - 2}
                             </span>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   {!selectionMode && (
                     <TableCell className="text-center px-4 py-4">
-                    <div className="space-y-2">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
-                        {problem.topic}
+                      <div className="space-y-2">
+                        <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
+                          {problem.topic}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
+                    </TableCell>
                   )}
                   {!selectionMode && (
                     <TableCell className="text-center px-4 py-4">
-                    <div
-                      className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${
-                        problem.acceptanceRate >= 70
+                      <div
+                        className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${problem.acceptanceRate >= 70
                           ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700"
                           : problem.acceptanceRate >= 40
                             ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700"
                             : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700"
-                      }`}
-                    >
-                      {problem.acceptanceRate.toFixed(1)}%
-                    </div>
-                  </TableCell>
+                          }`}
+                      >
+                        {problem.acceptanceRate.toFixed(1)}%
+                      </div>
+                    </TableCell>
                   )}
-                  
+
                 </TableRow>
               ))}
             </TableBody>
@@ -236,11 +257,10 @@ export default function ProblemTable({
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
-                    className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
-                      currentPage === pageNum
-                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                        : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
-                    }`}
+                    className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${currentPage === pageNum
+                      ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
+                      : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+                      }`}
                   >
                     {pageNum}
                   </Button>

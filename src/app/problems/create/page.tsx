@@ -2,42 +2,54 @@
 
 import { Button } from "@/components/ui/button";
 import ProblemForm from "@/components/problem-form";
-import { ProblemData } from "@/types/problem";
+import { ProblemData, ProblemDifficulty } from "@/types/problem";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ProblemService } from "@/services/problem-service";
+import { LtiService } from "@/services/lti-service";
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
 
-  const initialData: ProblemData = {
-    name: "",
-    description: "",
-    inputDescription: "",
-    outputDescription: "",
-    timeLimit: "1000",
-    memoryLimit: "256",
-    difficulty: "",
-    topic: "",
-    tags: [],
-    accessRange: "",
-    testCases: [
-      {
-        id: "1",
-        input: "",
-        expectedOutput: "",
-        isSample: true,
-      },
-    ],
-  };
 
-  const handleSave = async (data: ProblemData) => {
+  const handleSave = async (data: ProblemData, testcaseFile?: File) => {
     setIsSaving(true);
-    // Simulate saving
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Saving problem:", data);
-    setIsSaving(false);
-    // Here you would typically save to your backend
+
+    console.log(data);
+    try {
+      let result;
+
+      if (testcaseFile) {
+        result = await ProblemService.createProblemComplete(data, testcaseFile);
+      }
+
+      console.log("Problem created successfully:", result);
+
+      // Handle deep linking response
+      if (result.id) {
+        try {
+          await LtiService.sendDeepLinkingResponse(result.id);
+          console.log("Deep linking response sent successfully");
+        } catch (dlError) {
+          console.error("Failed to send deep linking response:", dlError);
+          // Continue even if deep linking fails
+        }
+
+        // Redirect to the newly created problem's detail page
+        // router.push(`/problems/${result.id}`);
+      } else {
+        // Fallback to problems list if no ID is returned
+        // router.push("/problems");
+      }
+    } catch (error) {
+      console.error("Failed to create problem:", error);
+      // You might want to show a toast notification here
+      alert("Failed to create problem. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -65,7 +77,6 @@ export default function CreateProblemPage() {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <ProblemForm
-          initialData={initialData}
           mode="create"
           onSave={handleSave}
           isSaving={isSaving}
