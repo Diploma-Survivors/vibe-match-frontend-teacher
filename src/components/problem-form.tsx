@@ -12,67 +12,89 @@ import {
 } from "@/components/ui/select";
 import {
   ACCESS_RANGE_OPTIONS,
-  TOPIC_OPTIONS,
-  TAG_OPTIONS,
   DIFFICULTY_OPTIONS,
   ProblemData,
-  TestCase,
+  TestcaseSample,
+  Tag,
+  Topic,
+  ProblemDifficulty,
 } from "@/types/problem";
-import { Plus, Save, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, Save, Trash2, Upload, FileText, X, FileSpreadsheet } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ProblemService } from "@/services/problem-service";
 
 interface ProblemFormProps {
-  initialData?: ProblemData;
   mode: "create" | "edit" | "view";
-  onSave?: (data: ProblemData) => Promise<void>;
+  onSave: (data: ProblemData, testcaseFile?: File) => Promise<void>;
   isSaving?: boolean;
   title: string;
   subtitle: string;
 }
 
 export default function ProblemForm({
-  initialData,
   mode,
   onSave,
   isSaving = false,
   title,
   subtitle,
 }: ProblemFormProps) {
-  
-  const [problemData, setProblemData] = useState<ProblemData>(
-    initialData ?? {
-      name: "",
+
+  const [problemData, setProblemData] = useState<ProblemData>({
+      title: "",
       description: "",
       inputDescription: "",
       outputDescription: "",
-      timeLimit: "1000",
-      memoryLimit: "256",
-      difficulty: "Dễ",
-      topic: "implementation",
+      maxScore: 100,
+      timeLimitMs: 1000,
+      memoryLimitKb: 262144,
+      difficulty: ProblemDifficulty.EASY,
       tags: [],
-      accessRange: "public",
-      testCases: [
+      topics: [],
+      testcase: "",
+      testcaseSamples: [
         {
-          id: "1",
           input: "",
-          expectedOutput: "",
-          isSample: true,
+          output: "",
         },
       ],
     }
   );
+
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
+  const [testcaseFile, setTestcaseFile] = useState<File | null>(null);
   const [currentTestPage, setCurrentTestPage] = useState(1);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isReadOnly = mode === "view";
 
+  // Load tags and topics when component mounts
+  useEffect(() => {
+    const loadTagsAndTopics = async () => {
+      try {
+        const [tagsData, topicsData] = await Promise.all([
+          ProblemService.getTags(),
+          ProblemService.getTopics(),
+        ]);
+        setAvailableTags(tagsData);
+        setAvailableTopics(topicsData);
+      } catch (error) {
+        console.error("Failed to load tags and topics:", error);
+      }
+    };
+
+    loadTagsAndTopics();
+  }, []);
+
   // Test case pagination constants
   const testCasesPerPage = 3;
-  const totalTestPages = Math.ceil(problemData.testCases.length / testCasesPerPage);
+  const totalTestPages = Math.ceil(problemData.testcaseSamples.length / testCasesPerPage);
   const startTestIndex = (currentTestPage - 1) * testCasesPerPage;
-  const endTestIndex = Math.min(startTestIndex + testCasesPerPage, problemData.testCases.length);
-  const currentTestCases = problemData.testCases.slice(startTestIndex, endTestIndex);
+  const endTestIndex = Math.min(startTestIndex + testCasesPerPage, problemData.testcaseSamples.length);
+  const currentTestCases = problemData.testcaseSamples.slice(startTestIndex, endTestIndex);
 
-  const handleInputChange = (field: keyof ProblemData, value: string | string[]) => {
+  const handleInputChange = (field: keyof ProblemData, value: string | string[] | number) => {
     if (isReadOnly) return;
     setProblemData((prev) => ({
       ...prev,
@@ -80,67 +102,155 @@ export default function ProblemForm({
     }));
   };
 
-  const handleTagChange = (tag: string) => {
+  const handleTagChange = (tagId: string) => {
     if (isReadOnly) return;
     setProblemData((prev) => {
       const currentTags = prev.tags || [];
-      const isSelected = currentTags.includes(tag);
-      
+      const isSelected = currentTags.includes(tagId);
+
       if (isSelected) {
         return {
           ...prev,
-          tags: currentTags.filter(t => t !== tag)
+          tags: currentTags.filter((t) => t !== tagId)
         };
       } else {
         return {
           ...prev,
-          tags: [...currentTags, tag]
+          tags: [...currentTags, tagId]
+        };
+      }
+    });
+  };
+
+  const handleTopicChange = (topicId: string) => {
+    if (isReadOnly) return;
+    setProblemData((prev) => {
+      const currentTopics = prev.topics || [];
+      const isSelected = currentTopics.includes(topicId);
+
+      if (isSelected) {
+        return {
+          ...prev,
+          topics: currentTopics.filter((t) => t !== topicId)
+        };
+      } else {
+        return {
+          ...prev,
+          topics: [...currentTopics, topicId]
         };
       }
     });
   };
 
   const handleTestCaseChange = (
-    id: string,
-    field: keyof TestCase,
-    value: string | boolean
+    index: number,
+    field: keyof TestcaseSample,
+    value: string
   ) => {
     if (isReadOnly) return;
     setProblemData((prev) => ({
       ...prev,
-      testCases: prev.testCases.map((testCase) =>
-        testCase.id === id ? { ...testCase, [field]: value } : testCase
+      testcaseSamples: prev.testcaseSamples.map((testCase, i) =>
+        i === index ? { ...testCase, [field]: value } : testCase
       ),
     }));
   };
 
   const addTestCase = () => {
     if (isReadOnly) return;
-    const newId = (problemData.testCases.length + 1).toString();
     setProblemData((prev) => ({
       ...prev,
-      testCases: [
-        ...prev.testCases,
+      testcaseSamples: [
+        ...prev.testcaseSamples,
         {
-          id: newId,
           input: "",
-          expectedOutput: "",
-          isSample: false,
+          output: "",
         },
       ],
     }));
   };
 
-  const removeTestCase = (id: string) => {
-    if (isReadOnly || problemData.testCases.length <= 1) return;
+  const removeTestCase = (index: number) => {
+    if (isReadOnly || problemData.testcaseSamples.length <= 1) return;
     setProblemData((prev) => ({
       ...prev,
-      testCases: prev.testCases.filter((testCase) => testCase.id !== id),
+      testcaseSamples: prev.testcaseSamples.filter((_, i) => i !== index),
     }));
   };
 
-  const handleSave = () => {
-    onSave?.(problemData);
+  // File upload handlers
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      const allowedTypes = [
+        "text/plain",
+        "text/csv",
+        "application/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ];
+      const allowedExtensions = [".txt", ".csv", ".xlsx", ".xls"];
+
+      const hasValidType = allowedTypes.includes(file.type);
+      const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+      if (hasValidType || hasValidExtension) {
+        setTestcaseFile(file);
+      } else {
+        alert("Chỉ chấp nhận file .txt, .csv, .xlsx, .xls");
+      }
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const allowedTypes = [
+        "text/plain",
+        "text/csv",
+        "application/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ];
+      const allowedExtensions = [".txt", ".csv", ".xlsx", ".xls"];
+
+      const hasValidType = allowedTypes.includes(file.type);
+      const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+
+      if (hasValidType || hasValidExtension) {
+        setTestcaseFile(file);
+      } else {
+        alert("Chỉ chấp nhận file .txt, .csv, .xlsx, .xls");
+      }
+    }
+  };
+
+  const removeFile = () => {
+    setTestcaseFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSave = async () => {
+    // callback
+    if (onSave) {
+      onSave(problemData, testcaseFile ?? undefined);
+    }
   };
 
   return (
@@ -163,15 +273,15 @@ export default function ProblemForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Problem Name */}
+          {/* Problem Title */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Tên bài tập <span className="text-red-500">*</span>
             </label>
             <Input
               placeholder="Nhập tên bài tập..."
-              value={problemData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              value={problemData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
               disabled={isReadOnly}
             />
@@ -221,15 +331,15 @@ export default function ProblemForm({
         </CardContent>
       </Card>
 
-      {/* Constraints */}
+      {/* Constraints & Settings */}
       <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
-            Giới hạn
+            Cài đặt & Giới hạn
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Time Limit */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -238,8 +348,8 @@ export default function ProblemForm({
               <Input
                 type="number"
                 placeholder="1000"
-                value={problemData.timeLimit}
-                onChange={(e) => handleInputChange("timeLimit", e.target.value)}
+                value={problemData.timeLimitMs}
+                onChange={(e) => handleInputChange("timeLimitMs", parseInt(e.target.value) || 1000)}
                 className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 disabled={isReadOnly}
               />
@@ -248,22 +358,60 @@ export default function ProblemForm({
             {/* Memory Limit */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Giới hạn bộ nhớ (MB)
+                Giới hạn bộ nhớ (KB)
               </label>
               <Input
                 type="number"
-                placeholder="256"
-                value={problemData.memoryLimit}
-                onChange={(e) => handleInputChange("memoryLimit", e.target.value)}
+                placeholder="262144"
+                value={problemData.memoryLimitKb}
+                onChange={(e) => handleInputChange("memoryLimitKb", parseInt(e.target.value) || 262144)}
+                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
+                disabled={isReadOnly}
+              />
+            </div>
+
+            {/* Max Score */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Điểm tối đa
+              </label>
+              <Input
+                type="number"
+                placeholder="100"
+                value={problemData.maxScore}
+                onChange={(e) => handleInputChange("maxScore", parseInt(e.target.value) || 100)}
                 className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 disabled={isReadOnly}
               />
             </div>
           </div>
+
+          {/* Difficulty */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mức độ khó <span className="text-red-500">*</span>
+            </label>
+            <Select
+              value={problemData.difficulty}
+              onValueChange={(value) => handleInputChange("difficulty", value)}
+              disabled={isReadOnly}
+            >
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
+                <SelectValue placeholder="Chọn mức độ khó" />
+              </SelectTrigger>
+              <SelectContent>
+                {DIFFICULTY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Problem Classification */}
+      {/* Topics & Tags */}
       <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -271,168 +419,182 @@ export default function ProblemForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Difficulty */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Mức độ <span className="text-red-500">*</span>
-              </label>
-              <Select
-                value={problemData.difficulty}
-                onValueChange={(value) => handleInputChange("difficulty", value)}
-                disabled={isReadOnly}
-              >
-                <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                  <SelectValue placeholder="Chọn mức độ" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIFFICULTY_OPTIONS.filter((option) => option.value !== "all").map(
-                    (option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Topic */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Dạng bài <span className="text-red-500">*</span>
-              </label>
-              <Select
-                value={problemData.topic}
-                onValueChange={(value) => handleInputChange("topic", value)}
-                disabled={isReadOnly}
-              >
-                <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                  <SelectValue placeholder="Chọn dạng bài" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TOPIC_OPTIONS.filter((option) => option.value !== "all").map(
-                    (option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tags - Multiple Select */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Tags
-              </label>
-              <Select disabled={isReadOnly}>
-                <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                  <SelectValue 
-                    placeholder={
-                      problemData.tags && problemData.tags.length > 0
-                        ? `${problemData.tags.length} tag được chọn`
-                        : "Chọn tags..."
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                  {TAG_OPTIONS.filter(option => option.value !== "all").map((option) => (
+          {/* Topics */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Chủ đề
+            </label>
+            <div className="space-y-3">
+              {availableTopics.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availableTopics.map((topic) => (
                     <div
-                      key={option.value}
-                      className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleTagChange(option.value);
-                      }}
+                      key={topic.id}
+                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${problemData.topics?.includes(topic.id)
+                          ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700"
+                          : "bg-slate-50 border-slate-200 hover:bg-slate-100 dark:bg-slate-700/30 dark:border-slate-600 dark:hover:bg-slate-700/50"
+                        }`}
+                      onClick={() => !isReadOnly && handleTopicChange(topic.id)}
                     >
                       <input
                         type="checkbox"
-                        checked={problemData.tags?.includes(option.value) || false}
-                        onChange={() => {}}
-                        className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                        checked={problemData.topics?.includes(topic.id) || false}
+                        onChange={() => { }}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         disabled={isReadOnly}
                       />
-                      <span className="text-sm">{option.label}</span>
+                      <span className="text-sm font-medium">{topic.name}</span>
                     </div>
                   ))}
-                  {problemData.tags && problemData.tags.length > 0 && !isReadOnly && (
-                    <div className="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleInputChange("tags", []);
-                        }}
-                        className="w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      >
-                        Xóa tất cả tags
-                      </button>
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              
-              {/* Display selected tags */}
-              {problemData.tags && problemData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {problemData.tags.map((tag) => {
-                    const tagOption = TAG_OPTIONS.find(option => option.value === tag);
-                    return (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md text-xs"
-                      >
-                        {tagOption?.label || tag}
-                        {!isReadOnly && (
-                          <button
-                            onClick={() => handleTagChange(tag)}
-                            className="ml-1 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </span>
-                    );
-                  })}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-slate-500">
+                  Đang tải chủ đề...
                 </div>
               )}
             </div>
           </div>
 
-          {/* Access Range */}
+          {/* Tags */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Phạm vi truy cập <span className="text-red-500">*</span>
+              Tags
             </label>
-            <Select
-              value={problemData.accessRange}
-              onValueChange={(value) => handleInputChange("accessRange", value)}
-              disabled={isReadOnly}
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                <SelectValue placeholder="Chọn phạm vi truy cập" />
-              </SelectTrigger>
-              <SelectContent>
-                {ACCESS_RANGE_OPTIONS.filter((option) => option.value !== "all").map(
-                  (option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  )
-                )}
-              </SelectContent>
-            </Select>
+            <div className="space-y-3">
+              {availableTags.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availableTags.map((tag) => (
+                    <div
+                      key={tag.id}
+                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${problemData.tags?.includes(tag.id)
+                          ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700"
+                          : "bg-slate-50 border-slate-200 hover:bg-slate-100 dark:bg-slate-700/30 dark:border-slate-600 dark:hover:bg-slate-700/50"
+                        }`}
+                      onClick={() => !isReadOnly && handleTagChange(tag.id)}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={problemData.tags?.includes(tag.id) || false}
+                        onChange={() => { }}
+                        className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                        disabled={isReadOnly}
+                      />
+                      <span className="text-sm font-medium">{tag.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-slate-500">
+                  Đang tải tags...
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Test Cases */}
+      {/* Test Cases Upload */}
+      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            Test Cases File (Tùy chọn)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div
+            className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${dragActive
+                ? "border-green-400 bg-green-50 dark:bg-green-900/20"
+                : "border-slate-300 dark:border-slate-600"
+              }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            {testcaseFile ? (
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
+                  {testcaseFile.name.toLowerCase().endsWith('.csv') ||
+                    testcaseFile.name.toLowerCase().endsWith('.xlsx') ||
+                    testcaseFile.name.toLowerCase().endsWith('.xls') ? (
+                    <FileSpreadsheet className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  ) : (
+                    <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                    {testcaseFile.name}
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {(testcaseFile.size / 1024).toFixed(2)} KB
+                  </p>
+                  <span className="inline-block px-2 py-1 mt-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md">
+                    {testcaseFile.name.split('.').pop()?.toUpperCase()}
+                  </span>
+                </div>
+                <Button
+                  onClick={removeFile}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <X className="w-4 h-4" />
+                  Xóa file
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-slate-100 dark:bg-slate-700 rounded-full">
+                  <Upload className="w-8 h-8 text-slate-500" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
+                    Tải lên file test cases
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                    Kéo thả file .txt, .csv, .xlsx, .xls vào đây hoặc click để chọn file
+                  </p>
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                    className="gap-2"
+                    disabled={isReadOnly}
+                  >
+                    <Upload className="w-4 h-4" />
+                    Chọn file
+                  </Button>
+                </div>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.csv,.xlsx,.xls,text/plain,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              onChange={handleFileSelect}
+              className="hidden"
+              disabled={isReadOnly}
+            />
+          </div>
+          <div className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+            <p><strong>Lưu ý:</strong> File test cases sẽ được ưu tiên sử dụng thay vì test cases thủ công bên dưới.</p>
+            <p>Hỗ trợ các định dạng: .txt, .csv, .xlsx, .xls</p>
+            <p><strong>Định dạng file:</strong></p>
+            <ul className="ml-4 space-y-1">
+              <li>• <strong>TXT:</strong> Mỗi dòng là một test case, format: input|output</li>
+              <li>• <strong>CSV:</strong> 2 cột: input, output</li>
+              <li>• <strong>XLSX/XLS:</strong> 2 cột đầu tiên là input và output</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Manual Test Cases */}
       <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
-              Test Cases ({problemData.testCases.length})
+              Test Cases Mẫu ({problemData.testcaseSamples.length})
             </CardTitle>
             {!isReadOnly && (
               <Button
@@ -453,53 +615,26 @@ export default function ProblemForm({
             const actualIndex = startTestIndex + index;
             return (
               <div
-                key={testCase.id}
-                className="p-6 bg-slate-50/50 dark:bg-slate-700/30 rounded-xl border border-slate-200/50 dark:border-slate-600/50"
+                key={actualIndex}
+                className="p-6 bg-gradient-to-r from-slate-50/50 to-blue-50/30 dark:from-slate-700/30 dark:to-blue-900/20 rounded-xl border border-slate-200/50 dark:border-slate-600/50"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                     Test Case {actualIndex + 1}
                   </h3>
-                  <div className="flex items-center gap-3">
-                    {/* Sample Test Case Toggle */}
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Loại test case:
-                      </label>
-                      <Select
-                        value={testCase.isSample ? "sample" : "hidden"}
-                        onValueChange={(value) =>
-                          handleTestCaseChange(
-                            testCase.id,
-                            "isSample",
-                            value === "sample"
-                          )
-                        }
-                        disabled={isReadOnly}
-                      >
-                        <SelectTrigger className="w-32 h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sample">Mẫu</SelectItem>
-                          <SelectItem value="hidden">Ẩn</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {!isReadOnly && problemData.testCases.length > 1 && (
-                      <Button
-                        onClick={() => removeTestCase(testCase.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
+                  {!isReadOnly && problemData.testcaseSamples.length > 1 && (
+                    <Button
+                      onClick={() => removeTestCase(actualIndex)}
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Input */}
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -509,7 +644,7 @@ export default function ProblemForm({
                       placeholder="Nhập dữ liệu đầu vào..."
                       value={testCase.input}
                       onChange={(e) =>
-                        handleTestCaseChange(testCase.id, "input", e.target.value)
+                        handleTestCaseChange(actualIndex, "input", e.target.value)
                       }
                       className="w-full h-24 p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 resize-none text-sm font-mono"
                       disabled={isReadOnly}
@@ -523,13 +658,9 @@ export default function ProblemForm({
                     </label>
                     <textarea
                       placeholder="Nhập kết quả mong đợi..."
-                      value={testCase.expectedOutput}
+                      value={testCase.output}
                       onChange={(e) =>
-                        handleTestCaseChange(
-                          testCase.id,
-                          "expectedOutput",
-                          e.target.value
-                        )
+                        handleTestCaseChange(actualIndex, "output", e.target.value)
                       }
                       className="w-full h-24 p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 resize-none text-sm font-mono"
                       disabled={isReadOnly}
@@ -539,14 +670,14 @@ export default function ProblemForm({
               </div>
             );
           })}
-          
+
           {/* Test Cases Pagination */}
           {totalTestPages > 1 && (
             <div className="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
               <div className="text-sm text-slate-600 dark:text-slate-400">
-                Hiển thị test case {startTestIndex + 1}-{endTestIndex} trong tổng số {problemData.testCases.length}
+                Hiển thị test case {startTestIndex + 1}-{endTestIndex} trong tổng số {problemData.testcaseSamples.length}
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -557,7 +688,7 @@ export default function ProblemForm({
                 >
                   Trước
                 </Button>
-                
+
                 <div className="flex items-center gap-1">
                   {Array.from({ length: Math.min(5, totalTestPages) }, (_, i) => {
                     let pageNum: number;
@@ -577,18 +708,17 @@ export default function ProblemForm({
                         variant={currentTestPage === pageNum ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCurrentTestPage(pageNum)}
-                        className={`w-8 h-8 p-0 text-xs ${
-                          currentTestPage === pageNum
+                        className={`w-8 h-8 p-0 text-xs ${currentTestPage === pageNum
                             ? "bg-green-600 text-white"
                             : "border-slate-300 dark:border-slate-600"
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </Button>
                     );
                   })}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -610,7 +740,7 @@ export default function ProblemForm({
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg"
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all"
           >
             <Save className="w-5 h-5 mr-2" />
             {isSaving ? "Đang lưu..." : mode === "create" ? "Tạo bài tập" : "Cập nhật bài tập"}

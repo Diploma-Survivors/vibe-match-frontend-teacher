@@ -1,7 +1,7 @@
 'use client'
 
 import axios from 'axios';
-import {getSession} from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 // Create a custom Axios instance
 const clientApi = axios.create({
@@ -17,6 +17,9 @@ clientApi.interceptors.request.use(
     const session = await getSession();
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
+    if (session?.deviceId) {
+      config.headers['X-Device-ID'] = session.deviceId;
     }
     return config;
   },

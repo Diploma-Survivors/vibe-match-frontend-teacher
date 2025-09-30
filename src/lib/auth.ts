@@ -6,6 +6,22 @@ import { getServerSession } from "next-auth"; // Add this import
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+declare module "next-auth" {
+  interface Session {
+    deviceId?: string;
+    accessToken?: string;
+    redirect?: string;
+  }
+  interface User {
+    deviceId?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    redirect?: string;
+    callbackUrl?: string;
+    id?: string;
+  }
+}
+
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     const response = await fetch(
@@ -49,6 +65,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         accessToken: { label: "Access Token", type: "text" },
         refreshToken: { label: "Refresh Token", type: "text" },
+        deviceId: { label: "Device ID", type: "text" },
         redirect: { label: "Redirect", type: "text" },
         callbackUrl: { label: "Callback URL", type: "text" },
       },
@@ -58,6 +75,7 @@ export const authOptions: NextAuthOptions = {
           id: "sso-user",
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
+          deviceId: credentials.deviceId,
           redirect: credentials.redirect,
           callbackUrl: credentials.callbackUrl,
         };
@@ -72,6 +90,7 @@ export const authOptions: NextAuthOptions = {
         token.refreshToken = user.refreshToken;
         token.redirect = user.redirect;
         token.callbackUrl = user.callbackUrl;
+        token.deviceId = user.deviceId;
 
         try {
           const decoded: DecodedAccessToken = jwtDecode(
@@ -103,6 +122,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       session.redirect = token.redirect as string;
+      session.deviceId = token.deviceId as string;
       return session;
     },
     async redirect({ url }) {
