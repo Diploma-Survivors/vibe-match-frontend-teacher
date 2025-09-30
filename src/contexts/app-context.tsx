@@ -20,7 +20,7 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const dedicatedPagesPattern = process.env.DEDICATED_PAGES_PATTERN || 
+const dedicatedPagesPattern = process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN || 
   "/problems/(?:create|[^/]+(?:/(create|edit))?)";
 
 
@@ -28,7 +28,7 @@ export function AppProvider({ children, initialUser, initialIssuer }: AppProvide
   const [user, setUser] = useState<UserInfo | null>(initialUser);
   const [issuer, setIssuer] = useState<"local" | "moodle">(initialIssuer);
   const [isLoading, setIsLoading] = useState(false);
-
+  
 
 
   const pathname = usePathname();
