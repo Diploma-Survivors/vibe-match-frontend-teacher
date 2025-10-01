@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import ProblemForm from '@/components/problem-form';
-import { ProblemData, ProblemDifficulty } from '@/types/problem';
+import { Button } from '@/components/ui/button';
+import { LtiService } from '@/services/lti-service';
+import { ProblemService } from '@/services/problem-service';
+import { type ProblemData, ProblemDifficulty } from '@/types/problem';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ProblemService } from '@/services/problem-service';
-import { LtiService } from '@/services/lti-service';
+import { useState } from 'react';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -18,7 +18,7 @@ export default function CreateProblemPage() {
 
     console.log('Data', data);
     try {
-      let result;
+      let result: any;
 
       if (testcaseFile) {
         result = await ProblemService.createProblemComplete(data, testcaseFile);

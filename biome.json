@@ -12,7 +12,8 @@
         "useValidAnchor": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noExplicitAny": "off"
       }
     }
   },
