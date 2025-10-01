@@ -2,6 +2,7 @@
 
 import ProblemForm from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/app-context';
 import { LtiService } from '@/services/lti-service';
 import { ProblemService } from '@/services/problem-service';
 import { type ProblemData, ProblemDifficulty } from '@/types/problem';
@@ -12,6 +13,7 @@ import { useState } from 'react';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const { shouldHideNavigation } = useApp();
 
   const handleSave = async (data: ProblemData, testcaseFile?: File) => {
     setIsSaving(true);
@@ -58,16 +60,29 @@ export default function CreateProblemPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/problems">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Quay lại danh sách
-                </Button>
-              </Link>
+              {shouldHideNavigation ? (
+                <Link href="/options">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại trang lựa chọn
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/problems">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại danh sách
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

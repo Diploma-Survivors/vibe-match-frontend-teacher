@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ContestForm from "@/components/contest-form";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import ContestForm from '@/components/contest-form';
+import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/app-context';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface ContestData {
   name: string;
@@ -18,14 +19,15 @@ interface ContestData {
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const { shouldHideNavigation } = useApp();
 
   const initialData: ContestData = {
-    name: "",
-    description: "",
-    startTime: "",
-    endTime: "",
+    name: '',
+    description: '',
+    startTime: '',
+    endTime: '',
     duration: 180,
-    accessRange: "public",
+    accessRange: 'public',
     problems: [],
   };
 
@@ -33,7 +35,7 @@ export default function CreateContestPage() {
     setIsSaving(true);
     // Simulate saving
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Creating contest:", data);
+    console.log('Creating contest:', data);
     setIsSaving(false);
     // Here you would typically save to your backend
   };
@@ -45,16 +47,29 @@ export default function CreateContestPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/contests">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Quay lại danh sách
-                </Button>
-              </Link>
+              {shouldHideNavigation ? (
+                <Link href="/options">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại trang lựa chọn
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/contests">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại danh sách
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
