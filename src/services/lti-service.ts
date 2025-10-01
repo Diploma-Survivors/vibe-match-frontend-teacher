@@ -2,15 +2,13 @@ import clientApi from "@/lib/apis/axios-client";
 import { getSession } from "next-auth/react";
 
 export class LtiService {
-
   private static async getDeviceId(): Promise<string> {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const session = await getSession();
-      return session?.deviceId || '';
+      return session?.deviceId || "";
     }
-    return '';
+    return "";
   }
-
 
   // Send deep linking response
   static async sendDeepLinkingResponse(problemId: string): Promise<any> {

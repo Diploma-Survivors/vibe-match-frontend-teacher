@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { ProblemFilters } from "@/types/problem";
 import { useEffect, useMemo, useState } from "react";
@@ -13,7 +13,7 @@ const ITEMS_PER_PAGE = 10;
 
 const mockFetchwithPromise = async () => {
   await new Promise((resolve) => setTimeout(resolve, 5000));
-}
+};
 
 interface ProblemTableProps {
   mode: "view" | "select";
@@ -22,7 +22,7 @@ interface ProblemTableProps {
 
 export default function ProblemList({
   mode,
-  onProblemView
+  onProblemView,
 }: ProblemTableProps) {
   mockFetchwithPromise();
 
@@ -47,13 +47,15 @@ export default function ProblemList({
     fetchProblems();
   }, []);
 
-  const handleProblemSelectForDeeplinkingResponse = async (problemId: string) => {
+  const handleProblemSelectForDeeplinkingResponse = async (
+    problemId: string
+  ) => {
     try {
       const response = await LtiService.sendDeepLinkingResponse(problemId);
     } catch (error) {
       console.log("FAID");
     }
-  }
+  };
 
   // First, fix the filtering to handle tags array
   const filteredAndSortedProblems = useMemo(() => {
@@ -79,7 +81,7 @@ export default function ProblemList({
       }
       // Handle tags array filtering
       if (filters.tags && filters.tags.length > 0) {
-        const hasMatchingTag = filters.tags.some(tag =>
+        const hasMatchingTag = filters.tags.some((tag) =>
           problem.tags?.includes(tag)
         );
         if (!hasMatchingTag) {
@@ -170,7 +172,6 @@ export default function ProblemList({
     setCurrentPage(1);
   };
 
-
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
@@ -248,5 +249,5 @@ export default function ProblemList({
         </div>
       </div>
     </div>
-  )
+  );
 }

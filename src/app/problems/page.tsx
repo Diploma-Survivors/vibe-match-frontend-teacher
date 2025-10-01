@@ -20,7 +20,7 @@ const ITEMS_PER_PAGE = 10;
 
 const mockFetchwithPromise = async () => {
   await new Promise((resolve) => setTimeout(resolve, 5000));
-}
+};
 
 export default function ProblemsPage() {
   mockFetchwithPromise();
@@ -28,75 +28,73 @@ export default function ProblemsPage() {
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>("id");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");         
-
-
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   // First, fix the filtering to handle tags array
-const filteredAndSortedProblems = useMemo(() => {
-  // First filter
-  const filtered = mockProblems.filter((problem) => {
-    if (
-      filters.id &&
-      !problem.id.toLowerCase().includes(filters.id.toLowerCase())
-    ) {
-      return false;
-    }
-    if (
-      filters.title &&
-      !problem.title.toLowerCase().includes(filters.title.toLowerCase())
-    ) {
-      return false;
-    }
-    if (filters.difficulty && problem.difficulty !== filters.difficulty) {
-      return false;
-    }
-    if (filters.topic && problem.topic !== filters.topic) {
-      return false;
-    }
-    // Handle tags array filtering
-    if (filters.tags && filters.tags.length > 0) {
-      const hasMatchingTag = filters.tags.some(tag => 
-        problem.tags?.includes(tag)
-      );
-      if (!hasMatchingTag) {
+  const filteredAndSortedProblems = useMemo(() => {
+    // First filter
+    const filtered = mockProblems.filter((problem) => {
+      if (
+        filters.id &&
+        !problem.id.toLowerCase().includes(filters.id.toLowerCase())
+      ) {
         return false;
       }
-    }
-    if (filters.accessRange && problem.accessRange !== filters.accessRange) {
-      return false;
-    }
-    return true;
-  });
+      if (
+        filters.title &&
+        !problem.title.toLowerCase().includes(filters.title.toLowerCase())
+      ) {
+        return false;
+      }
+      if (filters.difficulty && problem.difficulty !== filters.difficulty) {
+        return false;
+      }
+      if (filters.topic && problem.topic !== filters.topic) {
+        return false;
+      }
+      // Handle tags array filtering
+      if (filters.tags && filters.tags.length > 0) {
+        const hasMatchingTag = filters.tags.some((tag) =>
+          problem.tags?.includes(tag)
+        );
+        if (!hasMatchingTag) {
+          return false;
+        }
+      }
+      if (filters.accessRange && problem.accessRange !== filters.accessRange) {
+        return false;
+      }
+      return true;
+    });
 
-// Then sort - fix the type assertion
-filtered.sort((a, b) => {
-  let aValue: string | number = a[sortField];
-  let bValue: string | number = b[sortField];
+    // Then sort - fix the type assertion
+    filtered.sort((a, b) => {
+      let aValue: string | number = a[sortField];
+      let bValue: string | number = b[sortField];
 
-  // Handle special sorting for difficulty
-  if (sortField === "difficulty") {
-    const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
-    aValue =
-      difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
-    bValue =
-      difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
-  }
+      // Handle special sorting for difficulty
+      if (sortField === "difficulty") {
+        const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
+        aValue =
+          difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
+        bValue =
+          difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
+      }
 
-  // Handle string sorting
-  if (typeof aValue === "string" && typeof bValue === "string") {
-    aValue = aValue.toLowerCase();
-    bValue = bValue.toLowerCase();
-  }
+      // Handle string sorting
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
 
-  if (sortOrder === "asc") {
-    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-  }
-  return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-});
+      if (sortOrder === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      }
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    });
 
-  return filtered;
-}, [filters, sortField, sortOrder]);
+    return filtered;
+  }, [filters, sortField, sortOrder]);
 
   // Paginate filtered and sorted problems
   const paginatedProblems = useMemo(() => {
@@ -172,7 +170,7 @@ filtered.sort((a, b) => {
           </div>
         </div>
       </div>
-      <ProblemList mode="view"/>
+      <ProblemList mode="view" />
     </div>
   );
 }

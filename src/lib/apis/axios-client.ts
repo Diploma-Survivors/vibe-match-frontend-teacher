@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import axios from 'axios';
+import axios from "axios";
 import { getSession } from "next-auth/react";
 
 // Create a custom Axios instance
 const clientApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/v1', // Replace with your API base URL
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/v1", // Replace with your API base URL
   timeout: 5000, // Request timeout in milliseconds
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -19,7 +19,7 @@ clientApi.interceptors.request.use(
       config.headers.Authorization = `Bearer ${session.accessToken}`;
     }
     if (session?.deviceId) {
-      config.headers['X-Device-ID'] = session.deviceId;
+      config.headers["X-Device-ID"] = session.deviceId;
     }
     return config;
   },
@@ -37,7 +37,7 @@ clientApi.interceptors.response.use(
     // Handle global errors, e.g., redirect to login on 401 unauthorized
     if (error.response && error.response.status === 401) {
       // Handle unauthorized errors (e.g., redirect to login page)
-      console.error('Unauthorized, redirecting to login...');
+      console.error("Unauthorized, redirecting to login...");
       // Example: router.push('/login'); (if you have access to router)
     }
     return Promise.reject(error);

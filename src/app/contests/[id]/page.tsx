@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/table";
 import ContestForm from "@/components/contest-form";
 import { mockContests } from "@/lib/data/mock-contests";
-import {
-  ArrowLeft,
-  Edit,
-} from "lucide-react";
+import { ArrowLeft, Edit } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useState, useEffect, use } from "react";
@@ -89,14 +86,13 @@ export default function ContestDetailPage() {
   const params = useParams();
   const contestId = params.id;
 
-  
   const [contestData, setContestData] = useState<ContestData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load existing contest data
   useEffect(() => {
     const loadContestData = () => {
-      const existingContest = mockContests.find(c => c.id === contestId);
+      const existingContest = mockContests.find((c) => c.id === contestId);
       if (existingContest) {
         setContestData({
           name: existingContest.name,
@@ -142,7 +138,9 @@ export default function ContestDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">Đang tải dữ liệu cuộc thi...</p>
+          <p className="text-slate-600 dark:text-slate-400">
+            Đang tải dữ liệu cuộc thi...
+          </p>
         </div>
       </div>
     );

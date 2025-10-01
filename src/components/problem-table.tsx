@@ -53,7 +53,9 @@ export default function ProblemTable({
   onProblemSelect,
   onProblemView,
 }: ProblemTableProps) {
-  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
+  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
+    null
+  );
   const [showProblemDetail, setShowProblemDetail] = useState(false);
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,8 +122,6 @@ export default function ProblemTable({
                     % AC
                   </TableHead>
                 )}
-
-
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -205,18 +205,18 @@ export default function ProblemTable({
                   {!selectionMode && (
                     <TableCell className="text-center px-4 py-4">
                       <div
-                        className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${problem.acceptanceRate >= 70
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700"
-                          : problem.acceptanceRate >= 40
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700"
-                            : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700"
-                          }`}
+                        className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${
+                          problem.acceptanceRate >= 70
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700"
+                            : problem.acceptanceRate >= 40
+                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700"
+                              : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700"
+                        }`}
                       >
                         {problem.acceptanceRate.toFixed(1)}%
                       </div>
                     </TableCell>
                   )}
-
                 </TableRow>
               ))}
             </TableBody>
@@ -257,10 +257,11 @@ export default function ProblemTable({
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
-                    className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${currentPage === pageNum
-                      ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                      : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
-                      }`}
+                    className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
+                      currentPage === pageNum
+                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
+                        : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+                    }`}
                   >
                     {pageNum}
                   </Button>

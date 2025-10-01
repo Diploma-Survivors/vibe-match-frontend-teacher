@@ -130,7 +130,7 @@ export default function Header() {
           className="flex items-center gap-2 bg-black hover:bg-black/90 text-white"
         >
           <Wallet size={18} />
-          {walletConnected ? "Vu The Vy"  : "Vu "}
+          {walletConnected ? "Vu The Vy" : "Vu "}
         </Button>
       </div>
     </nav>

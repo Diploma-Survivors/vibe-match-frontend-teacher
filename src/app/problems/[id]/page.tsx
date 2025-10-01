@@ -12,21 +12,23 @@ import { mockProblems } from "@/lib/data/mock-problems";
 export default function ProblemDetailsPage() {
   const params = useParams();
   const problemId = params.id as string;
-  
+
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load existing problem data
   useEffect(() => {
     const loadProblemData = () => {
-      const existingProblem = mockProblems.find(p => p.id === problemId);
+      const existingProblem = mockProblems.find((p) => p.id === problemId);
       if (existingProblem) {
         // Convert existing problem to view format
         setProblemData({
           name: existingProblem.title,
-          description: "Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].",
+          description:
+            "Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].",
           inputDescription: "Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)",
-          outputDescription: "In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng",
+          outputDescription:
+            "In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng",
           timeLimit: "2000",
           memoryLimit: "256",
           difficulty: existingProblem.difficulty,
@@ -71,7 +73,9 @@ export default function ProblemDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">Đang tải dữ liệu bài tập...</p>
+          <p className="text-slate-600 dark:text-slate-400">
+            Đang tải dữ liệu bài tập...
+          </p>
         </div>
       </div>
     );

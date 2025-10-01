@@ -19,7 +19,15 @@ import {
   Topic,
   ProblemDifficulty,
 } from "@/types/problem";
-import { Plus, Save, Trash2, Upload, FileText, X, FileSpreadsheet } from "lucide-react";
+import {
+  Plus,
+  Save,
+  Trash2,
+  Upload,
+  FileText,
+  X,
+  FileSpreadsheet,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { ProblemService } from "@/services/problem-service";
 
@@ -38,27 +46,25 @@ export default function ProblemForm({
   title,
   subtitle,
 }: ProblemFormProps) {
-
   const [problemData, setProblemData] = useState<ProblemData>({
-      title: "",
-      description: "",
-      inputDescription: "",
-      outputDescription: "",
-      maxScore: 100,
-      timeLimitMs: 1000,
-      memoryLimitKb: 262144,
-      difficulty: ProblemDifficulty.EASY,
-      tags: [],
-      topics: [],
-      testcase: "",
-      testcaseSamples: [
-        {
-          input: "",
-          output: "",
-        },
-      ],
-    }
-  );
+    title: "",
+    description: "",
+    inputDescription: "",
+    outputDescription: "",
+    maxScore: 100,
+    timeLimitMs: 1000,
+    memoryLimitKb: 262144,
+    difficulty: ProblemDifficulty.EASY,
+    tags: [],
+    topics: [],
+    testcase: "",
+    testcaseSamples: [
+      {
+        input: "",
+        output: "",
+      },
+    ],
+  });
 
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
@@ -89,12 +95,23 @@ export default function ProblemForm({
 
   // Test case pagination constants
   const testCasesPerPage = 3;
-  const totalTestPages = Math.ceil(problemData.testcaseSamples.length / testCasesPerPage);
+  const totalTestPages = Math.ceil(
+    problemData.testcaseSamples.length / testCasesPerPage
+  );
   const startTestIndex = (currentTestPage - 1) * testCasesPerPage;
-  const endTestIndex = Math.min(startTestIndex + testCasesPerPage, problemData.testcaseSamples.length);
-  const currentTestCases = problemData.testcaseSamples.slice(startTestIndex, endTestIndex);
+  const endTestIndex = Math.min(
+    startTestIndex + testCasesPerPage,
+    problemData.testcaseSamples.length
+  );
+  const currentTestCases = problemData.testcaseSamples.slice(
+    startTestIndex,
+    endTestIndex
+  );
 
-  const handleInputChange = (field: keyof ProblemData, value: string | string[] | number) => {
+  const handleInputChange = (
+    field: keyof ProblemData,
+    value: string | string[] | number
+  ) => {
     if (isReadOnly) return;
     setProblemData((prev) => ({
       ...prev,
@@ -111,12 +128,12 @@ export default function ProblemForm({
       if (isSelected) {
         return {
           ...prev,
-          tags: currentTags.filter((t) => t !== tagId)
+          tags: currentTags.filter((t) => t !== tagId),
         };
       } else {
         return {
           ...prev,
-          tags: [...currentTags, tagId]
+          tags: [...currentTags, tagId],
         };
       }
     });
@@ -131,12 +148,12 @@ export default function ProblemForm({
       if (isSelected) {
         return {
           ...prev,
-          topics: currentTopics.filter((t) => t !== topicId)
+          topics: currentTopics.filter((t) => t !== topicId),
         };
       } else {
         return {
           ...prev,
-          topics: [...currentTopics, topicId]
+          topics: [...currentTopics, topicId],
         };
       }
     });
@@ -201,12 +218,14 @@ export default function ProblemForm({
         "text/csv",
         "application/csv",
         "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       ];
       const allowedExtensions = [".txt", ".csv", ".xlsx", ".xls"];
 
       const hasValidType = allowedTypes.includes(file.type);
-      const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+      const hasValidExtension = allowedExtensions.some((ext) =>
+        file.name.toLowerCase().endsWith(ext)
+      );
 
       if (hasValidType || hasValidExtension) {
         setTestcaseFile(file);
@@ -224,12 +243,14 @@ export default function ProblemForm({
         "text/csv",
         "application/csv",
         "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       ];
       const allowedExtensions = [".txt", ".csv", ".xlsx", ".xls"];
 
       const hasValidType = allowedTypes.includes(file.type);
-      const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+      const hasValidExtension = allowedExtensions.some((ext) =>
+        file.name.toLowerCase().endsWith(ext)
+      );
 
       if (hasValidType || hasValidExtension) {
         setTestcaseFile(file);
@@ -260,9 +281,7 @@ export default function ProblemForm({
         <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
           {title}
         </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-lg">
-          {subtitle}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400 text-lg">{subtitle}</p>
       </div>
 
       {/* Basic Information */}
@@ -309,7 +328,9 @@ export default function ProblemForm({
             <textarea
               placeholder="Mô tả định dạng và ý nghĩa của đầu vào..."
               value={problemData.inputDescription}
-              onChange={(e) => handleInputChange("inputDescription", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("inputDescription", e.target.value)
+              }
               className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
               disabled={isReadOnly}
             />
@@ -323,7 +344,9 @@ export default function ProblemForm({
             <textarea
               placeholder="Mô tả định dạng và ý nghĩa của đầu ra..."
               value={problemData.outputDescription}
-              onChange={(e) => handleInputChange("outputDescription", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("outputDescription", e.target.value)
+              }
               className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
               disabled={isReadOnly}
             />
@@ -349,7 +372,12 @@ export default function ProblemForm({
                 type="number"
                 placeholder="1000"
                 value={problemData.timeLimitMs}
-                onChange={(e) => handleInputChange("timeLimitMs", parseInt(e.target.value) || 1000)}
+                onChange={(e) =>
+                  handleInputChange(
+                    "timeLimitMs",
+                    parseInt(e.target.value) || 1000
+                  )
+                }
                 className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 disabled={isReadOnly}
               />
@@ -364,7 +392,12 @@ export default function ProblemForm({
                 type="number"
                 placeholder="262144"
                 value={problemData.memoryLimitKb}
-                onChange={(e) => handleInputChange("memoryLimitKb", parseInt(e.target.value) || 262144)}
+                onChange={(e) =>
+                  handleInputChange(
+                    "memoryLimitKb",
+                    parseInt(e.target.value) || 262144
+                  )
+                }
                 className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 disabled={isReadOnly}
               />
@@ -379,7 +412,9 @@ export default function ProblemForm({
                 type="number"
                 placeholder="100"
                 value={problemData.maxScore}
-                onChange={(e) => handleInputChange("maxScore", parseInt(e.target.value) || 100)}
+                onChange={(e) =>
+                  handleInputChange("maxScore", parseInt(e.target.value) || 100)
+                }
                 className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 disabled={isReadOnly}
               />
@@ -430,16 +465,19 @@ export default function ProblemForm({
                   {availableTopics.map((topic) => (
                     <div
                       key={topic.id}
-                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${problemData.topics?.includes(topic.id)
+                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${
+                        problemData.topics?.includes(topic.id)
                           ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700"
                           : "bg-slate-50 border-slate-200 hover:bg-slate-100 dark:bg-slate-700/30 dark:border-slate-600 dark:hover:bg-slate-700/50"
-                        }`}
+                      }`}
                       onClick={() => !isReadOnly && handleTopicChange(topic.id)}
                     >
                       <input
                         type="checkbox"
-                        checked={problemData.topics?.includes(topic.id) || false}
-                        onChange={() => { }}
+                        checked={
+                          problemData.topics?.includes(topic.id) || false
+                        }
+                        onChange={() => {}}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         disabled={isReadOnly}
                       />
@@ -466,16 +504,17 @@ export default function ProblemForm({
                   {availableTags.map((tag) => (
                     <div
                       key={tag.id}
-                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${problemData.tags?.includes(tag.id)
+                      className={`flex items-center space-x-2 p-3 rounded-lg border cursor-pointer transition-all ${
+                        problemData.tags?.includes(tag.id)
                           ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700"
                           : "bg-slate-50 border-slate-200 hover:bg-slate-100 dark:bg-slate-700/30 dark:border-slate-600 dark:hover:bg-slate-700/50"
-                        }`}
+                      }`}
                       onClick={() => !isReadOnly && handleTagChange(tag.id)}
                     >
                       <input
                         type="checkbox"
                         checked={problemData.tags?.includes(tag.id) || false}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                         disabled={isReadOnly}
                       />
@@ -502,10 +541,11 @@ export default function ProblemForm({
         </CardHeader>
         <CardContent className="space-y-6">
           <div
-            className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${dragActive
+            className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
+              dragActive
                 ? "border-green-400 bg-green-50 dark:bg-green-900/20"
                 : "border-slate-300 dark:border-slate-600"
-              }`}
+            }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -514,9 +554,9 @@ export default function ProblemForm({
             {testcaseFile ? (
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
-                  {testcaseFile.name.toLowerCase().endsWith('.csv') ||
-                    testcaseFile.name.toLowerCase().endsWith('.xlsx') ||
-                    testcaseFile.name.toLowerCase().endsWith('.xls') ? (
+                  {testcaseFile.name.toLowerCase().endsWith(".csv") ||
+                  testcaseFile.name.toLowerCase().endsWith(".xlsx") ||
+                  testcaseFile.name.toLowerCase().endsWith(".xls") ? (
                     <FileSpreadsheet className="w-8 h-8 text-green-600 dark:text-green-400" />
                   ) : (
                     <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -530,7 +570,7 @@ export default function ProblemForm({
                     {(testcaseFile.size / 1024).toFixed(2)} KB
                   </p>
                   <span className="inline-block px-2 py-1 mt-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md">
-                    {testcaseFile.name.split('.').pop()?.toUpperCase()}
+                    {testcaseFile.name.split(".").pop()?.toUpperCase()}
                   </span>
                 </div>
                 <Button
@@ -553,7 +593,8 @@ export default function ProblemForm({
                     Tải lên file test cases
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                    Kéo thả file .txt, .csv, .xlsx, .xls vào đây hoặc click để chọn file
+                    Kéo thả file .txt, .csv, .xlsx, .xls vào đây hoặc click để
+                    chọn file
                   </p>
                   <Button
                     onClick={() => fileInputRef.current?.click()}
@@ -577,13 +618,25 @@ export default function ProblemForm({
             />
           </div>
           <div className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
-            <p><strong>Lưu ý:</strong> File test cases sẽ được ưu tiên sử dụng thay vì test cases thủ công bên dưới.</p>
+            <p>
+              <strong>Lưu ý:</strong> File test cases sẽ được ưu tiên sử dụng
+              thay vì test cases thủ công bên dưới.
+            </p>
             <p>Hỗ trợ các định dạng: .txt, .csv, .xlsx, .xls</p>
-            <p><strong>Định dạng file:</strong></p>
+            <p>
+              <strong>Định dạng file:</strong>
+            </p>
             <ul className="ml-4 space-y-1">
-              <li>• <strong>TXT:</strong> Mỗi dòng là một test case, format: input|output</li>
-              <li>• <strong>CSV:</strong> 2 cột: input, output</li>
-              <li>• <strong>XLSX/XLS:</strong> 2 cột đầu tiên là input và output</li>
+              <li>
+                • <strong>TXT:</strong> Mỗi dòng là một test case, format:
+                input|output
+              </li>
+              <li>
+                • <strong>CSV:</strong> 2 cột: input, output
+              </li>
+              <li>
+                • <strong>XLSX/XLS:</strong> 2 cột đầu tiên là input và output
+              </li>
             </ul>
           </div>
         </CardContent>
@@ -644,7 +697,11 @@ export default function ProblemForm({
                       placeholder="Nhập dữ liệu đầu vào..."
                       value={testCase.input}
                       onChange={(e) =>
-                        handleTestCaseChange(actualIndex, "input", e.target.value)
+                        handleTestCaseChange(
+                          actualIndex,
+                          "input",
+                          e.target.value
+                        )
                       }
                       className="w-full h-24 p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 resize-none text-sm font-mono"
                       disabled={isReadOnly}
@@ -660,7 +717,11 @@ export default function ProblemForm({
                       placeholder="Nhập kết quả mong đợi..."
                       value={testCase.output}
                       onChange={(e) =>
-                        handleTestCaseChange(actualIndex, "output", e.target.value)
+                        handleTestCaseChange(
+                          actualIndex,
+                          "output",
+                          e.target.value
+                        )
                       }
                       className="w-full h-24 p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 resize-none text-sm font-mono"
                       disabled={isReadOnly}
@@ -675,7 +736,8 @@ export default function ProblemForm({
           {totalTestPages > 1 && (
             <div className="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
               <div className="text-sm text-slate-600 dark:text-slate-400">
-                Hiển thị test case {startTestIndex + 1}-{endTestIndex} trong tổng số {problemData.testcaseSamples.length}
+                Hiển thị test case {startTestIndex + 1}-{endTestIndex} trong
+                tổng số {problemData.testcaseSamples.length}
               </div>
 
               <div className="flex items-center gap-2">
@@ -690,33 +752,39 @@ export default function ProblemForm({
                 </Button>
 
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalTestPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (totalTestPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentTestPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentTestPage >= totalTestPages - 2) {
-                      pageNum = totalTestPages - 4 + i;
-                    } else {
-                      pageNum = currentTestPage - 2 + i;
-                    }
+                  {Array.from(
+                    { length: Math.min(5, totalTestPages) },
+                    (_, i) => {
+                      let pageNum: number;
+                      if (totalTestPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentTestPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentTestPage >= totalTestPages - 2) {
+                        pageNum = totalTestPages - 4 + i;
+                      } else {
+                        pageNum = currentTestPage - 2 + i;
+                      }
 
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentTestPage === pageNum ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentTestPage(pageNum)}
-                        className={`w-8 h-8 p-0 text-xs ${currentTestPage === pageNum
-                            ? "bg-green-600 text-white"
-                            : "border-slate-300 dark:border-slate-600"
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={
+                            currentTestPage === pageNum ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => setCurrentTestPage(pageNum)}
+                          className={`w-8 h-8 p-0 text-xs ${
+                            currentTestPage === pageNum
+                              ? "bg-green-600 text-white"
+                              : "border-slate-300 dark:border-slate-600"
                           }`}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    }
+                  )}
                 </div>
 
                 <Button
@@ -743,7 +811,11 @@ export default function ProblemForm({
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all"
           >
             <Save className="w-5 h-5 mr-2" />
-            {isSaving ? "Đang lưu..." : mode === "create" ? "Tạo bài tập" : "Cập nhật bài tập"}
+            {isSaving
+              ? "Đang lưu..."
+              : mode === "create"
+                ? "Tạo bài tập"
+                : "Cập nhật bài tập"}
           </Button>
         </div>
       )}

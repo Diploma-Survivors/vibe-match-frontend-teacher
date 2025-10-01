@@ -32,7 +32,6 @@ export interface CreateProblemRequest {
   testcaseSamples: TestcaseSample[];
 }
 
-
 export class ProblemService {
   // Fetch all available tags
   static async getTags(): Promise<Tag[]> {
@@ -70,7 +69,9 @@ export class ProblemService {
   }
 
   // Create testcase by uploading file
-  static async createTestcaseFile(file: File): Promise<CreateTestcaseFileResponse> {
+  static async createTestcaseFile(
+    file: File
+  ): Promise<CreateTestcaseFileResponse> {
     try {
       const formData = new FormData();
       formData.append("file", file, file.name);
@@ -90,7 +91,7 @@ export class ProblemService {
 
   static async getAll() {
     try {
-      const response = await clientApi.get('/problems');
+      const response = await clientApi.get("/problems");
 
       return response.data.data;
     } catch (error) {
@@ -172,22 +173,32 @@ export class ProblemService {
   }
 
   // Cache management for testcase responses
-  private static testcacheStorage = new Map<string, CreateTestcaseFileResponse>();
+  private static testcacheStorage = new Map<
+    string,
+    CreateTestcaseFileResponse
+  >();
 
-  private static saveTestcaseToCache(key: string, response: CreateTestcaseFileResponse): void {
+  private static saveTestcaseToCache(
+    key: string,
+    response: CreateTestcaseFileResponse
+  ): void {
     this.testcacheStorage.set(key, response);
     // Optional: Set expiration time (e.g., 1 hour)
-    setTimeout(() => {
-      this.testcacheStorage.delete(key);
-    }, 60 * 60 * 1000); // 1 hour expiration
+    setTimeout(
+      () => {
+        this.testcacheStorage.delete(key);
+      },
+      60 * 60 * 1000
+    ); // 1 hour expiration
   }
 
-  private static getTestcaseFromCache(key: string): CreateTestcaseFileResponse | null {
+  private static getTestcaseFromCache(
+    key: string
+  ): CreateTestcaseFileResponse | null {
     return this.testcacheStorage.get(key) || null;
   }
 
   private static clearTestcaseCache(): void {
     this.testcacheStorage.clear();
   }
-
 }

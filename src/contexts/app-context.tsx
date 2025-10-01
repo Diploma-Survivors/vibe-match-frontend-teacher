@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 import { usePathname } from "next/navigation";
 import { UserInfo } from "@/types/states";
 
@@ -20,16 +26,18 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const dedicatedPagesPattern = process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN || 
+const dedicatedPagesPattern =
+  process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
   "/problems/(?:create|[^/]+(?:/(create|edit))?)";
 
-
-export function AppProvider({ children, initialUser, initialIssuer }: AppProviderProps) {
+export function AppProvider({
+  children,
+  initialUser,
+  initialIssuer,
+}: AppProviderProps) {
   const [user, setUser] = useState<UserInfo | null>(initialUser);
   const [issuer, setIssuer] = useState<"local" | "moodle">(initialIssuer);
   const [isLoading, setIsLoading] = useState(false);
-  
-
 
   const pathname = usePathname();
 
@@ -41,7 +49,6 @@ export function AppProvider({ children, initialUser, initialIssuer }: AppProvide
     setUser(null);
     setIssuer("local");
   };
-
 
   const value: AppContextType = {
     user,

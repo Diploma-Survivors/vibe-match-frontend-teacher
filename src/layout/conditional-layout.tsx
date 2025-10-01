@@ -4,10 +4,10 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { useApp } from "@/contexts/app-context";
 
-export default function ConditionalLayout({ 
-  children 
-}: { 
-  children: React.ReactNode 
+export default function ConditionalLayout({
+  children,
+}: {
+  children: React.ReactNode;
 }) {
   const { shouldHideNavigation, isLoading, isInDedicatedPages } = useApp();
 
@@ -23,11 +23,7 @@ export default function ConditionalLayout({
   }
 
   if (shouldHideNavigation) {
-    return (
-      <main className="min-h-screen">
-        {children}
-      </main>
-    );
+    return <main className="min-h-screen">{children}</main>;
   }
 
   // Local mode OR Moodle mode on non-dedicated pages - show full layout

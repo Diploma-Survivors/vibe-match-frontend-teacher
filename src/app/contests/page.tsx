@@ -119,7 +119,8 @@ export default function ContestsPage() {
                 <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                   <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    {paginatedContests.length} / {filteredContests.length} cuộc thi
+                    {paginatedContests.length} / {filteredContests.length} cuộc
+                    thi
                   </span>
                 </div>
               </div>

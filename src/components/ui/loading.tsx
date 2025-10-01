@@ -8,13 +8,15 @@ interface LoadingProps {
   className?: string;
 }
 
-export default function Loading({ 
-  title = "Đang tải...", 
+export default function Loading({
+  title = "Đang tải...",
   description = "Vui lòng chờ trong giây lát",
-  className = ""
+  className = "",
 }: LoadingProps) {
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center ${className}`}>
+    <div
+      className={`min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center ${className}`}
+    >
       <div className="text-center">
         <div className="relative">
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -25,9 +27,7 @@ export default function Loading({
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
           {title}
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
-          {description}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400">{description}</p>
       </div>
     </div>
   );

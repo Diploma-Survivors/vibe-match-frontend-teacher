@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  return handleProxy(request, resolvedParams.path, 'GET');
+  return handleProxy(request, resolvedParams.path, "GET");
 }
 
 export async function POST(
@@ -13,32 +13,39 @@ export async function POST(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  const requestPath = resolvedParams.path.join('/');
-  if (requestPath === 'signin') {
+  const requestPath = resolvedParams.path.join("/");
+  if (requestPath === "signin") {
     try {
       const csrfData = await getCSRFToken(request);
       const formData = await request.formData();
-      const accessToken = formData.get('accessToken')?.toString() || '';
-      const refreshToken = formData.get('refreshToken')?.toString() || '';
-      const redirectPath = formData.get('redirect')?.toString() || '/dashboard';
-      const deviceId = formData.get('deviceId')?.toString() || '';
+      const accessToken = formData.get("accessToken")?.toString() || "";
+      const refreshToken = formData.get("refreshToken")?.toString() || "";
+      const redirectPath = formData.get("redirect")?.toString() || "/dashboard";
+      const deviceId = formData.get("deviceId")?.toString() || "";
 
-      const htmlContent = generateAuthForm(accessToken, refreshToken, deviceId, redirectPath, csrfData.token, request);
+      const htmlContent = generateAuthForm(
+        accessToken,
+        refreshToken,
+        deviceId,
+        redirectPath,
+        csrfData.token,
+        request
+      );
 
       // Create response headers
       const responseHeaders = new Headers({
-        'Content-Type': 'text/html',
+        "Content-Type": "text/html",
       });
 
       // Directly forward all Set-Cookie headers from CSRF response without parsing
       if (csrfData.cookies && csrfData.cookies.length > 0) {
-        csrfData.cookies.forEach(cookieHeader => {
-          responseHeaders.append('Set-Cookie', cookieHeader);
+        csrfData.cookies.forEach((cookieHeader) => {
+          responseHeaders.append("Set-Cookie", cookieHeader);
         });
       } else {
         // Fallback: manually set the CSRF token cookie if no cookies were returned
         const fallbackCsrfCookie = `next-auth.csrf-token=${csrfData.token}; Path=/; HttpOnly; SameSite=lax`;
-        responseHeaders.append('Set-Cookie', fallbackCsrfCookie);
+        responseHeaders.append("Set-Cookie", fallbackCsrfCookie);
       }
 
       const response = new NextResponse(htmlContent, {
@@ -47,19 +54,16 @@ export async function POST(
       });
 
       return response;
-
-    }
-    catch (error) {
-      console.error('Error in POST proxy handler:', error);
+    } catch (error) {
+      console.error("Error in POST proxy handler:", error);
       return NextResponse.json(
-        { error: 'Failed to process request' },
+        { error: "Failed to process request" },
         { status: 500 }
       );
     }
   }
 
-  return handleProxy(request, resolvedParams.path, 'POST');
-
+  return handleProxy(request, resolvedParams.path, "POST");
 }
 
 export async function PUT(
@@ -67,7 +71,7 @@ export async function PUT(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  return handleProxy(request, resolvedParams.path, 'PUT');
+  return handleProxy(request, resolvedParams.path, "PUT");
 }
 
 export async function DELETE(
@@ -75,7 +79,7 @@ export async function DELETE(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  return handleProxy(request, resolvedParams.path, 'DELETE');
+  return handleProxy(request, resolvedParams.path, "DELETE");
 }
 
 export async function PATCH(
@@ -83,7 +87,7 @@ export async function PATCH(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  return handleProxy(request, resolvedParams.path, 'PATCH');
+  return handleProxy(request, resolvedParams.path, "PATCH");
 }
 
 async function handleProxy(
@@ -95,22 +99,24 @@ async function handleProxy(
 }
 
 // Update the getCSRFToken function to return both token and cookies
-async function getCSRFToken(request: NextRequest): Promise<{ token: string, cookies?: string[] }> {
+async function getCSRFToken(
+  request: NextRequest
+): Promise<{ token: string; cookies?: string[] }> {
   try {
     // Get the current domain and protocol
-    const protocol = request.headers.get('x-forwarded-proto') ||
-      (request.url.startsWith('https') ? 'https' : 'http');
-    const host = request.headers.get('host');
+    const protocol =
+      request.headers.get("x-forwarded-proto") ||
+      (request.url.startsWith("https") ? "https" : "http");
+    const host = request.headers.get("host");
     const baseUrl = `${protocol}://${host}`;
-
 
     // Make request to NextAuth's CSRF endpoint
     const csrfResponse = await fetch(`${baseUrl}/api/auth/csrf`, {
-      method: 'GET',
+      method: "GET",
       headers: {
         // remove cookies to work properly
         // 'Cookie': request.headers.get('cookie') || '',
-        'User-Agent': request.headers.get('user-agent') || 'NextJS-Proxy',
+        "User-Agent": request.headers.get("user-agent") || "NextJS-Proxy",
       },
     });
 
@@ -122,17 +128,19 @@ async function getCSRFToken(request: NextRequest): Promise<{ token: string, cook
 
       return {
         token: csrfData.csrfToken,
-        cookies: setCookieHeaders.length > 0 ? setCookieHeaders : undefined
+        cookies: setCookieHeaders.length > 0 ? setCookieHeaders : undefined,
       };
     } else {
-      console.error('❌ Failed to get CSRF token:', csrfResponse.status);
-      throw new Error(`CSRF request failed with status: ${csrfResponse.status}`);
+      console.error("❌ Failed to get CSRF token:", csrfResponse.status);
+      throw new Error(
+        `CSRF request failed with status: ${csrfResponse.status}`
+      );
     }
   } catch (error) {
-    console.error('❌ CSRF token error:', error);
+    console.error("❌ CSRF token error:", error);
     // Return a fallback token if NextAuth fails
     return {
-      token: 'fallback-'
+      token: "fallback-",
     };
   }
 }
@@ -146,9 +154,10 @@ function generateAuthForm(
   request: NextRequest
 ): string {
   // Determine the target URL for form submission
-  const protocol = request.headers.get('x-forwarded-proto') ||
-    (request.url.startsWith('https') ? 'https' : 'http');
-  const host = request.headers.get('host');
+  const protocol =
+    request.headers.get("x-forwarded-proto") ||
+    (request.url.startsWith("https") ? "https" : "http");
+  const host = request.headers.get("host");
   const targetUrl = `${protocol}://${host}/api/auth/callback/sso`;
 
   return `

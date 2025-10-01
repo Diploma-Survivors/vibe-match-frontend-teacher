@@ -10,7 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Contest } from "@/types/contest";
-import { ChevronLeft, ChevronRight, Calendar, Users, Trophy } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  Users,
+  Trophy,
+} from "lucide-react";
 import Link from "next/link";
 
 interface ContestTableProps {
@@ -119,7 +125,9 @@ export default function ContestTable({
                         <div
                           className={`${contest.accessRange === "public" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"} font-medium px-2 py-1 rounded-lg border text-xs inline-block`}
                         >
-                          {contest.accessRange === "public" ? "Công khai" : "Riêng tư"}
+                          {contest.accessRange === "public"
+                            ? "Công khai"
+                            : "Riêng tư"}
                         </div>
                       </div>
                     </div>

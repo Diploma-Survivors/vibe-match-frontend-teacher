@@ -15,7 +15,7 @@ import {
   DIFFICULTY_OPTIONS,
   TOPIC_OPTIONS,
   ACCESS_RANGE_OPTIONS,
-  TAG_OPTIONS
+  TAG_OPTIONS,
 } from "@/types/problem";
 import { Filter, RotateCcw, Search, X } from "lucide-react";
 import React, { useState } from "react";
@@ -34,7 +34,10 @@ export default function ProblemFilter({
   onReset,
 }: ProblemFilterProps) {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
-  const handleFilterChange = (key: keyof ProblemFilters, value: string | string[]) => {
+  const handleFilterChange = (
+    key: keyof ProblemFilters,
+    value: string | string[]
+  ) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -59,7 +62,6 @@ export default function ProblemFilter({
               Bộ lọc tìm kiếm
             </h3>
           </div>
-          
 
           {/* Mobile Filter Toggle Button */}
           <div className="flex items-center gap-2">
@@ -76,7 +78,7 @@ export default function ProblemFilter({
               )}
               {isFilterExpanded ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
             </Button>
-            
+
             <Button
               variant="ghost"
               size="sm"
@@ -90,7 +92,11 @@ export default function ProblemFilter({
         </div>
 
         {/* Filter Fields - Hidden by default on mobile */}
-        <div className={`space-y-4 xl:block ${isFilterExpanded ? 'block' : 'hidden'}`}>          {/* Mã bài */}
+        <div
+          className={`space-y-4 xl:block ${isFilterExpanded ? "block" : "hidden"}`}
+        >
+          {" "}
+          {/* Mã bài */}
           <div className="space-y-2">
             <label
               htmlFor="problem-id"
@@ -106,7 +112,6 @@ export default function ProblemFilter({
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
-
           {/* Tên bài */}
           <div className="space-y-2">
             <label
@@ -123,7 +128,6 @@ export default function ProblemFilter({
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
-
           {/* Mức độ */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -151,7 +155,6 @@ export default function ProblemFilter({
               </SelectContent>
             </Select>
           </div>
-
           {/* Dạng bài */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -179,7 +182,6 @@ export default function ProblemFilter({
               </SelectContent>
             </Select>
           </div>
-
           {/* Lựa chọn tag */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -187,7 +189,7 @@ export default function ProblemFilter({
             </label>
             <Select>
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <SelectValue 
+                <SelectValue
                   placeholder={
                     filters.tags && filters.tags.length > 0
                       ? `${filters.tags.length} tag được chọn`
@@ -196,35 +198,39 @@ export default function ProblemFilter({
                 />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {TAG_OPTIONS.filter(option => option.value !== "all").map((option) => (
-                  <div
-                    key={option.value}
-                    className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const currentTags = filters.tags || [];
-                      const isSelected = currentTags.includes(option.value);
-                      
-                      if (isSelected) {
-                        // Remove from selection
-                        const newTags = currentTags.filter(t => t !== option.value);
-                        handleFilterChange("tags", newTags);
-                      } else {
-                        // Add to selection
-                        const newTags = [...currentTags, option.value];
-                        handleFilterChange("tags", newTags);
-                      }
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={filters.tags?.includes(option.value) || false}
-                      onChange={() => {}} // Handled by parent div onClick
-                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                    />
-                    <span className="text-sm">{option.label}</span>
-                  </div>
-                ))}
+                {TAG_OPTIONS.filter((option) => option.value !== "all").map(
+                  (option) => (
+                    <div
+                      key={option.value}
+                      className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const currentTags = filters.tags || [];
+                        const isSelected = currentTags.includes(option.value);
+
+                        if (isSelected) {
+                          // Remove from selection
+                          const newTags = currentTags.filter(
+                            (t) => t !== option.value
+                          );
+                          handleFilterChange("tags", newTags);
+                        } else {
+                          // Add to selection
+                          const newTags = [...currentTags, option.value];
+                          handleFilterChange("tags", newTags);
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={filters.tags?.includes(option.value) || false}
+                        onChange={() => {}} // Handled by parent div onClick
+                        className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                      />
+                      <span className="text-sm">{option.label}</span>
+                    </div>
+                  )
+                )}
                 {filters.tags && filters.tags.length > 0 && (
                   <div className="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2">
                     <button
@@ -240,8 +246,7 @@ export default function ProblemFilter({
                 )}
               </SelectContent>
             </Select>
-          </div>        
-
+          </div>
           {/* Phạm vi truy cập */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">

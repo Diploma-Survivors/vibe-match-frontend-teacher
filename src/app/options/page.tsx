@@ -11,7 +11,7 @@ export default function OptionsPage() {
 
   const handleProblemSelectionClick = () => {
     setShowProblemModal(true);
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
@@ -43,7 +43,6 @@ export default function OptionsPage() {
                 </p>
 
                 <div className="flex flex-col gap-2">
-
                   <Button
                     variant="outline"
                     className="w-full justify-between border-slate-200 dark:border-slate-600"
@@ -52,7 +51,6 @@ export default function OptionsPage() {
                     Chọn một problem có sẵn
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
-
 
                   <Link href="/problems/create" className="w-full">
                     <Button
@@ -84,9 +82,7 @@ export default function OptionsPage() {
                 </p>
 
                 <Link href="/contests/create" className="w-full block">
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                  >
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
                     Tạo contest <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
@@ -113,12 +109,9 @@ export default function OptionsPage() {
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-
             </div>
             <div className="px-2 overflow-y-auto no-top-offset ">
-              <ProblemList
-                mode="select"
-              />
+              <ProblemList mode="select" />
             </div>
           </div>
         </div>

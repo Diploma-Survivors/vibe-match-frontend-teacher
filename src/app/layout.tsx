@@ -24,7 +24,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
-      <ServerProvider>
+        <ServerProvider>
           <ConditionalLayout>{children}</ConditionalLayout>
         </ServerProvider>
       </body>

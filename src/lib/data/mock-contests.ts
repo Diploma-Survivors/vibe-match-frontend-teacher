@@ -4,13 +4,20 @@ export const mockContests: Contest[] = [
   {
     id: "1",
     name: "Vibe Match Programming Contest #1",
-    description: "Cuộc thi lập trình dành cho sinh viên năm nhất, tập trung vào các thuật toán cơ bản và cấu trúc dữ liệu.",
+    description:
+      "Cuộc thi lập trình dành cho sinh viên năm nhất, tập trung vào các thuật toán cơ bản và cấu trúc dữ liệu.",
     startTime: "2025-08-25T09:00:00",
     endTime: "2025-08-25T12:00:00",
     duration: 180,
     status: "chưa bắt đầu",
     accessRange: "public",
-    problems: ["array_basic01", "array_basic02", "array_basic03", "array_basic04", "array_basic05"],
+    problems: [
+      "array_basic01",
+      "array_basic02",
+      "array_basic03",
+      "array_basic04",
+      "array_basic05",
+    ],
     participants: 42,
     maxParticipants: 100,
     createdBy: "Nguyễn Văn A",
@@ -19,13 +26,19 @@ export const mockContests: Contest[] = [
   {
     id: "2",
     name: "Advanced Algorithms Challenge",
-    description: "Cuộc thi dành cho các lập trình viên có kinh nghiệm, bao gồm các bài toán về đồ thị và quy hoạch động.",
+    description:
+      "Cuộc thi dành cho các lập trình viên có kinh nghiệm, bao gồm các bài toán về đồ thị và quy hoạch động.",
     startTime: "2025-08-20T14:00:00",
     endTime: "2025-08-20T18:00:00",
     duration: 240,
     status: "đang diễn ra",
     accessRange: "private",
-    problems: ["array_basic10", "array_basic15", "array_basic20", "array_basic25"],
+    problems: [
+      "array_basic10",
+      "array_basic15",
+      "array_basic20",
+      "array_basic25",
+    ],
     participants: 28,
     maxParticipants: 50,
     createdBy: "Trần Thị B",
@@ -34,13 +47,19 @@ export const mockContests: Contest[] = [
   {
     id: "3",
     name: "Data Structure Mastery",
-    description: "Kiểm tra kiến thức về cấu trúc dữ liệu: mảng, danh sách liên kết, ngăn xếp, hàng đợi.",
+    description:
+      "Kiểm tra kiến thức về cấu trúc dữ liệu: mảng, danh sách liên kết, ngăn xếp, hàng đợi.",
     startTime: "2025-08-15T08:00:00",
     endTime: "2025-08-15T11:30:00",
     duration: 210,
     status: "đã kết thúc",
     accessRange: "public",
-    problems: ["array_basic06", "array_basic07", "array_basic08", "array_basic09"],
+    problems: [
+      "array_basic06",
+      "array_basic07",
+      "array_basic08",
+      "array_basic09",
+    ],
     participants: 67,
     maxParticipants: 80,
     createdBy: "Lê Văn C",
@@ -49,7 +68,8 @@ export const mockContests: Contest[] = [
   {
     id: "4",
     name: "Beginner Friendly Contest",
-    description: "Cuộc thi dành cho người mới bắt đầu học lập trình, các bài toán đơn giản và dễ hiểu.",
+    description:
+      "Cuộc thi dành cho người mới bắt đầu học lập trình, các bài toán đơn giản và dễ hiểu.",
     startTime: "2025-08-28T10:00:00",
     endTime: "2025-08-28T12:30:00",
     duration: 150,
@@ -64,7 +84,8 @@ export const mockContests: Contest[] = [
   {
     id: "5",
     name: "Math & Logic Challenge",
-    description: "Tập trung vào các bài toán toán học và logic, phù hợp cho việc rèn luyện tư duy.",
+    description:
+      "Tập trung vào các bài toán toán học và logic, phù hợp cho việc rèn luyện tư duy.",
     startTime: "2025-08-12T13:00:00",
     endTime: "2025-08-12T16:00:00",
     duration: 180,
@@ -79,13 +100,21 @@ export const mockContests: Contest[] = [
   {
     id: "6",
     name: "Speed Coding Marathon",
-    description: "Cuộc thi tốc độ coding, thời gian ngắn nhưng nhiều bài tập thú vị.",
+    description:
+      "Cuộc thi tốc độ coding, thời gian ngắn nhưng nhiều bài tập thú vị.",
     startTime: "2025-08-30T15:00:00",
     endTime: "2025-08-30T17:00:00",
     duration: 120,
     status: "chưa bắt đầu",
     accessRange: "public",
-    problems: ["array_basic11", "array_basic12", "array_basic13", "array_basic14", "array_basic16", "array_basic17"],
+    problems: [
+      "array_basic11",
+      "array_basic12",
+      "array_basic13",
+      "array_basic14",
+      "array_basic16",
+      "array_basic17",
+    ],
     participants: 8,
     maxParticipants: 30,
     createdBy: "Vũ Thị F",
