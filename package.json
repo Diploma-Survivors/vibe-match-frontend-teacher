@@ -46,9 +46,6 @@
     "typescript": "^5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,md}": [
-      "npx @biomejs/biome format --write",
-      "git add"
-    ]
+    "*.{js,jsx,ts,tsx,json,md,css,scss}": ["biome format --write"]
   }
 }

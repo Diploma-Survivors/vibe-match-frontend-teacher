@@ -16,7 +16,7 @@ export default function CreateProblemPage() {
   const handleSave = async (data: ProblemData, testcaseFile?: File) => {
     setIsSaving(true);
 
-    console.log(data);
+    console.log("Data", data);
     try {
       let result;
 
