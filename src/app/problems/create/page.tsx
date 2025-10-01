@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ProblemForm from "@/components/problem-form";
-import { ProblemData, ProblemDifficulty } from "@/types/problem";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ProblemService } from "@/services/problem-service";
-import { LtiService } from "@/services/lti-service";
+import { Button } from '@/components/ui/button';
+import ProblemForm from '@/components/problem-form';
+import { ProblemData, ProblemDifficulty } from '@/types/problem';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ProblemService } from '@/services/problem-service';
+import { LtiService } from '@/services/lti-service';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -16,7 +16,7 @@ export default function CreateProblemPage() {
   const handleSave = async (data: ProblemData, testcaseFile?: File) => {
     setIsSaving(true);
 
-    console.log("Data", data);
+    console.log('Data', data);
     try {
       let result;
 
@@ -24,15 +24,15 @@ export default function CreateProblemPage() {
         result = await ProblemService.createProblemComplete(data, testcaseFile);
       }
 
-      console.log("Problem created successfully:", result);
+      console.log('Problem created successfully:', result);
 
       // Handle deep linking response
       if (result.id) {
         try {
           await LtiService.sendDeepLinkingResponse(result.id);
-          console.log("Deep linking response sent successfully");
+          console.log('Deep linking response sent successfully');
         } catch (dlError) {
-          console.error("Failed to send deep linking response:", dlError);
+          console.error('Failed to send deep linking response:', dlError);
           // Continue even if deep linking fails
         }
 
@@ -43,9 +43,9 @@ export default function CreateProblemPage() {
         // router.push("/problems");
       }
     } catch (error) {
-      console.error("Failed to create problem:", error);
+      console.error('Failed to create problem:', error);
       // You might want to show a toast notification here
-      alert("Failed to create problem. Please try again.");
+      alert('Failed to create problem. Please try again.');
     } finally {
       setIsSaving(false);
     }
