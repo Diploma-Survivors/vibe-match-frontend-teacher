@@ -4,8 +4,8 @@ import ProblemForm from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
 import { LtiService } from '@/services/lti-service';
-import { ProblemService } from '@/services/problem-service';
-import { type ProblemData, ProblemDifficulty } from '@/types/problem';
+import { ProblemsService } from '@/services/problems-service';
+import { type CreateProblemRequest, ProblemDifficulty } from '@/types/problems';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,7 +15,10 @@ export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation } = useApp();
 
-  const handleSave = async (data: ProblemData, testcaseFile?: File) => {
+  const handleSave = async (
+    data: CreateProblemRequest,
+    testcaseFile?: File
+  ) => {
     setIsSaving(true);
 
     console.log('Data', data);
@@ -23,10 +26,13 @@ export default function CreateProblemPage() {
       let result: any;
 
       if (testcaseFile) {
-        result = await ProblemService.createProblemComplete(data, testcaseFile);
+        result = await ProblemsService.createProblemComplete(
+          data,
+          testcaseFile
+        );
       }
 
-      console.log('Problem created successfully:', result);
+      console.log('Problems created successfully:', result);
 
       // Handle deep linking response
       if (result.id) {
@@ -35,18 +41,10 @@ export default function CreateProblemPage() {
           console.log('Deep linking response sent successfully');
         } catch (dlError) {
           console.error('Failed to send deep linking response:', dlError);
-          // Continue even if deep linking fails
         }
-
-        // Redirect to the newly created problem's detail page
-        // router.push(`/problems/${result.id}`);
-      } else {
-        // Fallback to problems list if no ID is returned
-        // router.push("/problems");
       }
     } catch (error) {
       console.error('Failed to create problem:', error);
-      // You might want to show a toast notification here
       alert('Failed to create problem. Please try again.');
     } finally {
       setIsSaving(false);

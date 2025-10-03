@@ -1,16 +1,16 @@
+import axios from 'axios';
 // src/lib/serverApi.ts
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth"; // Adjust path to your authOptions file
-import axios from "axios";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth'; // Adjust path to your authOptions file
 
 // 1. Create a base instance without interceptors for authentication
 // This instance can be used for any general purpose or unauthenticated calls.
 const axiosInstance = axios.create({
   baseURL:
-    process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.escuelajs.co/api/v1",
-  timeout: 5000,
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.escuelajs.co/api/v1',
+  timeout: 10000,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -19,7 +19,7 @@ const axiosInstance = axios.create({
 const getAuthenticatedHeaders = async () => {
   const session = await getServerSession(authOptions);
   if (!session?.accessToken) {
-    throw new Error("Not authenticated or access token is missing.");
+    throw new Error('Not authenticated or access token is missing.');
   }
   return {
     Authorization: `Bearer ${session.accessToken}`,

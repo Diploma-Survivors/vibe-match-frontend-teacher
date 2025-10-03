@@ -1,33 +1,33 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { mockProblems } from "@/lib/data/mock-problems";
+} from '@/components/ui/select';
+import { mockProblems } from '@/lib/data/mock-problems';
+import type { ProblemData } from '@types/problems';
 import {
+  BarChart3,
+  Calendar,
+  Clock,
   Plus,
   Save,
   Search,
-  Trash2,
-  X,
-  Calendar,
-  Clock,
   Settings,
-  Users,
+  Trash2,
   Trophy,
-  BarChart3,
-} from "lucide-react";
-import { useState } from "react";
-import ProblemForm from "./problem-form";
-import { ProblemData } from "@/types/problem";
-import ProblemList from "./problem-list";
+  Users,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
+import ProblemForm from './problem-form';
+import ProblemList from './problem-list';
 
 interface ContestData {
   name: string;
@@ -46,7 +46,7 @@ interface ContestData {
 
 interface ContestFormProps {
   initialData: ContestData;
-  mode: "create" | "edit" | "view";
+  mode: 'create' | 'edit' | 'view';
   onSave: (data: ContestData) => Promise<void>;
   isSaving?: boolean;
   title: string;
@@ -63,7 +63,7 @@ export default function ContestForm({
 }: ContestFormProps) {
   const [contestData, setContestData] = useState<ContestData>(initialData);
   const [showProblemModal, setShowProblemModal] = useState(false);
-  const [problemSearch, setProblemSearch] = useState("");
+  const [problemSearch, setProblemSearch] = useState('');
   const [showNewProblemModal, setShowNewProblemModal] = useState(false);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
   const [showProblemDetailModal, setShowProblemDetailModal] = useState(false);
@@ -73,7 +73,7 @@ export default function ContestForm({
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isLoadingProblemDetail, setIsLoadingProblemDetail] = useState(false);
 
-  const isReadOnly = mode === "view";
+  const isReadOnly = mode === 'view';
 
   // Add this handler function
   const handleViewProblemDetail = async (problemId: string) => {
@@ -92,27 +92,27 @@ export default function ContestForm({
         // Convert to ProblemData format
         setProblemData({
           name: problem.title,
-          description: "Detailed description would be here",
-          inputDescription: "Input format details",
-          outputDescription: "Output format details",
-          timeLimit: "1000",
-          memoryLimit: "256",
+          description: 'Detailed description would be here',
+          inputDescription: 'Input format details',
+          outputDescription: 'Output format details',
+          timeLimit: '1000',
+          memoryLimit: '256',
           difficulty: problem.difficulty,
           topic: problem.topic,
           tags: problem.tags,
-          accessRange: problem.accessRange || "public",
+          accessRange: problem.accessRange || 'public',
           testCases: [
             {
-              id: "1",
-              input: "Sample input",
-              expectedOutput: "Sample output",
+              id: '1',
+              input: 'Sample input',
+              expectedOutput: 'Sample output',
               isSample: true,
             },
           ],
         });
       }
     } catch (error) {
-      console.error("Error fetching problem details:", error);
+      console.error('Error fetching problem details:', error);
     } finally {
       setIsLoadingProblemDetail(false);
     }
@@ -138,7 +138,7 @@ export default function ContestForm({
       }));
     }
     setShowProblemModal(false);
-    setProblemSearch("");
+    setProblemSearch('');
   };
 
   const handleCreateProblem = async (newProblemData: ProblemData) => {
@@ -160,7 +160,7 @@ export default function ContestForm({
       // Close the modal
       setShowNewProblemModal(false);
     } catch (error) {
-      console.error("Error creating problem:", error);
+      console.error('Error creating problem:', error);
     } finally {
       setIsCreatingProblem(false);
     }
@@ -180,7 +180,7 @@ export default function ContestForm({
       const end = new Date(contestData.endTime);
       const durationMs = end.getTime() - start.getTime();
       const durationMinutes = Math.floor(durationMs / (1000 * 60));
-      handleInputChange("duration", durationMinutes);
+      handleInputChange('duration', durationMinutes);
     }
   };
 
@@ -202,14 +202,14 @@ export default function ContestForm({
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "chưa bắt đầu":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "đang diễn ra":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "đã kết thúc":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+      case 'chưa bắt đầu':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'đang diễn ra':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'đã kết thúc':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
     }
   };
 
@@ -224,7 +224,7 @@ export default function ContestForm({
       </div>
 
       {/* Contest Stats (View mode only) */}
-      {mode === "view" && (
+      {mode === 'view' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
             <CardContent className="p-6">
@@ -293,7 +293,7 @@ export default function ContestForm({
                     Thời lượng
                   </p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {Math.floor(contestData.duration / 60)}h{" "}
+                    {Math.floor(contestData.duration / 60)}h{' '}
                     {contestData.duration % 60}m
                   </p>
                 </div>
@@ -320,7 +320,7 @@ export default function ContestForm({
             <Input
               placeholder="Nhập tên cuộc thi..."
               value={contestData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={(e) => handleInputChange('name', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500"
               disabled={isReadOnly}
             />
@@ -334,7 +334,7 @@ export default function ContestForm({
             <textarea
               placeholder="Nhập mô tả chi tiết về cuộc thi..."
               value={contestData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
+              onChange={(e) => handleInputChange('description', e.target.value)}
               className="w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 resize-none"
               disabled={isReadOnly}
             />
@@ -350,20 +350,20 @@ export default function ContestForm({
               {isReadOnly ? (
                 <div
                   className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                    contestData.accessRange === "public"
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                      : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                    contestData.accessRange === 'public'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
                   }`}
                 >
-                  {contestData.accessRange === "public"
-                    ? "Công khai"
-                    : "Riêng tư"}
+                  {contestData.accessRange === 'public'
+                    ? 'Công khai'
+                    : 'Riêng tư'}
                 </div>
               ) : (
                 <Select
                   value={contestData.accessRange}
                   onValueChange={(value) =>
-                    handleInputChange("accessRange", value)
+                    handleInputChange('accessRange', value)
                   }
                 >
                   <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
@@ -379,7 +379,7 @@ export default function ContestForm({
           </div>
 
           {/* Creator info (View mode only) */}
-          {mode === "view" && contestData.createdBy && (
+          {mode === 'view' && contestData.createdBy && (
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Người tạo
@@ -410,7 +410,7 @@ export default function ContestForm({
               {isReadOnly ? (
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                   <Calendar className="w-4 h-4" />
-                  {new Date(contestData.startTime).toLocaleString("vi-VN")}
+                  {new Date(contestData.startTime).toLocaleString('vi-VN')}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
@@ -420,17 +420,17 @@ export default function ContestForm({
                       contestData.startTime
                         ? new Date(contestData.startTime)
                             .toISOString()
-                            .split("T")[0]
-                        : ""
+                            .split('T')[0]
+                        : ''
                     }
                     onChange={(e) => {
                       const currentTime = contestData.startTime
                         ? new Date(contestData.startTime)
                             .toTimeString()
                             .slice(0, 5)
-                        : "09:00";
+                        : '09:00';
                       const newDateTime = `${e.target.value}T${currentTime}`;
-                      handleInputChange("startTime", newDateTime);
+                      handleInputChange('startTime', newDateTime);
                       calculateDuration();
                     }}
                     className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500"
@@ -442,16 +442,16 @@ export default function ContestForm({
                         ? new Date(contestData.startTime)
                             .toTimeString()
                             .slice(0, 5)
-                        : ""
+                        : ''
                     }
                     onChange={(e) => {
                       const currentDate = contestData.startTime
                         ? new Date(contestData.startTime)
                             .toISOString()
-                            .split("T")[0]
-                        : new Date().toISOString().split("T")[0];
+                            .split('T')[0]
+                        : new Date().toISOString().split('T')[0];
                       const newDateTime = `${currentDate}T${e.target.value}`;
-                      handleInputChange("startTime", newDateTime);
+                      handleInputChange('startTime', newDateTime);
                       calculateDuration();
                     }}
                     className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500"
@@ -468,7 +468,7 @@ export default function ContestForm({
               {isReadOnly ? (
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                   <Calendar className="w-4 h-4" />
-                  {new Date(contestData.endTime).toLocaleString("vi-VN")}
+                  {new Date(contestData.endTime).toLocaleString('vi-VN')}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
@@ -478,17 +478,17 @@ export default function ContestForm({
                       contestData.endTime
                         ? new Date(contestData.endTime)
                             .toISOString()
-                            .split("T")[0]
-                        : ""
+                            .split('T')[0]
+                        : ''
                     }
                     onChange={(e) => {
                       const currentTime = contestData.endTime
                         ? new Date(contestData.endTime)
                             .toTimeString()
                             .slice(0, 5)
-                        : "12:00";
+                        : '12:00';
                       const newDateTime = `${e.target.value}T${currentTime}`;
-                      handleInputChange("endTime", newDateTime);
+                      handleInputChange('endTime', newDateTime);
                       calculateDuration();
                     }}
                     className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500"
@@ -500,16 +500,16 @@ export default function ContestForm({
                         ? new Date(contestData.endTime)
                             .toTimeString()
                             .slice(0, 5)
-                        : ""
+                        : ''
                     }
                     onChange={(e) => {
                       const currentDate = contestData.endTime
                         ? new Date(contestData.endTime)
                             .toISOString()
-                            .split("T")[0]
-                        : new Date().toISOString().split("T")[0];
+                            .split('T')[0]
+                        : new Date().toISOString().split('T')[0];
                       const newDateTime = `${currentDate}T${e.target.value}`;
-                      handleInputChange("endTime", newDateTime);
+                      handleInputChange('endTime', newDateTime);
                       calculateDuration();
                     }}
                     className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500"
@@ -527,7 +527,7 @@ export default function ContestForm({
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-slate-500" />
               <span className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                {Math.floor(contestData.duration / 60)}h{" "}
+                {Math.floor(contestData.duration / 60)}h{' '}
                 {contestData.duration % 60}m
               </span>
             </div>
@@ -538,12 +538,15 @@ export default function ContestForm({
                   placeholder="180"
                   value={contestData.duration}
                   onChange={(e) =>
-                    handleInputChange("duration", parseInt(e.target.value) || 0)
+                    handleInputChange(
+                      'duration',
+                      Number.parseInt(e.target.value) || 0
+                    )
                   }
                   className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Thời lượng hiện tại: {Math.floor(contestData.duration / 60)}h{" "}
+                  Thời lượng hiện tại: {Math.floor(contestData.duration / 60)}h{' '}
                   {contestData.duration % 60}m
                 </p>
               </>
@@ -552,7 +555,7 @@ export default function ContestForm({
         </CardContent>
       </Card>
 
-      {/* Problem List */}
+      {/* Problems List */}
       <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -587,8 +590,8 @@ export default function ContestForm({
               </div>
               <p className="text-slate-500 dark:text-slate-400 mb-4">
                 {isReadOnly
-                  ? "Cuộc thi này chưa có bài tập nào"
-                  : "Chưa có bài tập nào được thêm vào cuộc thi"}
+                  ? 'Cuộc thi này chưa có bài tập nào'
+                  : 'Chưa có bài tập nào được thêm vào cuộc thi'}
               </p>
               {!isReadOnly && (
                 <Button
@@ -629,7 +632,7 @@ export default function ContestForm({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {mode === "view" && (
+                    {mode === 'view' && (
                       <div className="text-right">
                         <p className="text-sm text-slate-600 dark:text-slate-400">
                           {problem.acceptanceRate}% AC
@@ -667,10 +670,10 @@ export default function ContestForm({
           >
             <Save className="w-5 h-5 mr-2" />
             {isSaving
-              ? "Đang lưu..."
-              : mode === "create"
-                ? "Tạo cuộc thi"
-                : "Cập nhật cuộc thi"}
+              ? 'Đang lưu...'
+              : mode === 'create'
+                ? 'Tạo cuộc thi'
+                : 'Cập nhật cuộc thi'}
           </Button>
         </div>
       )}
@@ -703,7 +706,7 @@ export default function ContestForm({
         </div>
       )}
 
-      {/* Problem Selection Modal */}
+      {/* Problems Selection Modal */}
       {showProblemModal && !isReadOnly && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
@@ -732,7 +735,7 @@ export default function ContestForm({
         </div>
       )}
 
-      {/* Problem Detail Modal */}
+      {/* Problems Detail Modal */}
       {showProblemDetailModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
@@ -767,7 +770,7 @@ export default function ContestForm({
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {isLoadingProblemDetail ? (
                 <div className="flex items-center justify-center h-64">
-                  <div className="w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : problemData ? (
                 <ProblemForm

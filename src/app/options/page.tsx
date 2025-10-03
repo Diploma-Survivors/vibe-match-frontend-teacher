@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ChevronRight, File, FilePlus, Trophy, X } from "lucide-react";
-import { useState } from "react";
-import ProblemList from "@/components/problem-list";
+import ProblemList from '@/components/problem-list';
+import { Button } from '@/components/ui/button';
+import { ChevronRight, File, FilePlus, Trophy, X } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function OptionsPage() {
   const [showProblemModal, setShowProblemModal] = useState(false);
@@ -92,7 +92,7 @@ export default function OptionsPage() {
         </div>
       </div>
 
-      {/* Problem Selection Modal */}
+      {/* Problems Selection Modal */}
       {showProblemModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
