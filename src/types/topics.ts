@@ -6,6 +6,13 @@ export interface Topic {
   updatedAt: Date;
 }
 
+export interface CreateTopicRequest {
+  name: string;
+  description: string;
+}
+
+export interface UpdateTopicRequest extends Partial<CreateTopicRequest> {}
+
 // Temporary constants - will be replaced by dynamic data from backend
 export const TOPIC_OPTIONS = [
   { value: 'all', label: 'Tất cả' },

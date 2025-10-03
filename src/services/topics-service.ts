@@ -1,7 +1,33 @@
 import clientApi from '@/lib/apis/axios-client';
-import type { Topic } from '@/types/topics';
+import type {
+  CreateTopicRequest,
+  Topic,
+  UpdateTopicRequest,
+} from '@/types/topics';
 
 export class TopicsService {
+  // create topic
+  static async createTopic(topic: CreateTopicRequest): Promise<Topic> {
+    try {
+      const response = await clientApi.post('/topics', topic);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error creating topic:', error);
+      throw error;
+    }
+  }
+
+  // create multiple topics
+  static async createTopics(topics: CreateTopicRequest[]): Promise<Topic[]> {
+    try {
+      const response = await clientApi.post('/topics/bulk', { topics });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error creating topics:', error);
+      throw error;
+    }
+  }
+
   // Fetch all available topics
   static async getTopics(): Promise<Topic[]> {
     try {
@@ -24,19 +50,11 @@ export class TopicsService {
     }
   }
 
-  // Create new topic (if needed in the future)
-  static async createTopic(topic: Omit<Topic, 'id'>): Promise<Topic> {
-    try {
-      const response = await clientApi.post('/topics', topic);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error creating topic:', error);
-      throw error;
-    }
-  }
-
-  // Update topic (if needed in the future)
-  static async updateTopic(id: string, topic: Partial<Topic>): Promise<Topic> {
+  // Update topic
+  static async updateTopic(
+    topic: UpdateTopicRequest,
+    id: string
+  ): Promise<Topic> {
     try {
       const response = await clientApi.put(`/topics/${id}`, topic);
       return response.data.data;
@@ -46,7 +64,7 @@ export class TopicsService {
     }
   }
 
-  // Delete topic (if needed in the future)
+  // Delete topic
   static async deleteTopic(id: string): Promise<void> {
     try {
       await clientApi.delete(`/topics/${id}`);

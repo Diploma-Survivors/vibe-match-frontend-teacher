@@ -62,7 +62,7 @@ export default function ProblemList({
         console.log('Total count:', response.totalCount);
       } catch (err) {
         console.error('Error fetching problems:', err);
-        setError("Can't download the problems.");
+        setError("Can't load the problems.");
         setProblems([]);
         setPageInfo(null);
         setTotalCount(0);
@@ -91,7 +91,7 @@ export default function ProblemList({
         ...prev,
         after: pageInfo.endCursor,
         before: undefined,
-        first: prev.first || 2, // Keep the same page size
+        first: prev.first || 10,
         last: undefined,
       }));
     }
@@ -105,7 +105,7 @@ export default function ProblemList({
         before: pageInfo.startCursor,
         after: undefined,
         first: undefined,
-        last: prev.first || 2, // Use last instead of first for backward pagination
+        last: prev.first || 10,
       }));
     }
   };
@@ -116,7 +116,7 @@ export default function ProblemList({
       ...prev,
       after: undefined,
       before: undefined,
-      first: prev.first || 2,
+      first: prev.first || 10,
       last: undefined,
     }));
   };
