@@ -1,7 +1,29 @@
 import clientApi from '@/lib/apis/axios-client';
-import type { Tag } from '@/types/tags';
+import type { CreateTagRequest, Tag } from '@/types/tags';
 
 export class TagsService {
+  // create a new tag
+  static async createTag(tag: CreateTagRequest): Promise<Tag> {
+    try {
+      const response = await clientApi.post('/tags', tag);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error creating tag:', error);
+      throw error;
+    }
+  }
+
+  // create multiple tags
+  static async createTags(tags: CreateTagRequest[]): Promise<Tag[]> {
+    try {
+      const response = await clientApi.post('/tags/bulk', { tags });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error creating tags:', error);
+      throw error;
+    }
+  }
+
   // Fetch all available tags
   static async getTags(): Promise<Tag[]> {
     try {
@@ -24,21 +46,10 @@ export class TagsService {
     }
   }
 
-  // Create new tag (if needed in the future)
-  static async createTag(tag: Omit<Tag, 'id'>): Promise<Tag> {
+  // Update tag by ID
+  static async updateTag(tag: CreateTagRequest, id: string): Promise<Tag> {
     try {
-      const response = await clientApi.post('/tags', tag);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error creating tag:', error);
-      throw error;
-    }
-  }
-
-  // Update tag (if needed in the future)
-  static async updateTag(id: string, tag: Partial<Tag>): Promise<Tag> {
-    try {
-      const response = await clientApi.put(`/tags/${id}`, tag);
+      const response = await clientApi.patch(`/tags/${id}`, tag);
       return response.data.data;
     } catch (error) {
       console.error(`Error updating tag ${id}:`, error);
@@ -46,7 +57,7 @@ export class TagsService {
     }
   }
 
-  // Delete tag (if needed in the future)
+  // Delete tag by ID
   static async deleteTag(id: string): Promise<void> {
     try {
       await clientApi.delete(`/tags/${id}`);

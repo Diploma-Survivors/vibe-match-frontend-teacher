@@ -56,7 +56,7 @@ export class TopicsService {
     id: string
   ): Promise<Topic> {
     try {
-      const response = await clientApi.put(`/topics/${id}`, topic);
+      const response = await clientApi.patch(`/topics/${id}`, topic);
       return response.data.data;
     } catch (error) {
       console.error(`Error updating topic ${id}:`, error);
