@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { Problem } from "@/types/problem";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import type { Problems } from '@types/problems';
 import {
   Calendar,
   CheckCircle,
@@ -12,27 +12,27 @@ import {
   TrendingUp,
   Trophy,
   Users,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface ProblemSidebarProps {
-  problem: Problem;
+  problem: Problems;
 }
 
 export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
   // Mock related problems
   const relatedProblems = [
-    { id: "101", title: "Fibonacci Sequence", difficulty: "Dễ", solved: true },
+    { id: '101', title: 'Fibonacci Sequence', difficulty: 'Dễ', solved: true },
     {
-      id: "102",
-      title: "Prime Numbers",
-      difficulty: "Trung bình",
+      id: '102',
+      title: 'Prime Numbers',
+      difficulty: 'Trung bình',
       solved: false,
     },
-    { id: "103", title: "GCD & LCM", difficulty: "Khó", solved: false },
+    { id: '103', title: 'GCD & LCM', difficulty: 'Khó', solved: false },
     {
-      id: "104",
-      title: "Binary Search",
-      difficulty: "Trung bình",
+      id: '104',
+      title: 'Binary Search',
+      difficulty: 'Trung bình',
       solved: true,
     },
   ];
@@ -41,13 +41,13 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
   const submissionStats = {
     totalSubmissions: 1247,
     successfulSubmissions: 423,
-    averageTime: "2.4s",
+    averageTime: '2.4s',
     acceptanceRate: 33.9,
   };
 
   return (
     <div className="space-y-6">
-      {/* Problem Stats */}
+      {/* Problems Stats */}
       <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-green-600" />
@@ -62,11 +62,11 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
             </div>
             <Badge
               className={`${
-                problem.difficulty === "Dễ"
-                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  : problem.difficulty === "Trung bình"
-                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                problem.difficulty === 'Dễ'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : problem.difficulty === 'Trung bình'
+                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
               }`}
             >
               {problem.difficulty}
@@ -142,7 +142,7 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
             />
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 text-center">
-            {submissionStats.successfulSubmissions} /{" "}
+            {submissionStats.successfulSubmissions} /{' '}
             {submissionStats.totalSubmissions} submissions
           </div>
         </div>
@@ -166,8 +166,8 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
                 <div
                   className={`w-2 h-2 rounded-full ${
                     relatedProblem.solved
-                      ? "bg-green-500"
-                      : "bg-slate-300 dark:bg-slate-600"
+                      ? 'bg-green-500'
+                      : 'bg-slate-300 dark:bg-slate-600'
                   }`}
                 />
                 <div className="flex-1 text-left">
@@ -178,11 +178,11 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
                     <Badge
                       variant="outline"
                       className={`text-xs ${
-                        relatedProblem.difficulty === "Dễ"
-                          ? "border-green-300 text-green-700 dark:border-green-700 dark:text-green-400"
-                          : relatedProblem.difficulty === "Trung bình"
-                            ? "border-yellow-300 text-yellow-700 dark:border-yellow-700 dark:text-yellow-400"
-                            : "border-red-300 text-red-700 dark:border-red-700 dark:text-red-400"
+                        relatedProblem.difficulty === 'Dễ'
+                          ? 'border-green-300 text-green-700 dark:border-green-700 dark:text-green-400'
+                          : relatedProblem.difficulty === 'Trung bình'
+                            ? 'border-yellow-300 text-yellow-700 dark:border-yellow-700 dark:text-yellow-400'
+                            : 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-400'
                       }`}
                     >
                       {relatedProblem.difficulty}

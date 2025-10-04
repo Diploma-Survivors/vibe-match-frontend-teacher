@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
 
 interface LoadingProps {
   title?: string;
@@ -9,9 +9,9 @@ interface LoadingProps {
 }
 
 export default function Loading({
-  title = "Đang tải...",
-  description = "Vui lòng chờ trong giây lát",
-  className = "",
+  title = 'Đang tải...',
+  description = 'Vui lòng chờ trong giây lát',
+  className = '',
 }: LoadingProps) {
   return (
     <div
@@ -22,7 +22,7 @@ export default function Loading({
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Loader2 className="w-8 h-8 text-white animate-spin" />
           </div>
-          <div className="absolute inset-0 w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto animate-ping opacity-20"></div>
+          <div className="absolute inset-0 w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mx-auto animate-ping opacity-20" />
         </div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
           {title}

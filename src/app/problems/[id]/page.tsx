@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ProblemForm from "@/components/problem-form";
-import { ProblemData } from "@/types/problem";
-import { ArrowLeft, Edit } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { mockProblems } from "@/lib/data/mock-problems";
+import ProblemForm from '@/components/problem-form';
+import { Button } from '@/components/ui/button';
+import { mockProblems } from '@/lib/data/mock-problems';
+import type { ProblemData } from '@types/problems';
+import { ArrowLeft, Edit } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ProblemDetailsPage() {
   const params = useParams();
@@ -25,33 +25,33 @@ export default function ProblemDetailsPage() {
         setProblemData({
           name: existingProblem.title,
           description:
-            "Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].",
-          inputDescription: "Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)",
+            'Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].',
+          inputDescription: 'Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)',
           outputDescription:
-            "In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng",
-          timeLimit: "2000",
-          memoryLimit: "256",
+            'In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng',
+          timeLimit: '2000',
+          memoryLimit: '256',
           difficulty: existingProblem.difficulty,
           topic: existingProblem.topic,
           tags: existingProblem.tags,
           accessRange: existingProblem.accessRange,
           testCases: [
             {
-              id: "1",
-              input: "5",
-              expectedOutput: "1 1 2 2 4",
+              id: '1',
+              input: '5',
+              expectedOutput: '1 1 2 2 4',
               isSample: true,
             },
             {
-              id: "2",
-              input: "10",
-              expectedOutput: "1 1 2 2 4 2 6 4 6 4",
+              id: '2',
+              input: '10',
+              expectedOutput: '1 1 2 2 4 2 6 4 6 4',
               isSample: true,
             },
             {
-              id: "3",
-              input: "1",
-              expectedOutput: "1",
+              id: '3',
+              input: '1',
+              expectedOutput: '1',
               isSample: false,
             },
           ],
@@ -65,14 +65,14 @@ export default function ProblemDetailsPage() {
 
   const handleSave = async (data: ProblemData) => {
     // This won't be called in view mode
-    console.log("View mode - save not available");
+    console.log('View mode - save not available');
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4" />
           <p className="text-slate-600 dark:text-slate-400">
             Đang tải dữ liệu bài tập...
           </p>
@@ -132,7 +132,7 @@ export default function ProblemDetailsPage() {
           onSave={handleSave}
           isSaving={false}
           title="Chi tiết bài tập"
-          subtitle={``}
+          subtitle={''}
         />
       </div>
     </div>

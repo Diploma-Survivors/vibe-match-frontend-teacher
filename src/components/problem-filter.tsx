@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { ProblemFilters } from "@/types/problem";
+} from '@/components/ui/select';
+import type { ProblemFilters } from '@/types/problems';
 import {
-  DIFFICULTY_OPTIONS,
-  TOPIC_OPTIONS,
   ACCESS_RANGE_OPTIONS,
+  DIFFICULTY_OPTIONS,
   TAG_OPTIONS,
-} from "@/types/problem";
-import { Filter, RotateCcw, Search, X } from "lucide-react";
-import React, { useState } from "react";
+} from '@/types/problems';
+import { TOPIC_OPTIONS } from '@/types/topics';
+import { Filter, RotateCcw, Search, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface ProblemFilterProps {
   filters: ProblemFilters;
@@ -45,7 +45,7 @@ export default function ProblemFilter({
   };
 
   const toggleFilters = () => {
-    console.log("Toggling filter visibility", !isFilterExpanded);
+    console.log('Toggling filter visibility', !isFilterExpanded);
     setIsFilterExpanded(!isFilterExpanded);
   };
 
@@ -76,7 +76,7 @@ export default function ProblemFilter({
               ) : (
                 <Filter className="w-4 h-4 mr-1" />
               )}
-              {isFilterExpanded ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
+              {isFilterExpanded ? 'Ẩn bộ lọc' : 'Hiện bộ lọc'}
             </Button>
 
             <Button
@@ -93,9 +93,9 @@ export default function ProblemFilter({
 
         {/* Filter Fields - Hidden by default on mobile */}
         <div
-          className={`space-y-4 xl:block ${isFilterExpanded ? "block" : "hidden"}`}
+          className={`space-y-4 xl:block ${isFilterExpanded ? 'block' : 'hidden'}`}
         >
-          {" "}
+          {' '}
           {/* Mã bài */}
           <div className="space-y-2">
             <label
@@ -107,8 +107,8 @@ export default function ProblemFilter({
             <Input
               id="problem-id"
               placeholder="Nhập mã bài..."
-              value={filters.id || ""}
-              onChange={(e) => handleFilterChange("id", e.target.value)}
+              value={filters.id || ''}
+              onChange={(e) => handleFilterChange('id', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
@@ -123,8 +123,8 @@ export default function ProblemFilter({
             <Input
               id="problem-title"
               placeholder="Nhập tên bài..."
-              value={filters.title || ""}
-              onChange={(e) => handleFilterChange("title", e.target.value)}
+              value={filters.title || ''}
+              onChange={(e) => handleFilterChange('title', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
@@ -134,9 +134,9 @@ export default function ProblemFilter({
               Mức độ:
             </label>
             <Select
-              value={filters.difficulty || "all"}
+              value={filters.difficulty || 'all'}
               onValueChange={(value) =>
-                handleFilterChange("difficulty", value === "all" ? "" : value)
+                handleFilterChange('difficulty', value === 'all' ? '' : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
@@ -161,9 +161,9 @@ export default function ProblemFilter({
               Topic:
             </label>
             <Select
-              value={filters.topic || "all"}
+              value={filters.topic || 'all'}
               onValueChange={(value) =>
-                handleFilterChange("topic", value === "all" ? "" : value)
+                handleFilterChange('topic', value === 'all' ? '' : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
@@ -193,12 +193,12 @@ export default function ProblemFilter({
                   placeholder={
                     filters.tags && filters.tags.length > 0
                       ? `${filters.tags.length} tag được chọn`
-                      : "Chọn tag..."
+                      : 'Chọn tag...'
                   }
                 />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {TAG_OPTIONS.filter((option) => option.value !== "all").map(
+                {TAG_OPTIONS.filter((option) => option.value !== 'all').map(
                   (option) => (
                     <div
                       key={option.value}
@@ -213,13 +213,37 @@ export default function ProblemFilter({
                           const newTags = currentTags.filter(
                             (t) => t !== option.value
                           );
-                          handleFilterChange("tags", newTags);
+                          handleFilterChange('tags', newTags);
                         } else {
                           // Add to selection
                           const newTags = [...currentTags, option.value];
-                          handleFilterChange("tags", newTags);
+                          handleFilterChange('tags', newTags);
                         }
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          const currentTags = filters.tags || [];
+                          const isSelected = currentTags.includes(option.value);
+
+                          if (isSelected) {
+                            // Remove from selection
+                            const newTags = currentTags.filter(
+                              (t) => t !== option.value
+                            );
+                            handleFilterChange('tags', newTags);
+                          } else {
+                            // Add to selection
+                            const newTags = [...currentTags, option.value];
+                            handleFilterChange('tags', newTags);
+                          }
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={
+                        filters.tags?.includes(option.value) || false
+                      }
                     >
                       <input
                         type="checkbox"
@@ -234,9 +258,10 @@ export default function ProblemFilter({
                 {filters.tags && filters.tags.length > 0 && (
                   <div className="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2">
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        handleFilterChange("tags", []);
+                        handleFilterChange('tags', []);
                       }}
                       className="w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                     >
@@ -253,9 +278,9 @@ export default function ProblemFilter({
               Phạm vi truy cập:
             </label>
             <Select
-              value={filters.accessRange || "all"}
+              value={filters.accessRange || 'all'}
               onValueChange={(value) =>
-                handleFilterChange("accessRange", value === "all" ? "" : value)
+                handleFilterChange('accessRange', value === 'all' ? '' : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">

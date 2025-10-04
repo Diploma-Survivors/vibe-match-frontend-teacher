@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ContestForm from "@/components/contest-form";
-import { mockContests } from "@/lib/data/mock-contests";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import { useState, useEffect, use } from "react";
-import { useParams } from "next/navigation";
+import ContestForm from '@/components/contest-form';
+import { Button } from '@/components/ui/button';
+import { mockContests } from '@/lib/data/mock-contests';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { notFound, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { use, useEffect, useState } from 'react';
 
 interface ContestData {
   name: string;
@@ -63,7 +63,7 @@ export default function EditContestPage() {
     setIsSaving(true);
     // Simulate saving
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Updating contest:", data);
+    console.log('Updating contest:', data);
     setIsSaving(false);
     // Here you would typically save to your backend
     // router.push(`/contests/${contestId}`);
@@ -73,7 +73,7 @@ export default function EditContestPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
           <p className="text-slate-600 dark:text-slate-400">
             Đang tải dữ liệu cuộc thi...
           </p>

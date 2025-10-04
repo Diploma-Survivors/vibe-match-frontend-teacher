@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import ProblemFilter from "@/components/problem-filter";
-import ProblemStats from "@/components/problem-stats";
-import ProblemTable from "@/components/problem-table";
-import QuickFilters from "@/components/quick-filters";
+import ProblemFilter from '@/components/problem-filter';
+import ProblemList from '@/components/problem-list';
+import ProblemStats from '@/components/problem-stats';
+import ProblemTable from '@/components/problem-table';
+import QuickFilters from '@/components/quick-filters';
 import SortControls, {
   type SortField,
   type SortOrder,
-} from "@/components/sort-controls";
-import { mockProblems } from "@/lib/data/mock-problems";
-import type { Problem, ProblemFilters } from "@/types/problem";
-import React, { useState, useMemo, useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import ProblemList from "@/components/problem-list";
+} from '@/components/sort-controls';
+import { Button } from '@/components/ui/button';
+import { mockProblems } from '@/lib/data/mock-problems';
+import type { ProblemFilters, Problems } from '@types/problems';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import React, { useState, useMemo, useEffect } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,8 +27,8 @@ export default function ProblemsPage() {
 
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>("id");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [sortField, setSortField] = useState<SortField>('id');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   // First, fix the filtering to handle tags array
   const filteredAndSortedProblems = useMemo(() => {
@@ -73,8 +73,8 @@ export default function ProblemsPage() {
       let bValue: string | number = b[sortField];
 
       // Handle special sorting for difficulty
-      if (sortField === "difficulty") {
-        const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
+      if (sortField === 'difficulty') {
+        const difficultyOrder = { Dễ: 1, 'Trung bình': 2, Khó: 3 };
         aValue =
           difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
         bValue =
@@ -82,12 +82,12 @@ export default function ProblemsPage() {
       }
 
       // Handle string sorting
-      if (typeof aValue === "string" && typeof bValue === "string") {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
 
-      if (sortOrder === "asc") {
+      if (sortOrder === 'asc') {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       }
       return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
@@ -135,7 +135,7 @@ export default function ProblemsPage() {
   const handleRemoveFilter = (key: keyof ProblemFilters) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: "",
+      [key]: '',
     }));
     setCurrentPage(1);
   };
