@@ -11,7 +11,11 @@ import SortControls, {
 } from '@/components/sort-controls';
 import { Button } from '@/components/ui/button';
 import { mockProblems } from '@/lib/data/mock-problems';
-import type { ProblemFilters, Problems } from '@types/problems';
+import {
+  ProblemEndpointType,
+  type ProblemFilters,
+  type Problems,
+} from '@types/problems';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState, useMemo, useEffect } from 'react';
@@ -170,7 +174,10 @@ export default function ProblemsPage() {
           </div>
         </div>
       </div>
-      <ProblemList mode="view" />
+      <ProblemList
+        mode="view"
+        endpointType={ProblemEndpointType.SELECTABLE_FOR_ASSIGNMENT}
+      />
     </div>
   );
 }

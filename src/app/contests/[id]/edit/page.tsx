@@ -1,6 +1,6 @@
 'use client';
 
-import ContestForm from '@/components/contest-form';
+import ContestForm, { ContestFormMode } from '@/components/contest-form';
 import { Button } from '@/components/ui/button';
 import { mockContests } from '@/lib/data/mock-contests';
 import { ArrowLeft } from 'lucide-react';
@@ -123,7 +123,7 @@ export default function EditContestPage() {
       <div className="container mx-auto px-6 py-8">
         <ContestForm
           initialData={contestData}
-          mode="edit"
+          mode={ContestFormMode.EDIT}
           onSave={handleSave}
           isSaving={isSaving}
           title="Chỉnh sửa cuộc thi"

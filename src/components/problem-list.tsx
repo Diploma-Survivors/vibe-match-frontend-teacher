@@ -6,8 +6,9 @@ import {
   type GetProblemListRequest,
   type PageInfo,
   type ProblemData,
+  type ProblemEndpointType,
   ProblemFilters,
-  ProblemListResponse,
+  type ProblemListResponse,
   SortBy,
   SortOrder,
 } from '@/types/problems';
@@ -18,12 +19,16 @@ import SortControls, { type SortField } from './sort-controls';
 
 interface ProblemTableProps {
   mode: 'view' | 'select';
-  onProblemView?: (problemId: string) => void;
+  endpointType: ProblemEndpointType;
+  onProblemView?: (problem: ProblemData) => void;
+  onProblemSelect?: (problem: ProblemData) => void;
 }
 
 export default function ProblemList({
   mode,
+  endpointType,
   onProblemView,
+  onProblemSelect,
 }: ProblemTableProps) {
   const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<ProblemData[]>([]);
@@ -42,24 +47,21 @@ export default function ProblemList({
     const fetchProblems = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching problems with request:', getProblemsRequest);
 
-        const response =
-          await ProblemsService.getProblemList(getProblemsRequest);
-        console.log('API Response:', response);
+        const axiosResponse = await ProblemsService.getProblemList(
+          getProblemsRequest,
+          endpointType
+        );
+        const response: ProblemListResponse = axiosResponse?.data?.data;
 
         // Extract problems from edges
-        const problemsData = response.edges.map((edge) => ({
+        const problemsData = response?.edges.map((edge) => ({
           ...edge.node,
         }));
 
         setProblems(problemsData);
         setPageInfo(response.pageInfos);
         setTotalCount(response.totalCount);
-
-        console.log('Processed problems:', problemsData);
-        console.log('Page info:', response.pageInfos);
-        console.log('Total count:', response.totalCount);
       } catch (err) {
         console.error('Error fetching problems:', err);
         setError("Can't load the problems.");
@@ -72,21 +74,16 @@ export default function ProblemList({
     };
 
     fetchProblems();
-  }, [getProblemsRequest]);
+  }, [getProblemsRequest, endpointType]);
 
-  const handleProblemSelectForDeeplinkingResponse = async (
-    problemId: string
-  ) => {
-    try {
-      const response = await LtiService.sendDeepLinkingResponse(problemId);
-    } catch (error) {
-      console.log('Error sending deep linking response:', error);
+  const handleProblemSelection = (problem: ProblemData) => {
+    if (onProblemSelect) {
+      onProblemSelect(problem);
     }
   };
 
   const handleLoadMore = () => {
     if (pageInfo?.hasNextPage && !isLoading) {
-      console.log('Loading next page with cursor:', pageInfo.endCursor);
       setGetProblemsRequest((prev) => ({
         ...prev,
         after: pageInfo.endCursor,
@@ -99,7 +96,6 @@ export default function ProblemList({
 
   const handleLoadPrevious = () => {
     if (pageInfo?.hasPreviousPage && !isLoading) {
-      console.log('Loading previous page with cursor:', pageInfo.startCursor);
       setGetProblemsRequest((prev) => ({
         ...prev,
         before: pageInfo.startCursor,
@@ -111,7 +107,6 @@ export default function ProblemList({
   };
 
   const handleResetPagination = () => {
-    console.log('Resetting pagination to first page');
     setGetProblemsRequest((prev) => ({
       ...prev,
       after: undefined,
@@ -190,7 +185,6 @@ export default function ProblemList({
                   sortField={getProblemsRequest.sortBy as SortField}
                   sortOrder={getProblemsRequest.sortOrder || SortOrder.DESC}
                   onSortChange={(field, order) => {
-                    console.log('Sort changed:', field, order);
                     setGetProblemsRequest((prev) => ({
                       ...prev,
                       sortBy: field as SortBy,
@@ -226,7 +220,7 @@ export default function ProblemList({
                 onLoadPrevious={handleLoadPrevious}
                 isLoading={isLoading}
                 selectionMode={mode === 'select'}
-                onProblemSelect={handleProblemSelectForDeeplinkingResponse}
+                onProblemSelect={handleProblemSelection}
                 onProblemView={onProblemView}
               />
             )}

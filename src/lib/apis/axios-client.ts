@@ -1,5 +1,6 @@
 'use client';
 
+import { toastService } from '@/services/toasts-service';
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
 
@@ -34,12 +35,30 @@ clientApi.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle global errors, e.g., redirect to login on 401 unauthorized
-    if (error.response && error.response.status === 401) {
-      // Handle unauthorized errors (e.g., redirect to login page)
-      console.error('Unauthorized, redirecting to login...');
-      // Example: router.push('/login'); (if you have access to router)
+    // Handle global errors
+    if (error.response) {
+      const status = error.response.status;
+      const message =
+        error.response.data?.message || error.message || 'An error occurred';
+
+      switch (status) {
+        case 401: // Unauthorized
+        case 403: // Forbidden
+          window.location.href = '/unauthorized';
+          break;
+        case 404: // Not Found
+          window.location.href = '/not-found';
+          break;
+        default:
+          toastService.error(`Error ${status}: ${message}`);
+          break;
+      }
+    } else if (error.request) {
+      toastService.error('Network error. Please check your connection.');
+    } else {
+      toastService.error(error.message || 'An unexpected error occurred');
     }
+
     return Promise.reject(error);
   }
 );

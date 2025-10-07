@@ -1,6 +1,6 @@
 'use client';
 
-import ContestForm from '@/components/contest-form';
+import ContestForm, { ContestFormMode } from '@/components/contest-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -195,7 +195,7 @@ export default function ContestDetailPage() {
           {/* Contest Information */}
           <ContestForm
             initialData={contestData}
-            mode="view"
+            mode={ContestFormMode.VIEW}
             onSave={handleSave}
             isSaving={false}
             title="Chi tiết cuộc thi"

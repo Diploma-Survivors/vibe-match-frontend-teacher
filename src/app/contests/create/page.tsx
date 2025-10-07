@@ -1,43 +1,53 @@
 'use client';
 
-import ContestForm from '@/components/contest-form';
+import ContestForm, { ContestFormMode } from '@/components/contest-form';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
+import { ContestsService } from '@/services/contests-service';
+import { LtiService, ResourceType } from '@/services/lti-service';
+import { toastService } from '@/services/toasts-service';
+import { type Contest, ContestStatus } from '@/types/contest';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-}
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation } = useApp();
 
-  const initialData: ContestData = {
+  const initialData: Contest = {
     name: '',
     description: '',
     startTime: '',
     endTime: '',
-    duration: 180,
-    accessRange: 'public',
+    durationMinutes: 180,
+    status: ContestStatus.PRIVATE,
     problems: [],
   };
 
-  const handleSave = async (data: ContestData) => {
+  const handleSave = async (data: Contest) => {
     setIsSaving(true);
-    // Simulate saving
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log('Creating contest:', data);
-    setIsSaving(false);
-    // Here you would typically save to your backend
+
+    try {
+      const contestDTO = ContestsService.mapContestToDTO(data);
+
+      const response = await ContestsService.createContest(contestDTO);
+      const newContestId = response?.data?.data?.id;
+
+      if (newContestId) {
+        await LtiService.sendDeepLinkingResponse(
+          newContestId,
+          ResourceType.CONTEST
+        );
+        toastService.success(
+          'Contest created and deep linking completed successfully!'
+        );
+      }
+    } catch (error) {
+      // do nothing as error is handled in axios interceptor
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -79,7 +89,7 @@ export default function CreateContestPage() {
       <div className="container mx-auto px-6 py-8">
         <ContestForm
           initialData={initialData}
-          mode="create"
+          mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
           title="Tạo cuộc thi mới"

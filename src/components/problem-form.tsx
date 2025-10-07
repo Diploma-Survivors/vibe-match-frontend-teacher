@@ -16,7 +16,7 @@ import { TopicsService } from '@/services/topics-service';
 import {
   type CreateProblemRequest,
   DIFFICULTY_OPTIONS,
-  ProblemData,
+  type ProblemData,
   ProblemDifficulty,
   ProblemType,
 } from '@/types/problems';
@@ -34,12 +34,19 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+export enum ProblemFormMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+  VIEW = 'view',
+}
+
 interface ProblemFormProps {
-  mode: 'create' | 'edit' | 'view';
-  onSave: (data: CreateProblemRequest, testcaseFile?: File) => Promise<void>;
+  mode: ProblemFormMode;
+  onSave?: (data: CreateProblemRequest, testcaseFile?: File) => Promise<void>;
   isSaving?: boolean;
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
+  initialData?: ProblemData;
 }
 
 export default function ProblemForm({
@@ -48,8 +55,9 @@ export default function ProblemForm({
   isSaving = false,
   title,
   subtitle,
+  initialData,
 }: ProblemFormProps) {
-  const isReadOnly = mode === 'view';
+  const isReadOnly = mode === ProblemFormMode.VIEW;
 
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
@@ -81,6 +89,28 @@ export default function ProblemForm({
       ],
     }
   );
+
+  useEffect(() => {
+    if (initialData) {
+      setProblemData({
+        title: initialData.title || '',
+        description: initialData.description || '',
+        inputDescription: initialData.inputDescription || '',
+        outputDescription: initialData.outputDescription || '',
+        maxScore: initialData.maxScore || 100,
+        timeLimitMs: initialData.timeLimitMs || 1000,
+        memoryLimitKb: initialData.memoryLimitKb || 262144,
+        difficulty: initialData.difficulty || ProblemDifficulty.EASY,
+        type: (initialData.type as ProblemType) || ProblemType.STANDALONE,
+        tagIds: initialData.tags || [],
+        topicIds: initialData.topic ? [initialData.topic] : [],
+        testcaseId: initialData.testcase || '',
+        testcaseSamples: initialData.testcaseSamples?.length
+          ? initialData.testcaseSamples
+          : [{ input: '', output: '' }],
+      });
+    }
+  }, [initialData]);
 
   // Load tags and topics when component mounts
   useEffect(() => {
@@ -280,7 +310,7 @@ export default function ProblemForm({
 
   const handleSave = async () => {
     // Validate testcase file is required for create mode
-    if (mode === 'create' && !testcaseFile) {
+    if (mode === ProblemFormMode.CREATE && !testcaseFile) {
       setShowTestcaseError(true);
       return;
     }
@@ -499,8 +529,8 @@ export default function ProblemForm({
                           !isReadOnly && handleTopicChange(topic.id);
                         }
                       }}
-                      role="button"
-                      tabIndex={0}
+                      // role="button"
+                      // tabIndex={0}
                       aria-label={`Toggle ${topic.name} topic`}
                     >
                       <input
@@ -548,8 +578,8 @@ export default function ProblemForm({
                           !isReadOnly && handleTagChange(tag.id);
                         }
                       }}
-                      role="button"
-                      tabIndex={0}
+                      // role="button"
+                      // tabIndex={0}
                       aria-label={`Toggle ${tag.name} tag`}
                     >
                       <input
@@ -662,7 +692,7 @@ export default function ProblemForm({
           </div>
 
           {/* Error message for missing testcase file */}
-          {showTestcaseError && mode === 'create' && (
+          {showTestcaseError && mode === ProblemFormMode.CREATE && (
             <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
@@ -869,7 +899,7 @@ export default function ProblemForm({
             <Save className="w-5 h-5 mr-2" />
             {isSaving
               ? 'Đang lưu...'
-              : mode === 'create'
+              : mode === ProblemFormMode.CREATE
                 ? 'Tạo bài tập'
                 : 'Cập nhật bài tập'}
           </Button>

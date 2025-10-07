@@ -57,6 +57,7 @@ export interface ProblemData {
   topic: string;
   testcase: string;
   testcaseSamples: TestcaseSample[];
+  score?: number; // For use in contests or assignments
 }
 
 export interface ProblemFilters {
@@ -114,3 +115,35 @@ export const ACCESS_RANGE_OPTIONS = [
   { value: 'public', label: 'Public' },
   { value: 'private', label: 'Private' },
 ];
+
+export enum ProblemEndpointType {
+  SELECTABLE_FOR_CONTEST = 'selectable-for-contest',
+  SELECTABLE_FOR_ASSIGNMENT = 'selectable-for-assignment',
+  TRAINING = 'training',
+}
+
+export const DIFFICULTY_LABELS = new Map([
+  [ProblemDifficulty.EASY, 'Dễ'],
+  [ProblemDifficulty.MEDIUM, 'Trung bình'],
+  [ProblemDifficulty.HARD, 'Khó'],
+]);
+
+export const DIFFICULTY_COLORS = new Map([
+  [ProblemDifficulty.EASY, 'bg-green-100 text-green-800 hover:bg-green-200'],
+  [
+    ProblemDifficulty.MEDIUM,
+    'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
+  ],
+  [ProblemDifficulty.HARD, 'bg-red-100 text-red-800 hover:bg-red-200'],
+]);
+
+export const DEFAULT_DIFFICULTY_COLOR =
+  'bg-gray-100 text-gray-800 hover:bg-gray-200';
+
+export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
+  return DIFFICULTY_COLORS.get(difficulty) || DEFAULT_DIFFICULTY_COLOR;
+};
+
+export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
+  return DIFFICULTY_LABELS.get(difficulty) || difficulty;
+};

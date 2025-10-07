@@ -1,19 +1,19 @@
 'use client';
 
-import ProblemForm from '@/components/problem-form';
+import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
 import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
 import { type CreateProblemRequest, ProblemDifficulty } from '@/types/problems';
+import { IssuerType } from '@/types/states';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
-  const { shouldHideNavigation } = useApp();
+  const { shouldHideNavigation, issuer } = useApp();
 
   const handleSave = async (
     data: CreateProblemRequest,
@@ -21,7 +21,6 @@ export default function CreateProblemPage() {
   ) => {
     setIsSaving(true);
 
-    console.log('Data', data);
     try {
       let result: any;
 
@@ -32,10 +31,8 @@ export default function CreateProblemPage() {
         );
       }
 
-      console.log('Problems created successfully:', result);
-
       // Handle deep linking response
-      if (result.id) {
+      if (issuer === IssuerType.MOODLE && result.id) {
         try {
           await LtiService.sendDeepLinkingResponse(result.id);
           console.log('Deep linking response sent successfully');
@@ -89,7 +86,7 @@ export default function CreateProblemPage() {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <ProblemForm
-          mode="create"
+          mode={ProblemFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
           title="Tạo bài tập mới"

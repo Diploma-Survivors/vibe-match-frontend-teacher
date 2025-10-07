@@ -11,11 +11,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { mockProblems } from '@/lib/data/mock-problems';
-import type { ProblemData } from '@types/problems';
+import { ProblemsService } from '@/services/problems-service';
+import { toastService } from '@/services/toasts-service';
+import { type Contest, ContestDTO, ContestStatus } from '@/types/contest';
+import { IssuerType } from '@/types/states';
+import {
+  type CreateProblemRequest,
+  type ProblemData,
+  ProblemEndpointType,
+  getDifficultyColor,
+  getDifficultyLabel,
+} from '@types/problems';
 import {
   BarChart3,
   Calendar,
   Clock,
+  Edit,
   Plus,
   Save,
   Search,
@@ -26,28 +37,20 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import ProblemForm from './problem-form';
+import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList from './problem-list';
+import ProblemScoreModal from './problem-score-modal';
 
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-  participants?: number;
-  maxParticipants?: number;
-  status?: string;
-  createdBy?: string;
-  createdAt?: string;
+export enum ContestFormMode {
+  CREATE = 'create',
+  EDIT = 'edit',
+  VIEW = 'view',
 }
 
 interface ContestFormProps {
-  initialData: ContestData;
-  mode: 'create' | 'edit' | 'view';
-  onSave: (data: ContestData) => Promise<void>;
+  initialData: Contest;
+  mode: ContestFormMode;
+  onSave: (data: Contest) => Promise<void>;
   isSaving?: boolean;
   title: string;
   subtitle: string;
@@ -61,65 +64,34 @@ export default function ContestForm({
   title,
   subtitle,
 }: ContestFormProps) {
-  const [contestData, setContestData] = useState<ContestData>(initialData);
+  const [contestData, setContestData] = useState<Contest>(initialData);
   const [showProblemModal, setShowProblemModal] = useState(false);
   const [problemSearch, setProblemSearch] = useState('');
   const [showNewProblemModal, setShowNewProblemModal] = useState(false);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
   const [showProblemDetailModal, setShowProblemDetailModal] = useState(false);
-  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
+  const [selectedProblem, setSelectedProblem] = useState<ProblemData | null>(
     null
   );
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isLoadingProblemDetail, setIsLoadingProblemDetail] = useState(false);
 
-  const isReadOnly = mode === 'view';
+  // Score modal states
+  const [showScoreModal, setShowScoreModal] = useState(false);
+  const [pendingProblem, setPendingProblem] = useState<ProblemData | null>(
+    null
+  );
+
+  const isReadOnly = mode === ContestFormMode.VIEW;
 
   // Add this handler function
-  const handleViewProblemDetail = async (problemId: string) => {
-    setSelectedProblemId(problemId);
-    setIsLoadingProblemDetail(true);
+  const handleViewProblemDetail = async (problem: ProblemData) => {
+    setSelectedProblem(problem);
     setShowProblemDetailModal(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Find the problem in our mock data
-      const problem = mockProblems.find((p) => p.id === problemId);
-
-      if (problem) {
-        // Convert to ProblemData format
-        setProblemData({
-          name: problem.title,
-          description: 'Detailed description would be here',
-          inputDescription: 'Input format details',
-          outputDescription: 'Output format details',
-          timeLimit: '1000',
-          memoryLimit: '256',
-          difficulty: problem.difficulty,
-          topic: problem.topic,
-          tags: problem.tags,
-          accessRange: problem.accessRange || 'public',
-          testCases: [
-            {
-              id: '1',
-              input: 'Sample input',
-              expectedOutput: 'Sample output',
-              isSample: true,
-            },
-          ],
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching problem details:', error);
-    } finally {
-      setIsLoadingProblemDetail(false);
-    }
   };
 
   const handleInputChange = (
-    field: keyof ContestData,
+    field: keyof Contest,
     value: string | number | string[]
   ) => {
     if (isReadOnly) return;
@@ -129,38 +101,69 @@ export default function ContestForm({
     }));
   };
 
-  const handleAddProblem = (problemId: string) => {
+  const handleAddProblem = (problem: ProblemData) => {
     if (isReadOnly) return;
-    if (!contestData.problems.includes(problemId)) {
-      setContestData((prev) => ({
-        ...prev,
-        problems: [...prev.problems, problemId],
-      }));
+    if (contestData.problems.some((obj) => obj.id === problem.id)) {
+      toastService.error('Bài thi đã được thêm vào cuộc thi.');
+      return;
     }
+    setContestData((prev) => ({
+      ...prev,
+      problems: [...prev.problems, problem],
+    }));
+    setPendingProblem(problem);
+    setShowScoreModal(true);
     setShowProblemModal(false);
     setProblemSearch('');
   };
 
-  const handleCreateProblem = async (newProblemData: ProblemData) => {
+  const handleCreateProblem = async (
+    data: CreateProblemRequest,
+    testcaseFile?: File
+  ) => {
+    setIsCreatingProblem(true);
+
     try {
-      setIsCreatingProblem(true);
+      let result: any;
 
-      // Here you would typically make an API call to create the problem
-      // For example: const response = await fetch('/api/problems', {method: 'POST', body: JSON.stringify(newProblemData)})
+      if (testcaseFile) {
+        result = await ProblemsService.createProblemComplete(
+          data,
+          testcaseFile
+        );
+      }
+      if (result) {
+        const newProblem = result;
 
-      // Simulate API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Transform API response to ProblemData format if needed
+        const problemData: ProblemData = {
+          id: newProblem.id,
+          title: newProblem.title,
+          description: newProblem.description,
+          inputDescription: newProblem.inputDescription,
+          outputDescription: newProblem.outputDescription,
+          maxScore: newProblem.maxScore,
+          timeLimitMs: newProblem.timeLimitMs,
+          memoryLimitKb: newProblem.memoryLimitKb,
+          difficulty: newProblem.difficulty,
+          tags: newProblem.tagIds || [],
+          topic: newProblem.topicIds?.[0] || '',
+          testcase: newProblem.testcaseId || '',
+          testcaseSamples: newProblem.testcaseSamples || [],
+        };
 
-      // Mock a response with a generated ID
-      const newProblemId = `p-${Date.now().toString(36)}`;
+        setContestData((prevData) => ({
+          ...prevData,
+          problems: [...prevData.problems, problemData],
+        }));
 
-      // Add the new problem to the contest
-      handleAddProblem(newProblemId);
-
-      // Close the modal
-      setShowNewProblemModal(false);
+        setPendingProblem(problemData);
+        setShowScoreModal(true);
+        setShowNewProblemModal(false);
+      }
     } catch (error) {
-      console.error('Error creating problem:', error);
+      console.error('Failed to create problem:', error);
+      alert('Failed to create problem. Please try again.');
     } finally {
       setIsCreatingProblem(false);
     }
@@ -170,7 +173,7 @@ export default function ContestForm({
     if (isReadOnly) return;
     setContestData((prev) => ({
       ...prev,
-      problems: prev.problems.filter((id) => id !== problemId),
+      problems: prev.problems.filter((problem) => problem.id !== problemId),
     }));
   };
 
@@ -180,7 +183,7 @@ export default function ContestForm({
       const end = new Date(contestData.endTime);
       const durationMs = end.getTime() - start.getTime();
       const durationMinutes = Math.floor(durationMs / (1000 * 60));
-      handleInputChange('duration', durationMinutes);
+      handleInputChange('durationMinutes', durationMinutes);
     }
   };
 
@@ -213,6 +216,26 @@ export default function ContestForm({
     }
   };
 
+  const handleSaveScore = (score: number) => {
+    if (pendingProblem) {
+      setContestData((prev) => ({
+        ...prev,
+        problems: prev.problems.map((p) =>
+          p.id === pendingProblem.id ? { ...p, score } : p
+        ),
+      }));
+    }
+
+    setShowScoreModal(false);
+    setPendingProblem(null);
+  };
+
+  const handleEditProblemScore = (problem: ProblemData) => {
+    if (isReadOnly) return;
+    setPendingProblem(problem);
+    setShowScoreModal(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header Info */}
@@ -224,7 +247,7 @@ export default function ContestForm({
       </div>
 
       {/* Contest Stats (View mode only) */}
-      {mode === 'view' && (
+      {mode === ContestFormMode.VIEW && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
             <CardContent className="p-6">
@@ -237,7 +260,9 @@ export default function ContestForm({
                     Trạng thái
                   </p>
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(contestData.status)}`}
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                      contestData.status
+                    )}`}
                   >
                     {contestData.status}
                   </div>
@@ -293,8 +318,8 @@ export default function ContestForm({
                     Thời lượng
                   </p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {Math.floor(contestData.duration / 60)}h{' '}
-                    {contestData.duration % 60}m
+                    {Math.floor(contestData.durationMinutes / 60)}h{' '}
+                    {contestData.durationMinutes % 60}m
                   </p>
                 </div>
               </div>
@@ -350,21 +375,19 @@ export default function ContestForm({
               {isReadOnly ? (
                 <div
                   className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                    contestData.accessRange === 'public'
+                    contestData.status === ContestStatus.PRIVATE
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
                       : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
                   }`}
                 >
-                  {contestData.accessRange === 'public'
+                  {contestData.status === ContestStatus.PUBLIC
                     ? 'Công khai'
                     : 'Riêng tư'}
                 </div>
               ) : (
                 <Select
-                  value={contestData.accessRange}
-                  onValueChange={(value) =>
-                    handleInputChange('accessRange', value)
-                  }
+                  value={contestData.status}
+                  onValueChange={(value) => handleInputChange('status', value)}
                 >
                   <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
                     <SelectValue placeholder="Chọn phạm vi truy cập" />
@@ -379,7 +402,7 @@ export default function ContestForm({
           </div>
 
           {/* Creator info (View mode only) */}
-          {mode === 'view' && contestData.createdBy && (
+          {mode === ContestFormMode.VIEW && contestData.createdBy && (
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Người tạo
@@ -527,8 +550,8 @@ export default function ContestForm({
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-slate-500" />
               <span className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                {Math.floor(contestData.duration / 60)}h{' '}
-                {contestData.duration % 60}m
+                {Math.floor(contestData.durationMinutes / 60)}h{' '}
+                {contestData.durationMinutes % 60}m
               </span>
             </div>
             {!isReadOnly && (
@@ -536,18 +559,19 @@ export default function ContestForm({
                 <Input
                   type="number"
                   placeholder="180"
-                  value={contestData.duration}
+                  value={contestData.durationMinutes}
                   onChange={(e) =>
                     handleInputChange(
-                      'duration',
+                      'durationMinutes',
                       Number.parseInt(e.target.value) || 0
                     )
                   }
                   className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
                 />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Thời lượng hiện tại: {Math.floor(contestData.duration / 60)}h{' '}
-                  {contestData.duration % 60}m
+                  Thời lượng hiện tại:{' '}
+                  {Math.floor(contestData.durationMinutes / 60)}h{' '}
+                  {contestData.durationMinutes % 60}m
                 </p>
               </>
             )}
@@ -583,7 +607,7 @@ export default function ContestForm({
           </div>
         </CardHeader>
         <CardContent>
-          {selectedProblems.length === 0 ? (
+          {contestData.problems.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-slate-400" />
@@ -606,7 +630,7 @@ export default function ContestForm({
             </div>
           ) : (
             <div className="space-y-4">
-              {selectedProblems.map((problem, index) => (
+              {contestData.problems.map((problem, index) => (
                 <div
                   key={problem.id}
                   className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-700/30 rounded-xl border border-slate-200/50 dark:border-slate-600/50"
@@ -622,35 +646,39 @@ export default function ContestForm({
                         {problem.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded">
-                          {problem.id}
-                        </span>
-                        <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded">
-                          {problem.difficulty}
-                        </span>
+                        <div
+                          className={`${getDifficultyColor(problem.difficulty)} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
+                        >
+                          {getDifficultyLabel(problem.difficulty)}
+                        </div>
+                        {problem.score !== undefined && (
+                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded font-semibold">
+                            {problem.score} điểm
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {mode === 'view' && (
-                      <div className="text-right">
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          {problem.acceptanceRate}% AC
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-500">
-                          {problem.submissionCount} lần nộp
-                        </p>
-                      </div>
-                    )}
                     {!isReadOnly && (
-                      <Button
-                        onClick={() => handleRemoveProblem(problem.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => handleEditProblemScore(problem)}
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleRemoveProblem(problem.id)}
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -671,7 +699,7 @@ export default function ContestForm({
             <Save className="w-5 h-5 mr-2" />
             {isSaving
               ? 'Đang lưu...'
-              : mode === 'create'
+              : mode === ContestFormMode.CREATE
                 ? 'Tạo cuộc thi'
                 : 'Cập nhật cuộc thi'}
           </Button>
@@ -695,7 +723,7 @@ export default function ContestForm({
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               <ProblemForm
-                mode="create"
+                mode={ProblemFormMode.CREATE}
                 onSave={handleCreateProblem}
                 isSaving={isCreatingProblem}
                 title="Tạo bài tập mới"
@@ -727,6 +755,7 @@ export default function ContestForm({
             <div className="px-2 overflow-y-auto no-top-offset ">
               <ProblemList
                 mode="select"
+                endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
                 onProblemSelect={handleAddProblem}
                 onProblemView={handleViewProblemDetail}
               />
@@ -744,11 +773,11 @@ export default function ContestForm({
                 Chi tiết bài tập
               </h2>
               <div>
-                {selectedProblemId && (
+                {selectedProblem && (
                   <Button
                     onClick={() => {
-                      if (selectedProblemId) {
-                        handleAddProblem(selectedProblemId);
+                      if (selectedProblem) {
+                        handleAddProblem(selectedProblem);
                         setShowProblemDetailModal(false);
                       }
                     }}
@@ -768,14 +797,10 @@ export default function ContestForm({
               </div>
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-              {isLoadingProblemDetail ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="w-16 h-16 border-4 border-green-400 border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : problemData ? (
+              {selectedProblem ? (
                 <ProblemForm
-                  initialData={problemData}
-                  mode="view"
+                  initialData={selectedProblem}
+                  mode={ProblemFormMode.VIEW}
                   isSaving={false}
                   title="Chi tiết bài tập"
                   subtitle="Thông tin chi tiết về bài tập này"
@@ -786,41 +811,21 @@ export default function ContestForm({
                 </div>
               )}
             </div>
-            <div className="p-6 border-t border-slate-200 dark:border-slate-700 flex justify-end">
-              <Button
-                onClick={() => setShowProblemDetailModal(false)}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-800 mr-2"
-              >
-                Đóng
-              </Button>
-              {/* {selectedProblemId && (
-                <Button 
-                  onClick={() => {
-                    if (selectedProblemId) {
-                      handleAddProblem(selectedProblemId);
-                      setShowProblemDetailModal(false);
-                    }
-                  }}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
-                >
-                  Chọn bài tập này
-                </Button>
-              )} */}
-              <Button
-                onClick={() => {
-                  if (selectedProblemId) {
-                    handleAddProblem(selectedProblemId);
-                    setShowProblemDetailModal(false);
-                  }
-                }}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
-              >
-                Chọn bài tập này
-              </Button>
-            </div>
           </div>
         </div>
       )}
+
+      <ProblemScoreModal
+        isOpen={showScoreModal}
+        problem={pendingProblem}
+        currentScore={pendingProblem?.score}
+        onSave={handleSaveScore}
+        title={
+          pendingProblem?.score
+            ? 'Chỉnh sửa điểm bài tập'
+            : 'Thiết lập điểm cho bài tập'
+        }
+      />
     </div>
   );
 }

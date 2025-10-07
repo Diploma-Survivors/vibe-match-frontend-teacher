@@ -1,12 +1,12 @@
-import type { DecodedAccessToken } from "@/types/states";
-import { jwtDecode } from "jwt-decode";
-import NextAuth from "next-auth";
-import type { NextAuthOptions } from "next-auth";
-import { getServerSession } from "next-auth"; // Add this import
-import type { JWT } from "next-auth/jwt";
-import CredentialsProvider from "next-auth/providers/credentials";
+import type { DecodedAccessToken } from '@/types/states';
+import { jwtDecode } from 'jwt-decode';
+import NextAuth from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
+import { getServerSession } from 'next-auth'; // Add this import
+import type { JWT } from 'next-auth/jwt';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     deviceId?: string;
     accessToken?: string;
@@ -25,14 +25,15 @@ declare module "next-auth" {
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/v1"}/auth/refresh`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/v1'}/auth/refresh`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.refreshToken}`,
         },
         body: JSON.stringify({
-          refreshToken: token.refreshToken, // Use the refresh token from the old token
+          deviceId: token.deviceId,
         }),
       }
     );
@@ -49,10 +50,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       refreshToken: data.refreshToken, // Fall back to old refresh token
     };
   } catch (error) {
-    console.error("Error refreshing access token:", error);
+    console.error('Error refreshing access token:', error);
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: 'RefreshAccessTokenError',
     };
   }
 }
@@ -60,19 +61,19 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      id: "sso",
-      name: "SSO",
+      id: 'sso',
+      name: 'SSO',
       credentials: {
-        accessToken: { label: "Access Token", type: "text" },
-        refreshToken: { label: "Refresh Token", type: "text" },
-        deviceId: { label: "Device ID", type: "text" },
-        redirect: { label: "Redirect", type: "text" },
-        callbackUrl: { label: "Callback URL", type: "text" },
+        accessToken: { label: 'Access Token', type: 'text' },
+        refreshToken: { label: 'Refresh Token', type: 'text' },
+        deviceId: { label: 'Device ID', type: 'text' },
+        redirect: { label: 'Redirect', type: 'text' },
+        callbackUrl: { label: 'Callback URL', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
         return {
-          id: "sso-user",
+          id: 'sso-user',
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
           deviceId: credentials.deviceId,
@@ -98,7 +99,7 @@ export const authOptions: NextAuthOptions = {
           );
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
-          console.error("Failed to decode access token:", err);
+          console.error('Failed to decode access token:', err);
         }
       }
       if (
@@ -114,7 +115,7 @@ export const authOptions: NextAuthOptions = {
           );
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
-          console.error("Failed to decode access token:", err);
+          console.error('Failed to decode access token:', err);
         }
       }
       return token;
@@ -130,11 +131,11 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    error: "/",
+    signIn: '/auth/signin',
+    error: '/',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

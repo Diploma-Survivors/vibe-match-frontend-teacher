@@ -1,16 +1,39 @@
 'use client';
 
+import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import ProblemList from '@/components/problem-list';
 import { Button } from '@/components/ui/button';
+import { LtiService } from '@/services/lti-service';
+import { type ProblemData, ProblemEndpointType } from '@/types/problems';
 import { ChevronRight, File, FilePlus, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 export default function OptionsPage() {
   const [showProblemModal, setShowProblemModal] = useState(false);
+  const [showProblemDetailModal, setShowProblemDetailModal] = useState(false);
+  const [selectedProblem, setSelectedProblem] = useState<ProblemData | null>(
+    null
+  );
+  const [problemData, setProblemData] = useState<ProblemData | null>(null);
 
   const handleProblemSelectionClick = () => {
     setShowProblemModal(true);
+  };
+
+  const handleViewProblemDetail = async (problem: ProblemData) => {
+    setSelectedProblem(problem);
+    setShowProblemDetailModal(true);
+  };
+
+  const handleProblemSelectForDeeplinkingResponse = async (
+    problem: ProblemData
+  ) => {
+    try {
+      const response = await LtiService.sendDeepLinkingResponse(problem.id);
+    } catch (error) {
+      console.error('Error sending deep linking response:', error);
+    }
   };
 
   return (
@@ -111,8 +134,88 @@ export default function OptionsPage() {
               </div>
             </div>
             <div className="px-2 overflow-y-auto no-top-offset ">
-              <ProblemList mode="select" />
+              <ProblemList
+                mode="select"
+                endpointType={ProblemEndpointType.SELECTABLE_FOR_ASSIGNMENT}
+                onProblemView={handleViewProblemDetail}
+                onProblemSelect={handleProblemSelectForDeeplinkingResponse}
+              />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Problems Detail Modal */}
+      {showProblemDetailModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                Chi tiết bài tập
+              </h2>
+              <div>
+                {selectedProblem && (
+                  <Button
+                    onClick={() => {
+                      if (selectedProblem) {
+                        handleProblemSelectForDeeplinkingResponse(
+                          selectedProblem
+                        );
+                        setShowProblemDetailModal(false);
+                        setShowProblemModal(false);
+                      }
+                    }}
+                    className="mr-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  >
+                    Chọn bài tập này
+                  </Button>
+                )}
+                <Button
+                  onClick={() => setShowProblemDetailModal(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full w-8 h-8 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {selectedProblem ? (
+                <ProblemForm
+                  initialData={selectedProblem}
+                  mode={ProblemFormMode.VIEW}
+                  isSaving={false}
+                  title="Chi tiết bài tập"
+                  subtitle="Thông tin chi tiết về bài tập này"
+                />
+              ) : (
+                <div className="text-center text-slate-500 py-10">
+                  Không thể tải thông tin bài tập. Vui lòng thử lại sau.
+                </div>
+              )}
+            </div>
+            {/* <div className="p-6 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+              <Button
+                onClick={() => setShowProblemDetailModal(false)}
+                className="bg-slate-200 hover:bg-slate-300 text-slate-800 mr-2"
+              >
+                Đóng
+              </Button>
+              <Button
+                onClick={() => {
+                  console.log('Selected problem ID:', selectedProblemId);
+                  if (selectedProblemId) {
+                    console.log('Selected problem ID:', selectedProblemId);
+                    setShowProblemDetailModal(false);
+                    handleProblemSelectForDeeplinkingResponse(selectedProblemId);
+                  }
+                }}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+              >
+                Chọn bài tập này a
+              </Button>
+            </div> */}
           </div>
         </div>
       )}

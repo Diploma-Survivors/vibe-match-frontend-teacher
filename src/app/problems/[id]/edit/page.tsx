@@ -1,6 +1,6 @@
 'use client';
 
-import ProblemForm from '@/components/problem-form';
+import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
 import { mockProblems } from '@/lib/data/mock-problems';
 import type { ProblemData } from '@types/problems';
@@ -127,7 +127,7 @@ export default function EditProblemPage() {
       <div className="container mx-auto px-6 py-8">
         <ProblemForm
           initialData={problemData}
-          mode="edit"
+          mode={ProblemFormMode.EDIT}
           onSave={handleSave}
           isSaving={isSaving}
           title="Chỉnh sửa bài tập"

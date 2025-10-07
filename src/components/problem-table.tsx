@@ -10,10 +10,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { PageInfo, ProblemData } from '@/types/problems';
+import { getDifficultyColor, getDifficultyLabel } from '@/types/problems';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import ProblemForm from './problem-form';
 
 interface ProblemTableProps {
   problems: ProblemData[];
@@ -23,44 +23,9 @@ interface ProblemTableProps {
   onLoadPrevious?: () => void;
   isLoading?: boolean;
   selectionMode?: boolean;
-  onProblemSelect?: (problemId: string) => void;
-  onProblemView?: (problemId: string) => void;
+  onProblemSelect?: (problem: ProblemData) => void;
+  onProblemView?: (problem: ProblemData) => void;
 }
-
-const getDifficultyColor = (difficulty: string) => {
-  switch (difficulty.toLowerCase()) {
-    case 'easy':
-    case 'dễ':
-      return 'bg-green-100 text-green-800 hover:bg-green-200';
-    case 'medium':
-    case 'trung bình':
-      return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
-    case 'hard':
-    case 'khó':
-      return 'bg-red-100 text-red-800 hover:bg-red-200';
-    default:
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-  }
-};
-
-const getDifficultyLabel = (difficulty: string) => {
-  switch (difficulty.toLowerCase()) {
-    case 'easy':
-      return 'Dễ';
-    case 'medium':
-      return 'Trung bình';
-    case 'hard':
-      return 'Khó';
-    default:
-      return difficulty;
-  }
-};
-
-const getAcceptanceRateColor = (rate: number) => {
-  if (rate >= 70) return 'text-green-600';
-  if (rate >= 40) return 'text-yellow-600';
-  return 'text-red-600';
-};
 
 export default function ProblemTable({
   problems,
@@ -76,12 +41,15 @@ export default function ProblemTable({
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
     null
   );
-  const [showProblemDetail, setShowProblemDetail] = useState(false);
-  const [problemData, setProblemData] = useState<ProblemData | null>(null);
 
   const handleProblemClick = (problemId: string) => {
     if (selectionMode && onProblemView) {
-      onProblemView(problemId);
+      const selectedProblem = problems.find(
+        (problem) => problem.id === problemId
+      );
+      if (selectedProblem) {
+        onProblemView(selectedProblem);
+      }
     }
   };
 
@@ -91,7 +59,12 @@ export default function ProblemTable({
 
   const handleConfirmSelection = () => {
     if (selectedProblemId && onProblemSelect) {
-      onProblemSelect(selectedProblemId);
+      const selectedProblem = problems.find(
+        (problem) => problem.id === selectedProblemId
+      );
+      if (selectedProblem) {
+        onProblemSelect(selectedProblem);
+      }
     }
   };
 
