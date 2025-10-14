@@ -36,7 +36,7 @@ export interface CreateProblemRequest {
   type: ProblemType;
   tagIds: string[];
   topicIds: string[];
-  testcaseId: string;
+  testcase?: File;
   testcaseSamples: TestcaseSample[];
 }
 
@@ -55,7 +55,7 @@ export interface ProblemData {
   updatedAt?: string;
   tags: string[];
   topic: string;
-  testcase: string;
+  testcase: File | string;
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
 }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
 import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
-import { type CreateProblemRequest, ProblemDifficulty } from '@/types/problems';
+import type { CreateProblemRequest } from '@/types/problems';
 import { IssuerType } from '@/types/states';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -15,20 +15,14 @@ export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation, issuer } = useApp();
 
-  const handleSave = async (
-    data: CreateProblemRequest,
-    testcaseFile?: File
-  ) => {
+  const handleSave = async (data: CreateProblemRequest) => {
     setIsSaving(true);
 
     try {
       let result: any;
 
-      if (testcaseFile) {
-        result = await ProblemsService.createProblemComplete(
-          data,
-          testcaseFile
-        );
+      if (data.testcase) {
+        result = await ProblemsService.createProblemComplete(data);
       }
 
       // Handle deep linking response

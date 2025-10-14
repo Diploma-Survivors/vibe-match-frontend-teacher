@@ -13,12 +13,12 @@ import {
 import { mockProblems } from '@/lib/data/mock-problems';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
-import { type Contest, ContestDTO, ContestStatus } from '@/types/contest';
-import { IssuerType } from '@/types/states';
+import { type Contest, ContestStatus } from '@/types/contest';
 import {
   type CreateProblemRequest,
   type ProblemData,
   ProblemEndpointType,
+  ProblemType,
   getDifficultyColor,
   getDifficultyLabel,
 } from '@types/problems';
@@ -117,20 +117,17 @@ export default function ContestForm({
     setProblemSearch('');
   };
 
-  const handleCreateProblem = async (
-    data: CreateProblemRequest,
-    testcaseFile?: File
-  ) => {
+  const handleCreateProblem = async (data: CreateProblemRequest) => {
     setIsCreatingProblem(true);
 
     try {
       let result: any;
 
-      if (testcaseFile) {
-        result = await ProblemsService.createProblemComplete(
-          data,
-          testcaseFile
-        );
+      if (data.testcase) {
+        result = await ProblemsService.createProblemComplete({
+          ...data,
+          type: ProblemType.CONTEST,
+        });
       }
       if (result) {
         const newProblem = result;
@@ -647,7 +644,9 @@ export default function ContestForm({
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <div
-                          className={`${getDifficultyColor(problem.difficulty)} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
+                          className={`${getDifficultyColor(
+                            problem.difficulty
+                          )} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
                         >
                           {getDifficultyLabel(problem.difficulty)}
                         </div>

@@ -1,19 +1,12 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
-import {
-  type CreateProblemRequest,
-  type GetProblemListRequest,
-  ProblemData,
-  type ProblemEndpointType,
-  type ProblemListResponse,
+import type {
+  CreateProblemRequest,
+  GetProblemListRequest,
+  ProblemEndpointType,
+  ProblemListResponse,
 } from '@/types/problems';
-import { Tag } from '@/types/tags';
-import { TestcaseSample } from '@/types/testcases';
-import { Topic } from '@/types/topics';
 import type { AxiosResponse } from 'axios';
-import { TagsService } from './tags-service';
-import { TestcasesService } from './testcases-service';
-import { TopicsService } from './topics-service';
 
 async function getProblemList(
   getProblemListRequest: GetProblemListRequest,
@@ -28,36 +21,39 @@ async function getProblemList(
 
 // Complete problem creation workflow
 async function createProblemComplete(
-  problemRequest: CreateProblemRequest,
-  testcaseFile?: File
+  problemRequest: CreateProblemRequest
 ): Promise<any> {
   try {
-    let testcaseId: string;
-
-    // If testcaseFile is provided, upload it first
-    if (testcaseFile) {
-      testcaseId = await TestcasesService.createTestcaseComplete(testcaseFile);
-    } else if (problemRequest.testcaseId) {
-      // Use existing testcase ID if provided
-      testcaseId = problemRequest.testcaseId;
-    } else {
-      throw new Error('Either testcase file or testcase ID must be provided');
+    if (!problemRequest.testcase) {
+      throw new Error(
+        'Testcase file is required for complete problem creation.'
+      );
     }
 
-    // Create the request with testcase ID
-    const request: CreateProblemRequest = {
-      ...problemRequest,
-      testcaseId: testcaseId,
-      // Ensure arrays are properly formatted
-      tagIds: Array.isArray(problemRequest.tagIds) ? problemRequest.tagIds : [],
-      topicIds: Array.isArray(problemRequest.topicIds)
-        ? problemRequest.topicIds
-        : [],
-    };
+    const formData = new FormData();
+    formData.append('title', problemRequest.title);
+    formData.append('description', problemRequest.description);
+    formData.append('inputDescription', problemRequest.inputDescription);
+    formData.append('outputDescription', problemRequest.outputDescription);
+    formData.append('maxScore', problemRequest.maxScore.toString());
+    formData.append('timeLimitMs', problemRequest.timeLimitMs.toString());
+    formData.append('memoryLimitKb', problemRequest.memoryLimitKb.toString());
+    formData.append('difficulty', problemRequest.difficulty);
+    formData.append('type', problemRequest.type);
+    formData.append('tagIds', JSON.stringify(problemRequest.tagIds || []));
+    formData.append('topicIds', JSON.stringify(problemRequest.topicIds || []));
+    formData.append('testcaseFile', problemRequest.testcase);
+    formData.append(
+      'testcaseSamples',
+      JSON.stringify(problemRequest.testcaseSamples || [])
+    );
 
-    console.log('Final request payload:', JSON.stringify(request, null, 2));
+    console.log('Final request payload:', JSON.stringify(formData, null, 2));
 
-    const response = await clientApi.post('/problems', request, {
+    const response = await clientApi.post('/problems', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
       withCredentials: true,
     });
     return response.data.data;

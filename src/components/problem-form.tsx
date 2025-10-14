@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ProblemsService } from '@/services/problems-service';
 import { TagsService } from '@/services/tags-service';
 import { TopicsService } from '@/services/topics-service';
 import {
@@ -42,7 +41,7 @@ export enum ProblemFormMode {
 
 interface ProblemFormProps {
   mode: ProblemFormMode;
-  onSave?: (data: CreateProblemRequest, testcaseFile?: File) => Promise<void>;
+  onSave?: (data: CreateProblemRequest) => Promise<void>;
   isSaving?: boolean;
   title?: string;
   subtitle?: string;
@@ -61,7 +60,6 @@ export default function ProblemForm({
 
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-  const [testcaseFile, setTestcaseFile] = useState<File | null>(null);
   const [currentTestPage, setCurrentTestPage] = useState(1);
   const [dragActive, setDragActive] = useState(false);
   const [showTestcaseError, setShowTestcaseError] = useState(false);
@@ -80,7 +78,7 @@ export default function ProblemForm({
       type: ProblemType.STANDALONE,
       tagIds: [],
       topicIds: [],
-      testcaseId: '',
+      testcase: undefined,
       testcaseSamples: [
         {
           input: '',
@@ -104,7 +102,7 @@ export default function ProblemForm({
         type: (initialData.type as ProblemType) || ProblemType.STANDALONE,
         tagIds: initialData.tags || [],
         topicIds: initialData.topic ? [initialData.topic] : [],
-        testcaseId: initialData.testcase || '',
+        testcase: (initialData.testcase as File) || undefined,
         testcaseSamples: initialData.testcaseSamples?.length
           ? initialData.testcaseSamples
           : [{ input: '', output: '' }],
@@ -267,7 +265,10 @@ export default function ProblemForm({
       );
 
       if (hasValidType || hasValidExtension) {
-        setTestcaseFile(file);
+        setProblemData((prev) => ({
+          ...prev,
+          testcase: file,
+        }));
         setShowTestcaseError(false); // Hide error when file is uploaded
       } else {
         alert('Chỉ chấp nhận file .txt, .csv, .xlsx, .xls');
@@ -293,7 +294,10 @@ export default function ProblemForm({
       );
 
       if (hasValidType || hasValidExtension) {
-        setTestcaseFile(file);
+        setProblemData((prev) => ({
+          ...prev,
+          testcase: file,
+        }));
         setShowTestcaseError(false); // Hide error when file is uploaded
       } else {
         alert('Chỉ chấp nhận file .txt, .csv, .xlsx, .xls');
@@ -302,7 +306,10 @@ export default function ProblemForm({
   };
 
   const removeFile = () => {
-    setTestcaseFile(null);
+    setProblemData((prev) => ({
+      ...prev,
+      testcase: undefined,
+    }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -310,7 +317,7 @@ export default function ProblemForm({
 
   const handleSave = async () => {
     // Validate testcase file is required for create mode
-    if (mode === ProblemFormMode.CREATE && !testcaseFile) {
+    if (mode === ProblemFormMode.CREATE && !createProblemRequest.testcase) {
       setShowTestcaseError(true);
       return;
     }
@@ -319,7 +326,7 @@ export default function ProblemForm({
 
     // callback
     if (onSave) {
-      onSave(createProblemRequest, testcaseFile ?? undefined);
+      onSave(createProblemRequest);
     }
   };
 
@@ -624,12 +631,18 @@ export default function ProblemForm({
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            {testcaseFile ? (
+            {createProblemRequest.testcase ? (
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
-                  {testcaseFile.name.toLowerCase().endsWith('.csv') ||
-                  testcaseFile.name.toLowerCase().endsWith('.xlsx') ||
-                  testcaseFile.name.toLowerCase().endsWith('.xls') ? (
+                  {createProblemRequest.testcase.name
+                    .toLowerCase()
+                    .endsWith('.csv') ||
+                  createProblemRequest.testcase.name
+                    .toLowerCase()
+                    .endsWith('.xlsx') ||
+                  createProblemRequest.testcase.name
+                    .toLowerCase()
+                    .endsWith('.xls') ? (
                     <FileSpreadsheet className="w-8 h-8 text-green-600 dark:text-green-400" />
                   ) : (
                     <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
@@ -637,13 +650,16 @@ export default function ProblemForm({
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                    {testcaseFile.name}
+                    {createProblemRequest.testcase.name}
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {(testcaseFile.size / 1024).toFixed(2)} KB
+                    {(createProblemRequest.testcase.size / 1024).toFixed(2)} KB
                   </p>
                   <span className="inline-block px-2 py-1 mt-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md">
-                    {testcaseFile.name.split('.').pop()?.toUpperCase()}
+                    {createProblemRequest.testcase.name
+                      .split('.')
+                      .pop()
+                      ?.toUpperCase()}
                   </span>
                 </div>
                 <Button
