@@ -155,7 +155,7 @@ export default function ProblemForm({
     }));
   };
 
-  const handleTagChange = (tagId: string) => {
+  const handleTagChange = (tagId: number) => {
     if (isReadOnly) return;
     setProblemData((prev) => {
       const currentTags = prev.tagIds || [];
@@ -164,7 +164,7 @@ export default function ProblemForm({
       if (isSelected) {
         return {
           ...prev,
-          tagIds: currentTags.filter((t: string) => t !== tagId),
+          tagIds: currentTags.filter((t: number) => t !== tagId),
         };
       }
       return {
@@ -174,7 +174,7 @@ export default function ProblemForm({
     });
   };
 
-  const handleTopicChange = (topicId: string) => {
+  const handleTopicChange = (topicId: number) => {
     if (isReadOnly) return;
     setProblemData((prev) => {
       const currentTopics = prev.topicIds || [];
@@ -183,7 +183,7 @@ export default function ProblemForm({
       if (isSelected) {
         return {
           ...prev,
-          topicIds: currentTopics.filter((t: string) => t !== topicId),
+          topicIds: currentTopics.filter((t: number) => t !== topicId),
         };
       }
       return {

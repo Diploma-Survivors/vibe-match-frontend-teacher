@@ -74,7 +74,7 @@ export class TestcasesService {
   }
 
   // Complete testcase creation workflow with caching
-  static async createTestcaseComplete(file: File): Promise<string> {
+  static async createTestcaseComplete(file: File): Promise<number> {
     try {
       // Check if we have a cached testcase response for this file
       const cacheKey = TestcasesService.generateCacheKey(file);

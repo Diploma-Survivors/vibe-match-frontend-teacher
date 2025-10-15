@@ -94,11 +94,11 @@ function convertToQueryParams(request: GetProblemListRequest): URLSearchParams {
       params.append('difficulty', request.filters.difficulty);
     }
     if (request.filters.topic) {
-      params.append('topic', request.filters.topic);
+      params.append('topic', request.filters.topic.toString());
     }
     if (request.filters.tags && request.filters.tags.length > 0) {
       for (const tag of request.filters.tags) {
-        params.append('tags', tag);
+        params.append('tags', tag.toString());
       }
     }
   }

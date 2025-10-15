@@ -36,7 +36,7 @@ export class TagsService {
   }
 
   // Fetch tag by ID
-  static async getTagById(id: string): Promise<Tag> {
+  static async getTagById(id: number): Promise<Tag> {
     try {
       const response = await clientApi.get(`/tags/${id}`);
       return response.data.data;
@@ -47,7 +47,7 @@ export class TagsService {
   }
 
   // Update tag by ID
-  static async updateTag(tag: CreateTagRequest, id: string): Promise<Tag> {
+  static async updateTag(tag: CreateTagRequest, id: number): Promise<Tag> {
     try {
       const response = await clientApi.patch(`/tags/${id}`, tag);
       return response.data.data;
@@ -58,7 +58,7 @@ export class TagsService {
   }
 
   // Delete tag by ID
-  static async deleteTag(id: string): Promise<void> {
+  static async deleteTag(id: number): Promise<void> {
     try {
       await clientApi.delete(`/tags/${id}`);
     } catch (error) {

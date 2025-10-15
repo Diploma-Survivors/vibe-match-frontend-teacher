@@ -1,19 +1,16 @@
 'use client';
 
-import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
   type PageInfo,
   type ProblemData,
   type ProblemEndpointType,
-  ProblemFilters,
   type ProblemListResponse,
   SortBy,
   SortOrder,
 } from '@/types/problems';
-import { useEffect, useMemo, useState } from 'react';
-import ProblemFilter from './problem-filter';
+import { useEffect, useState } from 'react';
 import ProblemTable from './problem-table';
 import SortControls, { type SortField } from './sort-controls';
 

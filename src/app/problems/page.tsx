@@ -1,24 +1,13 @@
 'use client';
 
-import ProblemFilter from '@/components/problem-filter';
 import ProblemList from '@/components/problem-list';
-import ProblemStats from '@/components/problem-stats';
-import ProblemTable from '@/components/problem-table';
-import QuickFilters from '@/components/quick-filters';
-import SortControls, {
-  type SortField,
-  type SortOrder,
-} from '@/components/sort-controls';
+import type { SortField, SortOrder } from '@/components/sort-controls';
 import { Button } from '@/components/ui/button';
 import { mockProblems } from '@/lib/data/mock-problems';
-import {
-  ProblemEndpointType,
-  type ProblemFilters,
-  type Problems,
-} from '@types/problems';
+import { ProblemEndpointType, type ProblemFilters } from '@types/problems';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import React, { useState, useMemo, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 

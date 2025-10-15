@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { mockContests } from '@/lib/data/mock-contests';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { notFound, useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface ContestData {
   name: string;

@@ -16,7 +16,7 @@ async function getDeviceId(): Promise<string> {
 
 // Send deep linking response
 async function sendDeepLinkingResponse(
-  resourceId: string,
+  resourceId: number,
   type: ResourceType = ResourceType.PROBLEM
 ): Promise<any> {
   try {

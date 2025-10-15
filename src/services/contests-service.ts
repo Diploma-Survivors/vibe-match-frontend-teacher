@@ -1,7 +1,7 @@
 import clientApi from '@/lib/apis/axios-client';
-import { type ApiResponse, HttpStatus } from '@/types/api';
+import type { ApiResponse } from '@/types/api';
 import type { Contest, ContestDTO, ContestProblemDTO } from '@/types/contest';
-import axios, { type AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 
 async function createContest(
   contestDTO: ContestDTO

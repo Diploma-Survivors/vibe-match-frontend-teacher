@@ -1,10 +1,8 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ProblemFilters } from '@types/problems';
 import { Filter, X } from 'lucide-react';
-import React from 'react';
 
 interface QuickFiltersProps {
   activeFilters: ProblemFilters;

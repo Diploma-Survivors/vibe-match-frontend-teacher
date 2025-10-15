@@ -166,7 +166,7 @@ export default function ContestForm({
     }
   };
 
-  const handleRemoveProblem = (problemId: string) => {
+  const handleRemoveProblem = (problemId: number) => {
     if (isReadOnly) return;
     setContestData((prev) => ({
       ...prev,

@@ -40,7 +40,7 @@ export class TopicsService {
   }
 
   // Fetch topic by ID
-  static async getTopicById(id: string): Promise<Topic> {
+  static async getTopicById(id: number): Promise<Topic> {
     try {
       const response = await clientApi.get(`/topics/${id}`);
       return response.data.data;
@@ -53,7 +53,7 @@ export class TopicsService {
   // Update topic
   static async updateTopic(
     topic: UpdateTopicRequest,
-    id: string
+    id: number
   ): Promise<Topic> {
     try {
       const response = await clientApi.patch(`/topics/${id}`, topic);
@@ -65,7 +65,7 @@ export class TopicsService {
   }
 
   // Delete topic
-  static async deleteTopic(id: string): Promise<void> {
+  static async deleteTopic(id: number): Promise<void> {
     try {
       await clientApi.delete(`/topics/${id}`);
     } catch (error) {

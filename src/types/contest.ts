@@ -1,7 +1,7 @@
 import type { ProblemData } from './problems';
 
 export interface Contest {
-  id?: string;
+  id?: number;
   name: string;
   description: string;
   startTime: string;
@@ -14,7 +14,7 @@ export interface Contest {
 }
 
 export interface ContestDTO {
-  id?: string;
+  id?: number;
   name: string;
   description: string;
   startTime: string;
@@ -32,7 +32,7 @@ export enum ContestStatus {
 }
 
 export interface ContestFilters {
-  id?: string;
+  id?: number;
   name?: string;
   status?: string;
   accessRange?: string;
@@ -52,6 +52,6 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
 ];
 
 export interface ContestProblemDTO {
-  problemId: string;
+  problemId: number;
   score: number;
 }

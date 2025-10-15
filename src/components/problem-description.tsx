@@ -18,8 +18,6 @@ import {
   Clock,
   Code2,
   Copy,
-  FileText,
-  Filter,
   MemoryStick,
   Play,
   Search,
@@ -568,7 +566,15 @@ export default function ProblemDescription({
 
       setSubmissions([newSubmission, ...submissions]);
       setOutput(
-        `✅ Submission #${newSubmission.id} completed!\n\nStatus: ${newSubmission.status}\nRuntime: ${newSubmission.runtime}\nMemory: ${newSubmission.memory}\nScore: ${newSubmission.score}/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'} (0.15s)`
+        `✅ Submission #${newSubmission.id} completed!\n\nStatus: ${
+          newSubmission.status
+        }\nRuntime: ${newSubmission.runtime}\nMemory: ${
+          newSubmission.memory
+        }\nScore: ${
+          newSubmission.score
+        }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
+          newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'
+        } (0.15s)`
       );
       setIsSubmitting(false);
     }, 3000);
@@ -1048,7 +1054,9 @@ export default function ProblemDescription({
                               {submission.fullName}
                             </span>
                             <span
-                              className={`text-xs font-medium ${getRankColor(submission.userRank)}`}
+                              className={`text-xs font-medium ${getRankColor(
+                                submission.userRank
+                              )}`}
                             >
                               @{submission.who}
                             </span>
@@ -1080,7 +1088,9 @@ export default function ProblemDescription({
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="relative group">
                           <div
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${getVerdictColor(submission.verdict)}`}
+                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${getVerdictColor(
+                              submission.verdict
+                            )}`}
                           >
                             {getVerdictIcon(submission.verdict)}
                             {submission.verdict}

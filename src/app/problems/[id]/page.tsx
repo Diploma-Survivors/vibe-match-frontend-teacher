@@ -23,36 +23,30 @@ export default function ProblemDetailsPage() {
       if (existingProblem) {
         // Convert existing problem to view format
         setProblemData({
-          name: existingProblem.title,
+          title: existingProblem.title,
           description:
             'Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].',
           inputDescription: 'Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)',
           outputDescription:
             'In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng',
-          timeLimit: '2000',
-          memoryLimit: '256',
+          timeLimitMs: 2000,
+          memoryLimitKb: 256000,
           difficulty: existingProblem.difficulty,
           topic: existingProblem.topic,
           tags: existingProblem.tags,
-          accessRange: existingProblem.accessRange,
-          testCases: [
+          type: existingProblem.type,
+          testcaseSamples: [
             {
-              id: '1',
               input: '5',
-              expectedOutput: '1 1 2 2 4',
-              isSample: true,
+              output: '1 1 2 2 4',
             },
             {
-              id: '2',
               input: '10',
-              expectedOutput: '1 1 2 2 4 2 6 4 6 4',
-              isSample: true,
+              output: '1 1 2 2 4 2 6 4 6 4',
             },
             {
-              id: '3',
               input: '1',
-              expectedOutput: '1',
-              isSample: false,
+              output: '1',
             },
           ],
         });

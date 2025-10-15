@@ -34,14 +34,14 @@ export interface CreateProblemRequest {
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
   type: ProblemType;
-  tagIds: string[];
-  topicIds: string[];
+  tagIds: number[];
+  topicIds: number[];
   testcase?: File;
   testcaseSamples: TestcaseSample[];
 }
 
 export interface ProblemData {
-  id: string;
+  id: number;
   title: string;
   description: string;
   inputDescription: string;
@@ -53,17 +53,17 @@ export interface ProblemData {
   type?: string;
   createdAt?: string;
   updatedAt?: string;
-  tags: string[];
-  topic: string;
-  testcase: File | string;
+  tags: number[];
+  topic: number;
+  testcase: File | number;
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
 }
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
-  topic?: string;
-  tags?: string[];
+  topic?: number;
+  tags?: number[];
 }
 
 export interface GetProblemListRequest {

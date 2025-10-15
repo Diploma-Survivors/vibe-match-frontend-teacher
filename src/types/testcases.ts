@@ -1,5 +1,5 @@
 export interface TestCase {
-  id: string;
+  id: number;
   input: string;
   expectedOutput: string;
   isSample: boolean;
@@ -15,13 +15,13 @@ export interface CreateTestcaseRequest {
 }
 
 export interface CreateTestcaseFileResponse {
-  id: string;
+  id: number;
   fileUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateTestcaseResponse {
-  id: string;
+  id: number;
   // Add other fields as returned by backend
 }
