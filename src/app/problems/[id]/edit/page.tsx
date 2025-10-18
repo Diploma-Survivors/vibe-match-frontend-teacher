@@ -7,6 +7,7 @@ import {
   type CreateProblemRequest,
   type ProblemData,
   ProblemDifficulty,
+  ProblemType,
 } from '@/types/problems';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -61,7 +62,7 @@ export default function EditProblemPage() {
           timeLimitMs: 1000,
           memoryLimitKb: 256000,
           difficulty: ProblemDifficulty.EASY,
-          type: 'standalone',
+          type: ProblemType.STANDALONE,
           createdAt: '2024-01-15T10:30:00Z',
           updatedAt: '2024-01-20T14:45:00Z',
           tags: [1, 3, 5], // Array manipulation, Hash table, Two pointers
