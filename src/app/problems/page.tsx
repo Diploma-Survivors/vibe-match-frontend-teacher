@@ -4,7 +4,7 @@ import ProblemList from '@/components/problem-list';
 import type { SortField, SortOrder } from '@/components/sort-controls';
 import { Button } from '@/components/ui/button';
 import { mockProblems } from '@/lib/data/mock-problems';
-import { ProblemEndpointType, type ProblemFilters } from '@types/problems';
+import { ProblemEndpointType, type ProblemFilters } from '@/types/problems';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -27,18 +27,6 @@ export default function ProblemsPage() {
   const filteredAndSortedProblems = useMemo(() => {
     // First filter
     const filtered = mockProblems.filter((problem) => {
-      if (
-        filters.id &&
-        !problem.id.toLowerCase().includes(filters.id.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
-        filters.title &&
-        !problem.title.toLowerCase().includes(filters.title.toLowerCase())
-      ) {
-        return false;
-      }
       if (filters.difficulty && problem.difficulty !== filters.difficulty) {
         return false;
       }
@@ -54,40 +42,11 @@ export default function ProblemsPage() {
           return false;
         }
       }
-      if (filters.accessRange && problem.accessRange !== filters.accessRange) {
-        return false;
-      }
       return true;
     });
 
-    // Then sort - fix the type assertion
-    filtered.sort((a, b) => {
-      let aValue: string | number = a[sortField];
-      let bValue: string | number = b[sortField];
-
-      // Handle special sorting for difficulty
-      if (sortField === 'difficulty') {
-        const difficultyOrder = { Dễ: 1, 'Trung bình': 2, Khó: 3 };
-        aValue =
-          difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
-        bValue =
-          difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
-      }
-
-      // Handle string sorting
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
-
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      }
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    });
-
     return filtered;
-  }, [filters, sortField, sortOrder]);
+  }, [filters]);
 
   // Paginate filtered and sorted problems
   const paginatedProblems = useMemo(() => {

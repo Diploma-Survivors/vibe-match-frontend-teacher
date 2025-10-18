@@ -3,7 +3,11 @@
 import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
 import { mockProblems } from '@/lib/data/mock-problems';
-import type { ProblemData } from '@types/problems';
+import {
+  type CreateProblemRequest,
+  type ProblemData,
+  ProblemDifficulty,
+} from '@/types/problems';
 import { ArrowLeft, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -11,7 +15,7 @@ import { useEffect, useState } from 'react';
 
 export default function ProblemDetailsPage() {
   const params = useParams();
-  const problemId = params.id as string;
+  const problemId = Number.parseInt(params.id as string, 10);
 
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,30 +27,53 @@ export default function ProblemDetailsPage() {
       if (existingProblem) {
         // Convert existing problem to view format
         setProblemData({
-          title: existingProblem.title,
-          description:
-            'Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].',
-          inputDescription: 'Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)',
-          outputDescription:
-            'In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng',
-          timeLimitMs: 2000,
+          id: 1,
+          title: 'Two Sum',
+          description: `
+                      <p>Cho một mảng các số nguyên <code>nums</code> và một số nguyên <code>target</code>, hãy trả về các chỉ số của hai số sao cho tổng của chúng bằng <code>target</code>.</p>
+                      
+                      <p>Bạn có thể giả định rằng mỗi đầu vào sẽ có chính xác một lời giải, và bạn không thể sử dụng cùng một phần tử hai lần.</p>
+                      
+                      <p>Bạn có thể trả về câu trả lời theo bất kỳ thứ tự nào.</p>
+                      
+                      <h3>Ví dụ 1:</h3>
+                      <pre>
+                      Input: nums = [2,7,11,15], target = 9
+                      Output: [0,1]
+                      Giải thích: Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1].
+                      </pre>
+                      
+                      <h3>Ví dụ 2:</h3>
+                      <pre>
+                      Input: nums = [3,2,4], target = 6
+                      Output: [1,2]
+                      </pre>
+                    `,
+          inputDescription: `
+                      <p>Dòng đầu tiên chứa hai số nguyên <code>n</code> và <code>target</code> (1 ≤ n ≤ 10^4, -10^9 ≤ target ≤ 10^9)</p>
+                      <p>Dòng thứ hai chứa <code>n</code> số nguyên <code>nums[i]</code> (-10^9 ≤ nums[i] ≤ 10^9)</p>
+                    `,
+          outputDescription: `
+                      <p>In ra hai số nguyên là chỉ số của hai phần tử có tổng bằng target, cách nhau bởi dấu cách.</p>
+                    `,
+          maxScore: 100,
+          timeLimitMs: 1000,
           memoryLimitKb: 256000,
-          difficulty: existingProblem.difficulty,
-          topic: existingProblem.topic,
-          tags: existingProblem.tags,
-          type: existingProblem.type,
+          difficulty: ProblemDifficulty.EASY,
+          type: 'standalone',
+          createdAt: '2024-01-15T10:30:00Z',
+          updatedAt: '2024-01-20T14:45:00Z',
+          tags: [1, 3, 5], // Array manipulation, Hash table, Two pointers
+          topic: 1, // Data Structures
+          testcase: 1,
           testcaseSamples: [
             {
-              input: '5',
-              output: '1 1 2 2 4',
+              input: '4 9\n2 7 11 15',
+              output: '0 1',
             },
             {
-              input: '10',
-              output: '1 1 2 2 4 2 6 4 6 4',
-            },
-            {
-              input: '1',
-              output: '1',
+              input: '3 6\n3 2 4',
+              output: '1 2',
             },
           ],
         });
@@ -57,7 +84,7 @@ export default function ProblemDetailsPage() {
     loadProblemData();
   }, [problemId]);
 
-  const handleSave = async (data: ProblemData) => {
+  const handleSave = async (data: CreateProblemRequest) => {
     // This won't be called in view mode
     console.log('View mode - save not available');
   };

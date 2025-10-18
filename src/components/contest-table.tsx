@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -8,16 +8,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { Contest } from "@/types/contest";
+} from '@/components/ui/table';
+import type { Contest } from '@/types/contest';
 import {
+  Calendar,
   ChevronLeft,
   ChevronRight,
-  Calendar,
-  Users,
   Trophy,
-} from "lucide-react";
-import Link from "next/link";
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface ContestTableProps {
   contests: Contest[];
@@ -28,24 +28,24 @@ interface ContestTableProps {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "chưa bắt đầu":
-      return "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300";
-    case "đang diễn ra":
-      return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300";
-    case "đã kết thúc":
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300";
+    case 'chưa bắt đầu':
+      return 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300';
+    case 'đang diễn ra':
+      return 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300';
+    case 'đã kết thúc':
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300';
     default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300";
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300';
   }
 };
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case "chưa bắt đầu":
+    case 'chưa bắt đầu':
       return <Calendar className="w-4 h-4" />;
-    case "đang diễn ra":
+    case 'đang diễn ra':
       return <Trophy className="w-4 h-4" />;
-    case "đã kết thúc":
+    case 'đã kết thúc':
       return <Users className="w-4 h-4" />;
     default:
       return <Calendar className="w-4 h-4" />;
@@ -121,7 +121,7 @@ export default function ContestTable({
                           {contest.name}
                         </button>
                       </Link>
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         <div
                           className={`${contest.accessRange === "public" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"} font-medium px-2 py-1 rounded-lg border text-xs inline-block`}
                         >
@@ -129,17 +129,17 @@ export default function ContestTable({
                             ? "Công khai"
                             : "Riêng tư"}
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-4 py-4">
                     <div className="space-y-2">
-                      <div
+                      {/* <div
                         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(contest.status)}`}
                       >
                         {getStatusIcon(contest.status)}
                         {contest.status}
-                      </div>
+                      </div> */}
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-4 py-4">
@@ -186,13 +186,13 @@ export default function ContestTable({
                 return (
                   <Button
                     key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
+                    variant={currentPage === pageNum ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
                     className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
                       currentPage === pageNum
-                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                        : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                        : 'border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
                     }`}
                   >
                     {pageNum}
@@ -213,11 +213,11 @@ export default function ContestTable({
           </div>
 
           <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Trang{" "}
+            Trang{' '}
             <span className="font-bold text-slate-900 dark:text-slate-100">
               {currentPage}
-            </span>{" "}
-            /{" "}
+            </span>{' '}
+            /{' '}
             <span className="font-bold text-slate-900 dark:text-slate-100">
               {totalPages}
             </span>

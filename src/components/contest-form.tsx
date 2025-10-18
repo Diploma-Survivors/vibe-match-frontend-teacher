@@ -21,7 +21,7 @@ import {
   ProblemType,
   getDifficultyColor,
   getDifficultyLabel,
-} from '@types/problems';
+} from '@/types/problems';
 import {
   BarChart3,
   Calendar,
@@ -188,18 +188,6 @@ export default function ContestForm({
     onSave(contestData);
   };
 
-  // Filter problems for modal
-  const filteredProblems = mockProblems.filter((problem) =>
-    problemSearch
-      ? problem.title.toLowerCase().includes(problemSearch.toLowerCase()) ||
-        problem.id.toLowerCase().includes(problemSearch.toLowerCase())
-      : true
-  );
-
-  const selectedProblems = mockProblems.filter((problem) =>
-    contestData.problems.includes(problem.id)
-  );
-
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'chưa bắt đầu':
@@ -274,14 +262,14 @@ export default function ContestForm({
                 <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
                     Thí sinh
                   </p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                     {contestData.participants || 0}
                   </p>
-                </div>
+                </div> */}
               </div>
             </CardContent>
           </Card>

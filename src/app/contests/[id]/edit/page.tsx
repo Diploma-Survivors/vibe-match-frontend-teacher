@@ -3,32 +3,33 @@
 import ContestForm, { ContestFormMode } from '@/components/contest-form';
 import { Button } from '@/components/ui/button';
 import { mockContests } from '@/lib/data/mock-contests';
+import type { Contest } from '@/types/contest';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-  participants?: number;
-  maxParticipants?: number;
-  status?: string;
-  createdBy?: string;
-  createdAt?: string;
-}
+// interface ContestData {
+//   name: string;
+//   description: string;
+//   startTime: string;
+//   endTime: string;
+//   duration: number;
+//   accessRange: string;
+//   problems: string[];
+//   participants?: number;
+//   maxParticipants?: number;
+//   status?: string;
+//   createdBy?: string;
+//   createdAt?: string;
+// }
 
 export default function EditContestPage() {
   const router = useRouter();
   const params = useParams();
   const contestId = params.id;
 
-  const [contestData, setContestData] = useState<ContestData | null>(null);
+  const [contestData, setContestData] = useState<Contest | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,11 +43,8 @@ export default function EditContestPage() {
           description: existingContest.description,
           startTime: existingContest.startTime,
           endTime: existingContest.endTime,
-          duration: existingContest.duration,
-          accessRange: existingContest.accessRange,
-          problems: existingContest.problems,
-          participants: existingContest.participants,
-          maxParticipants: existingContest.maxParticipants,
+          durationMinutes: existingContest.durationMinutes,
+          problems: [],
           status: existingContest.status,
           createdBy: existingContest.createdBy,
           createdAt: existingContest.createdAt,
@@ -58,7 +56,7 @@ export default function EditContestPage() {
     loadContestData();
   }, [contestId]);
 
-  const handleSave = async (data: ContestData) => {
+  const handleSave = async (data: Contest) => {
     setIsSaving(true);
     // Simulate saving
     await new Promise((resolve) => setTimeout(resolve, 2000));

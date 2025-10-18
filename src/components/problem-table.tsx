@@ -38,11 +38,11 @@ export default function ProblemTable({
   onProblemSelect,
   onProblemView,
 }: ProblemTableProps) {
-  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
+  const [selectedProblemId, setSelectedProblemId] = useState<number | null>(
     null
   );
 
-  const handleProblemClick = (problemId: string) => {
+  const handleProblemClick = (problemId: number) => {
     if (selectionMode && onProblemView) {
       const selectedProblem = problems.find(
         (problem) => problem.id === problemId
@@ -53,7 +53,7 @@ export default function ProblemTable({
     }
   };
 
-  const handleProblemSelection = (problemId: string) => {
+  const handleProblemSelection = (problemId: number) => {
     setSelectedProblemId(problemId);
   };
 

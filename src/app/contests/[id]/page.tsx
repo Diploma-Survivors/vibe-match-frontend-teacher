@@ -3,80 +3,17 @@
 import ContestForm, { ContestFormMode } from '@/components/contest-form';
 import { Button } from '@/components/ui/button';
 import { mockContests } from '@/lib/data/mock-contests';
+import type { Contest } from '@/types/contest';
 import { ArrowLeft, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-  participants?: number;
-  maxParticipants?: number;
-  status?: string;
-  createdBy?: string;
-  createdAt?: string;
-}
-
-// Mock participants data
-const mockParticipants = [
-  {
-    id: '1',
-    name: 'Nguyễn Văn A',
-    rank: 1,
-    score: 100,
-    solvedProblems: 5,
-    totalTime: '2h 15m',
-    status: 'Hoàn thành',
-  },
-  {
-    id: '2',
-    name: 'Trần Thị B',
-    rank: 2,
-    score: 85,
-    solvedProblems: 4,
-    totalTime: '2h 45m',
-    status: 'Hoàn thành',
-  },
-  {
-    id: '3',
-    name: 'Lê Văn C',
-    rank: 3,
-    score: 75,
-    solvedProblems: 4,
-    totalTime: '2h 50m',
-    status: 'Hoàn thành',
-  },
-  {
-    id: '4',
-    name: 'Phạm Thị D',
-    rank: 4,
-    score: 60,
-    solvedProblems: 3,
-    totalTime: '2h 30m',
-    status: 'Đang thi',
-  },
-  {
-    id: '5',
-    name: 'Hoàng Văn E',
-    rank: 5,
-    score: 45,
-    solvedProblems: 2,
-    totalTime: '1h 45m',
-    status: 'Đang thi',
-  },
-];
-
 export default function ContestDetailPage() {
   const params = useParams();
   const contestId = params.id;
 
-  const [contestData, setContestData] = useState<ContestData | null>(null);
+  const [contestData, setContestData] = useState<Contest | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load existing contest data
@@ -89,11 +26,8 @@ export default function ContestDetailPage() {
           description: existingContest.description,
           startTime: existingContest.startTime,
           endTime: existingContest.endTime,
-          duration: existingContest.duration,
-          accessRange: existingContest.accessRange,
-          problems: existingContest.problems,
-          participants: existingContest.participants,
-          maxParticipants: existingContest.maxParticipants,
+          durationMinutes: existingContest.durationMinutes,
+          problems: [],
           status: existingContest.status,
           createdBy: existingContest.createdBy,
           createdAt: existingContest.createdAt,
@@ -105,7 +39,7 @@ export default function ContestDetailPage() {
     loadContestData();
   }, [contestId]);
 
-  const handleSave = async (data: ContestData) => {
+  const handleSave = async (data: Contest) => {
     // This won't be called in view mode
     console.log('View mode - save not available');
   };
