@@ -11,11 +11,7 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import React from "react";
 
-export type SortField =
-  | "id"
-  | "title"
-  | "difficulty"
-  | "acceptanceRate"
+export type SortField = "id" | "title" | "difficulty" | "acceptanceRate";
 export type SortOrder = "asc" | "desc";
 
 interface SortControlsProps {

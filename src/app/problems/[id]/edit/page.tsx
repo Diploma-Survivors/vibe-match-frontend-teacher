@@ -1,18 +1,23 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ProblemForm from "@/components/problem-form";
-import { ProblemData } from "@/types/problem";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { mockProblems } from "@/lib/data/mock-problems";
+import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
+import { Button } from '@/components/ui/button';
+import { mockProblems } from '@/lib/data/mock-problems';
+import {
+  type CreateProblemRequest,
+  type ProblemData,
+  ProblemDifficulty,
+  ProblemType,
+} from '@/types/problems';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function EditProblemPage() {
   const params = useParams();
-  const problemId = params.id as string;
-  
+  const problemId = Number.parseInt(params.id as string, 10);
+
   const [problemData, setProblemData] = useState<ProblemData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,38 +25,57 @@ export default function EditProblemPage() {
   // Load existing problem data
   useEffect(() => {
     const loadProblemData = () => {
-      const existingProblem = mockProblems.find(p => p.id === problemId);
+      const existingProblem = mockProblems.find((p) => p.id === problemId);
       if (existingProblem) {
         // Convert existing problem to edit format
         setProblemData({
-          name: existingProblem.title,
-          description: "Cho số nguyên dương N, liệt kê phi hàm euler của các số từ 1 tới N và in ra màn hình.\n\nPhi hàm euler của số X hiển số lượng số nguyên tố cùng nhau với X nằm trong khoảng từ [1, X].",
-          inputDescription: "Dòng duy nhất chứa số nguyên N (1 ≤ N ≤ 10^6)",
-          outputDescription: "In ra phi hàm euler của các số từ 1 tới N, mỗi số cách nhau một khoảng trắng",
-          timeLimit: "2000",
-          memoryLimit: "256",
-          difficulty: existingProblem.difficulty,
-          topic: existingProblem.topic,
-          tags: existingProblem.tags,
-          accessRange: existingProblem.accessRange,
-          testCases: [
+          id: 1,
+          title: 'Two Sum',
+          description: `
+              <p>Cho một mảng các số nguyên <code>nums</code> và một số nguyên <code>target</code>, hãy trả về các chỉ số của hai số sao cho tổng của chúng bằng <code>target</code>.</p>
+              
+              <p>Bạn có thể giả định rằng mỗi đầu vào sẽ có chính xác một lời giải, và bạn không thể sử dụng cùng một phần tử hai lần.</p>
+              
+              <p>Bạn có thể trả về câu trả lời theo bất kỳ thứ tự nào.</p>
+              
+              <h3>Ví dụ 1:</h3>
+              <pre>
+              Input: nums = [2,7,11,15], target = 9
+              Output: [0,1]
+              Giải thích: Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1].
+              </pre>
+              
+              <h3>Ví dụ 2:</h3>
+              <pre>
+              Input: nums = [3,2,4], target = 6
+              Output: [1,2]
+              </pre>
+            `,
+          inputDescription: `
+              <p>Dòng đầu tiên chứa hai số nguyên <code>n</code> và <code>target</code> (1 ≤ n ≤ 10^4, -10^9 ≤ target ≤ 10^9)</p>
+              <p>Dòng thứ hai chứa <code>n</code> số nguyên <code>nums[i]</code> (-10^9 ≤ nums[i] ≤ 10^9)</p>
+            `,
+          outputDescription: `
+              <p>In ra hai số nguyên là chỉ số của hai phần tử có tổng bằng target, cách nhau bởi dấu cách.</p>
+            `,
+          maxScore: 100,
+          timeLimitMs: 1000,
+          memoryLimitKb: 256000,
+          difficulty: ProblemDifficulty.EASY,
+          type: ProblemType.STANDALONE,
+          createdAt: '2024-01-15T10:30:00Z',
+          updatedAt: '2024-01-20T14:45:00Z',
+          tags: [1, 3, 5], // Array manipulation, Hash table, Two pointers
+          topic: 1, // Data Structures
+          testcase: 1,
+          testcaseSamples: [
             {
-              id: "1",
-              input: "5",
-              expectedOutput: "1 1 2 2 4",
-              isSample: true,
+              input: '4 9\n2 7 11 15',
+              output: '0 1',
             },
             {
-              id: "2",
-              input: "10",
-              expectedOutput: "1 1 2 2 4 2 6 4 6 4",
-              isSample: true,
-            },
-            {
-              id: "3",
-              input: "1",
-              expectedOutput: "1",
-              isSample: false,
+              input: '3 6\n3 2 4',
+              output: '1 2',
             },
           ],
         });
@@ -62,11 +86,11 @@ export default function EditProblemPage() {
     loadProblemData();
   }, [problemId]);
 
-  const handleSave = async (data: ProblemData) => {
+  const handleSave = async (data: CreateProblemRequest) => {
     setIsSaving(true);
     // Simulate saving
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Updating problem:", data);
+    console.log('Updating problem:', data);
     setIsSaving(false);
     // Here you would typically save to your backend
   };
@@ -75,8 +99,10 @@ export default function EditProblemPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">Đang tải dữ liệu bài tập...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Đang tải dữ liệu bài tập...
+          </p>
         </div>
       </div>
     );
@@ -123,7 +149,7 @@ export default function EditProblemPage() {
       <div className="container mx-auto px-6 py-8">
         <ProblemForm
           initialData={problemData}
-          mode="edit"
+          mode={ProblemFormMode.EDIT}
           onSave={handleSave}
           isSaving={isSaving}
           title="Chỉnh sửa bài tập"

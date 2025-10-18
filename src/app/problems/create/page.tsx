@@ -1,43 +1,45 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ProblemForm from "@/components/problem-form";
-import { ProblemData } from "@/types/problem";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
+import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/app-context';
+import { LtiService } from '@/services/lti-service';
+import { ProblemsService } from '@/services/problems-service';
+import type { CreateProblemRequest } from '@/types/problems';
+import { IssuerType } from '@/types/states';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const { shouldHideNavigation, issuer } = useApp();
 
-  const initialData: ProblemData = {
-    name: "",
-    description: "",
-    inputDescription: "",
-    outputDescription: "",
-    timeLimit: "1000",
-    memoryLimit: "256",
-    difficulty: "",
-    topic: "",
-    tags: [],
-    accessRange: "",
-    testCases: [
-      {
-        id: "1",
-        input: "",
-        expectedOutput: "",
-        isSample: true,
-      },
-    ],
-  };
-
-  const handleSave = async (data: ProblemData) => {
+  const handleSave = async (data: CreateProblemRequest) => {
     setIsSaving(true);
-    // Simulate saving
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Saving problem:", data);
-    setIsSaving(false);
-    // Here you would typically save to your backend
+
+    try {
+      let result: any;
+
+      if (data.testcase) {
+        result = await ProblemsService.createProblemComplete(data);
+      }
+
+      // Handle deep linking response
+      if (issuer === IssuerType.MOODLE && result.id) {
+        try {
+          await LtiService.sendDeepLinkingResponse(result.id);
+          console.log('Deep linking response sent successfully');
+        } catch (dlError) {
+          console.error('Failed to send deep linking response:', dlError);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create problem:', error);
+      alert('Failed to create problem. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -47,16 +49,29 @@ export default function CreateProblemPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/problems">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Quay lại danh sách
-                </Button>
-              </Link>
+              {shouldHideNavigation ? (
+                <Link href="/options">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại trang lựa chọn
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/problems">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại danh sách
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -65,8 +80,7 @@ export default function CreateProblemPage() {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <ProblemForm
-          initialData={initialData}
-          mode="create"
+          mode={ProblemFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
           title="Tạo bài tập mới"

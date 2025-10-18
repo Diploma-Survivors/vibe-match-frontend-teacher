@@ -1,41 +1,54 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ContestForm from "@/components/contest-form";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-}
+import ContestForm, { ContestFormMode } from '@/components/contest-form';
+import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/app-context';
+import { ContestsService } from '@/services/contests-service';
+import { LtiService, ResourceType } from '@/services/lti-service';
+import { toastService } from '@/services/toasts-service';
+import { type Contest, ContestStatus } from '@/types/contest';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const { shouldHideNavigation } = useApp();
 
-  const initialData: ContestData = {
-    name: "",
-    description: "",
-    startTime: "",
-    endTime: "",
-    duration: 180,
-    accessRange: "public",
+  const initialData: Contest = {
+    name: '',
+    description: '',
+    startTime: '',
+    endTime: '',
+    durationMinutes: 180,
+    status: ContestStatus.PRIVATE,
     problems: [],
   };
 
-  const handleSave = async (data: ContestData) => {
+  const handleSave = async (data: Contest) => {
     setIsSaving(true);
-    // Simulate saving
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Creating contest:", data);
-    setIsSaving(false);
-    // Here you would typically save to your backend
+
+    try {
+      const contestDTO = ContestsService.mapContestToDTO(data);
+
+      const response = await ContestsService.createContest(contestDTO);
+      const newContestId = response?.data?.data?.id;
+      console.log(response.data.data);
+
+      if (newContestId) {
+        await LtiService.sendDeepLinkingResponse(
+          newContestId,
+          ResourceType.CONTEST
+        );
+        toastService.success(
+          'Contest created and deep linking completed successfully!'
+        );
+      }
+    } catch (error) {
+      // do nothing as error is handled in axios interceptor
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -45,16 +58,29 @@ export default function CreateContestPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/contests">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Quay lại danh sách
-                </Button>
-              </Link>
+              {shouldHideNavigation ? (
+                <Link href="/options">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại trang lựa chọn
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/contests">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-green-400"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại danh sách
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -64,7 +90,7 @@ export default function CreateContestPage() {
       <div className="container mx-auto px-6 py-8">
         <ContestForm
           initialData={initialData}
-          mode="create"
+          mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
           title="Tạo cuộc thi mới"

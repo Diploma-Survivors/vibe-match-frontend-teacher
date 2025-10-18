@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Clock, Play, RotateCcw, Save, Send, Settings } from "lucide-react";
-import { useState } from "react";
+} from '@/components/ui/select';
+import { Clock, Play, RotateCcw, Save, Settings } from 'lucide-react';
+import { useState } from 'react';
 
 const languages = [
-  { value: "python", label: "Python 3", extension: ".py" },
-  { value: "cpp", label: "C++17", extension: ".cpp" },
-  { value: "java", label: "Java 17", extension: ".java" },
-  { value: "javascript", label: "JavaScript", extension: ".js" },
-  { value: "csharp", label: "C# 10", extension: ".cs" },
+  { value: 'python', label: 'Python 3', extension: '.py' },
+  { value: 'cpp', label: 'C++17', extension: '.cpp' },
+  { value: 'java', label: 'Java 17', extension: '.java' },
+  { value: 'javascript', label: 'JavaScript', extension: '.js' },
+  { value: 'csharp', label: 'C# 10', extension: '.cs' },
 ];
 
 const defaultCode = {
@@ -88,7 +88,7 @@ class Program {
 };
 
 export default function CodeEditor() {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState(defaultCode.python);
 
   const handleLanguageChange = (language: string) => {
@@ -159,7 +159,7 @@ export default function CodeEditor() {
             onChange={(e) => setCode(e.target.value)}
             placeholder="Write your code here..."
             className="w-full h-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4 font-mono text-sm text-slate-800 dark:text-slate-200 placeholder-slate-500 dark:placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            style={{ minHeight: "300px" }}
+            style={{ minHeight: '300px' }}
           />
         </div>
 
@@ -169,7 +169,7 @@ export default function CodeEditor() {
             <Button
               onClick={() => {
                 // Run code logic will be in Submit tab
-                console.log("Run code:", code);
+                console.log('Run code:', code);
               }}
               className="bg-green-600 hover:bg-green-700 text-white border-0"
             >

@@ -1,101 +1,52 @@
-"use client";
+'use client';
 
-import ProblemFilter from "@/components/problem-filter";
-import ProblemStats from "@/components/problem-stats";
-import ProblemTable from "@/components/problem-table";
-import QuickFilters from "@/components/quick-filters";
-import SortControls, {
-  type SortField,
-  type SortOrder,
-} from "@/components/sort-controls";
-import { mockProblems } from "@/lib/data/mock-problems";
-import type { Problem, ProblemFilters } from "@/types/problem";
-import React, { useState, useMemo, useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import ProblemList from '@/components/problem-list';
+import type { SortField, SortOrder } from '@/components/sort-controls';
+import { Button } from '@/components/ui/button';
+import { mockProblems } from '@/lib/data/mock-problems';
+import { ProblemEndpointType, type ProblemFilters } from '@/types/problems';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 
 const mockFetchwithPromise = async () => {
   await new Promise((resolve) => setTimeout(resolve, 5000));
-}
+};
 
 export default function ProblemsPage() {
   mockFetchwithPromise();
 
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>("id");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");         
-
-
+  const [sortField, setSortField] = useState<SortField>('id');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   // First, fix the filtering to handle tags array
-const filteredAndSortedProblems = useMemo(() => {
-  // First filter
-  const filtered = mockProblems.filter((problem) => {
-    if (
-      filters.id &&
-      !problem.id.toLowerCase().includes(filters.id.toLowerCase())
-    ) {
-      return false;
-    }
-    if (
-      filters.title &&
-      !problem.title.toLowerCase().includes(filters.title.toLowerCase())
-    ) {
-      return false;
-    }
-    if (filters.difficulty && problem.difficulty !== filters.difficulty) {
-      return false;
-    }
-    if (filters.topic && problem.topic !== filters.topic) {
-      return false;
-    }
-    // Handle tags array filtering
-    if (filters.tags && filters.tags.length > 0) {
-      const hasMatchingTag = filters.tags.some(tag => 
-        problem.tags?.includes(tag)
-      );
-      if (!hasMatchingTag) {
+  const filteredAndSortedProblems = useMemo(() => {
+    // First filter
+    const filtered = mockProblems.filter((problem) => {
+      if (filters.difficulty && problem.difficulty !== filters.difficulty) {
         return false;
       }
-    }
-    if (filters.accessRange && problem.accessRange !== filters.accessRange) {
-      return false;
-    }
-    return true;
-  });
+      if (filters.topic && problem.topic !== filters.topic) {
+        return false;
+      }
+      // Handle tags array filtering
+      if (filters.tags && filters.tags.length > 0) {
+        const hasMatchingTag = filters.tags.some((tag) =>
+          problem.tags?.includes(tag)
+        );
+        if (!hasMatchingTag) {
+          return false;
+        }
+      }
+      return true;
+    });
 
-// Then sort - fix the type assertion
-filtered.sort((a, b) => {
-  let aValue: string | number = a[sortField];
-  let bValue: string | number = b[sortField];
-
-  // Handle special sorting for difficulty
-  if (sortField === "difficulty") {
-    const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
-    aValue =
-      difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
-    bValue =
-      difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
-  }
-
-  // Handle string sorting
-  if (typeof aValue === "string" && typeof bValue === "string") {
-    aValue = aValue.toLowerCase();
-    bValue = bValue.toLowerCase();
-  }
-
-  if (sortOrder === "asc") {
-    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-  }
-  return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-});
-
-  return filtered;
-}, [filters, sortField, sortOrder]);
+    return filtered;
+  }, [filters]);
 
   // Paginate filtered and sorted problems
   const paginatedProblems = useMemo(() => {
@@ -136,7 +87,7 @@ filtered.sort((a, b) => {
   const handleRemoveFilter = (key: keyof ProblemFilters) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: "",
+      [key]: '',
     }));
     setCurrentPage(1);
   };
@@ -171,81 +122,10 @@ filtered.sort((a, b) => {
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-          {/* Left Sidebar - Filters */}
-          <div className="xl:col-span-1">
-            <div className="xl:sticky xl:top-32 xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:custom-scrollbar xl:pr-2">
-              <div className="space-y-6">
-                <ProblemFilter
-                  filters={filters}
-                  onFiltersChange={handleFiltersChange}
-                  onSearch={handleSearch}
-                  onReset={handleReset}
-                />
-
-                <QuickFilters
-                  activeFilters={filters}
-                  onRemoveFilter={handleRemoveFilter}
-                  onClearAll={handleClearAllFilters}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Content - Problem List */}
-          <div className="xl:col-span-3">
-            <div className="space-y-6">
-              {/* Controls */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-                <div className="flex items-center gap-4">
-                  <SortControls
-                    sortField={sortField}
-                    sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
-                  />
-                </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    {paginatedProblems.length} /{" "}
-                    {filteredAndSortedProblems.length} bài tập
-                  </span>
-                </div>
-              </div>
-
-              {/* Problem Table */}
-              <ProblemTable
-                problems={paginatedProblems}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-white/20 dark:border-slate-700/50">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-lg">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-slate-600 dark:text-slate-400 font-medium">
-                Dữ liệu được đồng bộ real-time từ Vibe Match
-              </span>
-            </div>
-            <p className="mt-4 text-slate-500 dark:text-slate-500">
-              Tổng cộng{" "}
-              <strong className="text-green-600 dark:text-emerald-400">
-                {mockProblems.length}
-              </strong>{" "}
-              bài tập từ nhiều chủ đề
-            </p>
-          </div>
-        </div>
-      </div>
+      <ProblemList
+        mode="view"
+        endpointType={ProblemEndpointType.SELECTABLE_FOR_ASSIGNMENT}
+      />
     </div>
   );
 }

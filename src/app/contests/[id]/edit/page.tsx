@@ -1,54 +1,50 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import ContestForm from "@/components/contest-form";
-import { mockContests } from "@/lib/data/mock-contests";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import { useState, useEffect, use } from "react";
-import { useParams } from "next/navigation";
+import ContestForm, { ContestFormMode } from '@/components/contest-form';
+import { Button } from '@/components/ui/button';
+import { mockContests } from '@/lib/data/mock-contests';
+import type { Contest } from '@/types/contest';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-
-interface ContestData {
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  accessRange: string;
-  problems: string[];
-  participants?: number;
-  maxParticipants?: number;
-  status?: string;
-  createdBy?: string;
-  createdAt?: string;
-}
+// interface ContestData {
+//   name: string;
+//   description: string;
+//   startTime: string;
+//   endTime: string;
+//   duration: number;
+//   accessRange: string;
+//   problems: string[];
+//   participants?: number;
+//   maxParticipants?: number;
+//   status?: string;
+//   createdBy?: string;
+//   createdAt?: string;
+// }
 
 export default function EditContestPage() {
   const router = useRouter();
   const params = useParams();
   const contestId = params.id;
-  
-  const [contestData, setContestData] = useState<ContestData | null>(null);
+
+  const [contestData, setContestData] = useState<Contest | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load existing contest data
   useEffect(() => {
     const loadContestData = () => {
-      const existingContest = mockContests.find(c => c.id === contestId);
+      const existingContest = mockContests.find((c) => c.id === contestId);
       if (existingContest) {
         setContestData({
           name: existingContest.name,
           description: existingContest.description,
           startTime: existingContest.startTime,
           endTime: existingContest.endTime,
-          duration: existingContest.duration,
-          accessRange: existingContest.accessRange,
-          problems: existingContest.problems,
-          participants: existingContest.participants,
-          maxParticipants: existingContest.maxParticipants,
+          durationMinutes: existingContest.durationMinutes,
+          problems: [],
           status: existingContest.status,
           createdBy: existingContest.createdBy,
           createdAt: existingContest.createdAt,
@@ -60,11 +56,11 @@ export default function EditContestPage() {
     loadContestData();
   }, [contestId]);
 
-  const handleSave = async (data: ContestData) => {
+  const handleSave = async (data: Contest) => {
     setIsSaving(true);
     // Simulate saving
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Updating contest:", data);
+    console.log('Updating contest:', data);
     setIsSaving(false);
     // Here you would typically save to your backend
     // router.push(`/contests/${contestId}`);
@@ -74,8 +70,10 @@ export default function EditContestPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">Đang tải dữ liệu cuộc thi...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Đang tải dữ liệu cuộc thi...
+          </p>
         </div>
       </div>
     );
@@ -122,7 +120,7 @@ export default function EditContestPage() {
       <div className="container mx-auto px-6 py-8">
         <ContestForm
           initialData={contestData}
-          mode="edit"
+          mode={ContestFormMode.EDIT}
           onSave={handleSave}
           isSaving={isSaving}
           title="Chỉnh sửa cuộc thi"

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import ContestFilter from "@/components/contest-filter";
-import ContestTable from "@/components/contest-table";
-import { Button } from "@/components/ui/button";
-import { mockContests } from "@/lib/data/mock-contests";
-import type { Contest, ContestFilters } from "@/types/contest";
-import { Plus } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import ContestFilter from '@/components/contest-filter';
+import ContestTable from '@/components/contest-table';
+import { Button } from '@/components/ui/button';
+import { mockContests } from '@/lib/data/mock-contests';
+import type { Contest, ContestFilters } from '@/types/contest';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -19,21 +19,12 @@ export default function ContestsPage() {
   const filteredContests = useMemo(() => {
     return mockContests.filter((contest) => {
       if (
-        filters.id &&
-        !contest.id.toLowerCase().includes(filters.id.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
         filters.name &&
         !contest.name.toLowerCase().includes(filters.name.toLowerCase())
       ) {
         return false;
       }
       if (filters.status && contest.status !== filters.status) {
-        return false;
-      }
-      if (filters.accessRange && contest.accessRange !== filters.accessRange) {
         return false;
       }
       return true;
@@ -119,7 +110,8 @@ export default function ContestsPage() {
                 <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                   <span className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    {paginatedContests.length} / {filteredContests.length} cuộc thi
+                    {paginatedContests.length} / {filteredContests.length} cuộc
+                    thi
                   </span>
                 </div>
               </div>
@@ -145,10 +137,10 @@ export default function ContestsPage() {
               </span>
             </div>
             <p className="mt-4 text-slate-500 dark:text-slate-500">
-              Tổng cộng{" "}
+              Tổng cộng{' '}
               <strong className="text-green-600 dark:text-emerald-400">
                 {mockContests.length}
-              </strong>{" "}
+              </strong>{' '}
               cuộc thi đã được tạo
             </p>
           </div>

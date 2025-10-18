@@ -1,12 +1,13 @@
-'use client'
+'use client';
 
+import { toastService } from '@/services/toasts-service';
 import axios from 'axios';
-import {getSession} from "next-auth/react";
+import { getSession } from 'next-auth/react';
 
 // Create a custom Axios instance
 const clientApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/v1', // Replace with your API base URL
-  timeout: 5000, // Request timeout in milliseconds
+  timeout: 10000, // Request timeout in milliseconds
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,6 +18,9 @@ clientApi.interceptors.request.use(
     const session = await getSession();
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
+    if (session?.deviceId) {
+      config.headers['X-Device-ID'] = session.deviceId;
     }
     return config;
   },
@@ -31,12 +35,30 @@ clientApi.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle global errors, e.g., redirect to login on 401 unauthorized
-    if (error.response && error.response.status === 401) {
-      // Handle unauthorized errors (e.g., redirect to login page)
-      console.error('Unauthorized, redirecting to login...');
-      // Example: router.push('/login'); (if you have access to router)
+    // Handle global errors
+    if (error.response) {
+      const status = error.response.status;
+      const message =
+        error.response.data?.message || error.message || 'An error occurred';
+
+      switch (status) {
+        case 401: // Unauthorized
+        case 403: // Forbidden
+          window.location.href = '/unauthorized';
+          break;
+        case 404: // Not Found
+          window.location.href = '/not-found';
+          break;
+        default:
+          toastService.error(`Error ${status}: ${message}`);
+          break;
+      }
+    } else if (error.request) {
+      toastService.error('Network error. Please check your connection.');
+    } else {
+      toastService.error(error.message || 'An unexpected error occurred');
     }
+
     return Promise.reject(error);
   }
 );

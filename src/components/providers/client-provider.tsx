@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@/components/providers";
-import { AppProvider } from "@/contexts/app-context";
-import type { UserInfo } from "@/types/states";
+import { ThemeProvider } from '@/components/providers';
+import { AppProvider } from '@/contexts/app-context';
+import type { IssuerType, UserInfo } from '@/types/states';
+import { SessionProvider } from 'next-auth/react';
 
 interface ClientProviderProps {
   children: React.ReactNode;
   initialUser: UserInfo | null;
-  initialIssuer: "local" | "moodle";
+  initialIssuer: IssuerType;
 }
 
 export function ClientProvider({

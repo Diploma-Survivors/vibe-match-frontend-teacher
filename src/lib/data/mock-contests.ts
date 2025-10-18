@@ -1,94 +1,100 @@
-import type { Contest } from "@/types/contest";
+import { type Contest, ContestStatus } from '@/types/contest';
+import {
+  type ProblemData,
+  ProblemDifficulty,
+  ProblemType,
+} from '@/types/problems';
+
+const mockProblem: ProblemData = {
+  id: 1,
+  title: 'Two Sum',
+  description: `
+      <p>Cho một mảng các số nguyên <code>nums</code> và một số nguyên <code>target</code>, hãy trả về các chỉ số của hai số sao cho tổng của chúng bằng <code>target</code>.</p>
+      
+      <p>Bạn có thể giả định rằng mỗi đầu vào sẽ có chính xác một lời giải, và bạn không thể sử dụng cùng một phần tử hai lần.</p>
+      
+      <p>Bạn có thể trả về câu trả lời theo bất kỳ thứ tự nào.</p>
+      
+      <h3>Ví dụ 1:</h3>
+      <pre>
+      Input: nums = [2,7,11,15], target = 9
+      Output: [0,1]
+      Giải thích: Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1].
+      </pre>
+      
+      <h3>Ví dụ 2:</h3>
+      <pre>
+      Input: nums = [3,2,4], target = 6
+      Output: [1,2]
+      </pre>
+    `,
+  inputDescription: `
+      <p>Dòng đầu tiên chứa hai số nguyên <code>n</code> và <code>target</code> (1 ≤ n ≤ 10^4, -10^9 ≤ target ≤ 10^9)</p>
+      <p>Dòng thứ hai chứa <code>n</code> số nguyên <code>nums[i]</code> (-10^9 ≤ nums[i] ≤ 10^9)</p>
+    `,
+  outputDescription: `
+      <p>In ra hai số nguyên là chỉ số của hai phần tử có tổng bằng target, cách nhau bởi dấu cách.</p>
+    `,
+  maxScore: 100,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  difficulty: ProblemDifficulty.EASY,
+  type: ProblemType.STANDALONE,
+  createdAt: '2024-01-15T10:30:00Z',
+  updatedAt: '2024-01-20T14:45:00Z',
+  tags: [1, 3, 5], // Array manipulation, Hash table, Two pointers
+  topic: 1, // Data Structures
+  testcase: 1,
+  testcaseSamples: [
+    {
+      input: '4 9\n2 7 11 15',
+      output: '0 1',
+    },
+    {
+      input: '3 6\n3 2 4',
+      output: '1 2',
+    },
+  ],
+};
 
 export const mockContests: Contest[] = [
   {
-    id: "1",
-    name: "Vibe Match Programming Contest #1",
-    description: "Cuộc thi lập trình dành cho sinh viên năm nhất, tập trung vào các thuật toán cơ bản và cấu trúc dữ liệu.",
-    startTime: "2025-08-25T09:00:00",
-    endTime: "2025-08-25T12:00:00",
-    duration: 180,
-    status: "chưa bắt đầu",
-    accessRange: "public",
-    problems: ["array_basic01", "array_basic02", "array_basic03", "array_basic04", "array_basic05"],
-    participants: 42,
-    maxParticipants: 100,
-    createdBy: "Nguyễn Văn A",
-    createdAt: "2025-08-15T10:30:00",
+    id: 1,
+    name: 'Vibe Match Programming Contest #1',
+    description:
+      'Cuộc thi lập trình dành cho sinh viên năm nhất, tập trung vào các thuật toán cơ bản và cấu trúc dữ liệu.',
+    startTime: '2025-08-25T09:00:00',
+    endTime: '2025-08-25T12:00:00',
+    durationMinutes: 180,
+    status: ContestStatus.PUBLIC,
+    problems: [mockProblem],
+    createdBy: 'Nguyễn Văn A',
+    createdAt: '2025-08-15T10:30:00',
   },
   {
-    id: "2",
-    name: "Advanced Algorithms Challenge",
-    description: "Cuộc thi dành cho các lập trình viên có kinh nghiệm, bao gồm các bài toán về đồ thị và quy hoạch động.",
-    startTime: "2025-08-20T14:00:00",
-    endTime: "2025-08-20T18:00:00",
-    duration: 240,
-    status: "đang diễn ra",
-    accessRange: "private",
-    problems: ["array_basic10", "array_basic15", "array_basic20", "array_basic25"],
-    participants: 28,
-    maxParticipants: 50,
-    createdBy: "Trần Thị B",
-    createdAt: "2025-08-10T16:45:00",
+    id: 2,
+    name: 'Advanced Algorithms Challenge',
+    description:
+      'Cuộc thi dành cho các lập trình viên có kinh nghiệm, bao gồm các bài toán về đồ thị và quy hoạch động.',
+    startTime: '2025-08-20T14:00:00',
+    endTime: '2025-08-20T18:00:00',
+    durationMinutes: 240,
+    status: ContestStatus.PRIVATE,
+    problems: [mockProblem],
+    createdBy: 'Trần Thị B',
+    createdAt: '2025-08-10T16:45:00',
   },
   {
-    id: "3",
-    name: "Data Structure Mastery",
-    description: "Kiểm tra kiến thức về cấu trúc dữ liệu: mảng, danh sách liên kết, ngăn xếp, hàng đợi.",
-    startTime: "2025-08-15T08:00:00",
-    endTime: "2025-08-15T11:30:00",
-    duration: 210,
-    status: "đã kết thúc",
-    accessRange: "public",
-    problems: ["array_basic06", "array_basic07", "array_basic08", "array_basic09"],
-    participants: 67,
-    maxParticipants: 80,
-    createdBy: "Lê Văn C",
-    createdAt: "2025-08-05T09:15:00",
-  },
-  {
-    id: "4",
-    name: "Beginner Friendly Contest",
-    description: "Cuộc thi dành cho người mới bắt đầu học lập trình, các bài toán đơn giản và dễ hiểu.",
-    startTime: "2025-08-28T10:00:00",
-    endTime: "2025-08-28T12:30:00",
-    duration: 150,
-    status: "chưa bắt đầu",
-    accessRange: "public",
-    problems: ["array_basic30", "array_basic35", "array_basic40"],
-    participants: 15,
-    maxParticipants: 60,
-    createdBy: "Phạm Thị D",
-    createdAt: "2025-08-18T14:20:00",
-  },
-  {
-    id: "5",
-    name: "Math & Logic Challenge",
-    description: "Tập trung vào các bài toán toán học và logic, phù hợp cho việc rèn luyện tư duy.",
-    startTime: "2025-08-12T13:00:00",
-    endTime: "2025-08-12T16:00:00",
-    duration: 180,
-    status: "đã kết thúc",
-    accessRange: "private",
-    problems: ["array_basic45", "array_basic50"],
-    participants: 35,
-    maxParticipants: 40,
-    createdBy: "Hoàng Văn E",
-    createdAt: "2025-08-01T11:00:00",
-  },
-  {
-    id: "6",
-    name: "Speed Coding Marathon",
-    description: "Cuộc thi tốc độ coding, thời gian ngắn nhưng nhiều bài tập thú vị.",
-    startTime: "2025-08-30T15:00:00",
-    endTime: "2025-08-30T17:00:00",
-    duration: 120,
-    status: "chưa bắt đầu",
-    accessRange: "public",
-    problems: ["array_basic11", "array_basic12", "array_basic13", "array_basic14", "array_basic16", "array_basic17"],
-    participants: 8,
-    maxParticipants: 30,
-    createdBy: "Vũ Thị F",
-    createdAt: "2025-08-22T08:30:00",
+    id: 3,
+    name: 'Data Structure Mastery',
+    description:
+      'Kiểm tra kiến thức về cấu trúc dữ liệu: mảng, danh sách liên kết, ngăn xếp, hàng đợi.',
+    startTime: '2025-08-15T08:00:00',
+    endTime: '2025-08-15T11:30:00',
+    durationMinutes: 210,
+    status: ContestStatus.PUBLIC,
+    problems: [mockProblem],
+    createdBy: 'Lê Văn C',
+    createdAt: '2025-08-05T09:15:00',
   },
 ];
