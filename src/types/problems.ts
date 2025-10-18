@@ -50,7 +50,7 @@ export interface ProblemData {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
-  type?: string;
+  type?: ProblemType;
   createdAt?: string;
   updatedAt?: string;
   tags: number[];

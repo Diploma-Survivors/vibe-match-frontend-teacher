@@ -1,4 +1,8 @@
-import { type ProblemData, ProblemDifficulty } from '../../types/problems';
+import {
+  type ProblemData,
+  ProblemDifficulty,
+  ProblemType,
+} from '../../types/problems';
 
 // Mock problem data
 export const mockProblems: ProblemData[] = [
@@ -36,7 +40,7 @@ export const mockProblems: ProblemData[] = [
     timeLimitMs: 1000,
     memoryLimitKb: 256000,
     difficulty: ProblemDifficulty.EASY,
-    type: 'standalone',
+    type: ProblemType.STANDALONE,
     createdAt: '2024-01-15T10:30:00Z',
     updatedAt: '2024-01-20T14:45:00Z',
     tags: [1, 3, 5], // Array manipulation, Hash table, Two pointers
@@ -88,7 +92,7 @@ export const mockProblems: ProblemData[] = [
     timeLimitMs: 2000,
     memoryLimitKb: 512000,
     difficulty: ProblemDifficulty.HARD,
-    type: 'contest',
+    type: ProblemType.CONTEST,
     createdAt: '2024-02-01T09:15:00Z',
     updatedAt: '2024-02-05T16:20:00Z',
     tags: [2, 4, 6], // Tree, DFS, Dynamic Programming
@@ -147,7 +151,7 @@ export const mockProblems: ProblemData[] = [
     timeLimitMs: 1500,
     memoryLimitKb: 128000,
     difficulty: ProblemDifficulty.MEDIUM,
-    type: 'hybrid',
+    type: ProblemType.HYBRID,
     createdAt: '2024-01-25T11:45:00Z',
     updatedAt: '2024-01-30T13:10:00Z',
     tags: [7, 8], // Stack, String
