@@ -1,5 +1,6 @@
 'use client';
 
+import useProblems from '@/hooks/use-problems';
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
@@ -11,14 +12,21 @@ import {
   SortOrder,
 } from '@/types/problems';
 import { useEffect, useState } from 'react';
-import ProblemTable from './problem-table';
-import SortControls, { type SortField } from './sort-controls';
+import ProblemTable, { type ProblemTableMode } from './problem-table';
+import SortControls from './sort-controls';
 
-interface ProblemTableProps {
-  mode: 'view' | 'select';
+export enum ProblemListMode {
+  VIEW = 'view',
+  SELECT = 'select',
+  MULTIPLE_SELECT = 'multiple_select',
+}
+
+interface ProblemListProps {
+  mode: ProblemListMode;
   endpointType: ProblemEndpointType;
   onProblemView?: (problem: ProblemData) => void;
   onProblemSelect?: (problem: ProblemData) => void;
+  onMultipleProblemsSelect?: (problems: ProblemData[]) => void;
 }
 
 export default function ProblemList({
@@ -26,52 +34,31 @@ export default function ProblemList({
   endpointType,
   onProblemView,
   onProblemSelect,
-}: ProblemTableProps) {
-  const [error, setError] = useState<string | null>(null);
-  const [problems, setProblems] = useState<ProblemData[]>([]);
-  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [getProblemsRequest, setGetProblemsRequest] =
-    useState<GetProblemListRequest>({
-      keyword: '',
-      first: 3,
-      sortBy: SortBy.CREATED_AT,
-      sortOrder: SortOrder.DESC,
-    });
+  onMultipleProblemsSelect,
+}: ProblemListProps) {
+  const {
+    // State
+    problems,
+    pageInfo,
+    totalCount,
+    isLoading,
+    error,
 
-  useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        setIsLoading(true);
+    // Request params (exposed for UI)
+    filters,
+    keyword,
+    sortBy,
+    sortOrder,
 
-        const axiosResponse = await ProblemsService.getProblemList(
-          getProblemsRequest,
-          endpointType
-        );
-        const response: ProblemListResponse = axiosResponse?.data?.data;
-
-        // Extract problems from edges
-        const problemsData = response?.edges.map((edge) => ({
-          ...edge.node,
-        }));
-
-        setProblems(problemsData);
-        setPageInfo(response.pageInfos);
-        setTotalCount(response.totalCount);
-      } catch (err) {
-        console.error('Error fetching problems:', err);
-        setError("Can't load the problems.");
-        setProblems([]);
-        setPageInfo(null);
-        setTotalCount(0);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProblems();
-  }, [getProblemsRequest, endpointType]);
+    // Handlers
+    handleFiltersChange,
+    handleKeywordChange,
+    handleSortByChange,
+    handleSortOrderChange,
+    handleSearch,
+    handleReset,
+    handleLoadMore,
+  } = useProblems(endpointType);
 
   const handleProblemSelection = (problem: ProblemData) => {
     if (onProblemSelect) {
@@ -79,38 +66,10 @@ export default function ProblemList({
     }
   };
 
-  const handleLoadMore = () => {
-    if (pageInfo?.hasNextPage && !isLoading) {
-      setGetProblemsRequest((prev) => ({
-        ...prev,
-        after: pageInfo.endCursor,
-        before: undefined,
-        first: prev.first || 10,
-        last: undefined,
-      }));
+  const handleMultipleProblemsSelect = (selectedProblems: ProblemData[]) => {
+    if (mode === ProblemListMode.MULTIPLE_SELECT && onMultipleProblemsSelect) {
+      onMultipleProblemsSelect(selectedProblems);
     }
-  };
-
-  const handleLoadPrevious = () => {
-    if (pageInfo?.hasPreviousPage && !isLoading) {
-      setGetProblemsRequest((prev) => ({
-        ...prev,
-        before: pageInfo.startCursor,
-        after: undefined,
-        first: undefined,
-        last: prev.first || 10,
-      }));
-    }
-  };
-
-  const handleResetPagination = () => {
-    setGetProblemsRequest((prev) => ({
-      ...prev,
-      after: undefined,
-      before: undefined,
-      first: prev.first || 10,
-      last: undefined,
-    }));
   };
 
   return (
@@ -176,30 +135,16 @@ export default function ProblemList({
         <div className="xl:col-span-3">
           <div className="space-y-6">
             {/* Controls */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
+            {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
               <div className="flex items-center gap-4">
                 <SortControls
-                  sortField={getProblemsRequest.sortBy as SortField}
-                  sortOrder={getProblemsRequest.sortOrder || SortOrder.DESC}
-                  onSortChange={(field, order) => {
-                    setGetProblemsRequest((prev) => ({
-                      ...prev,
-                      sortBy: field as SortBy,
-                      sortOrder: order as SortOrder,
-                      after: undefined,
-                      before: undefined,
-                      first: prev.first || 2,
-                      last: undefined,
-                    }));
-                  }}
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                  onSortByChange={handleSortByChange}
+                  onSortOrderChange={handleSortOrderChange}
                 />
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
-                  Tìm kiếm
-                </span>
-              </div>
-            </div>
+            </div> */}
 
             {/* Problems Table */}
             {error ? (
@@ -211,14 +156,18 @@ export default function ProblemList({
             ) : (
               <ProblemTable
                 problems={problems}
-                pageInfo={pageInfo}
+                hasMore={pageInfo?.hasNextPage ?? false}
                 totalCount={totalCount}
                 onLoadMore={handleLoadMore}
-                onLoadPrevious={handleLoadPrevious}
                 isLoading={isLoading}
-                selectionMode={mode === 'select'}
+                mode={mode as unknown as ProblemTableMode}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortByChange={handleSortByChange}
+                onSortOrderChange={handleSortOrderChange}
                 onProblemSelect={handleProblemSelection}
                 onProblemView={onProblemView}
+                onMultipleProblemsSelect={handleMultipleProblemsSelect}
               />
             )}
           </div>

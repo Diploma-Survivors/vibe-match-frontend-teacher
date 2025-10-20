@@ -7,10 +7,8 @@ export enum ProblemDifficulty {
 }
 
 export enum SortBy {
-  CREATED_AT = 'createdAt',
   TITLE = 'title',
   DIFFICULTY = 'difficulty',
-  MAX_SCORE = 'maxScore',
 }
 
 export enum SortOrder {
@@ -22,6 +20,21 @@ export enum ProblemType {
   STANDALONE = 'standalone',
   CONTEST = 'contest',
   HYBRID = 'hybrid',
+}
+
+export enum MatchMode {
+  ANY = 'any',
+  ALL = 'all',
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+}
+
+export interface Topic {
+  id: number;
+  name: string;
 }
 
 export interface CreateProblemRequest {
@@ -53,8 +66,8 @@ export interface ProblemData {
   type?: ProblemType;
   createdAt?: string;
   updatedAt?: string;
-  tags: number[];
-  topic: number;
+  tags: Tag[];
+  topic: Topic[];
   testcase: File | number;
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
@@ -73,6 +86,7 @@ export interface GetProblemListRequest {
   first?: number;
   last?: number;
   sortOrder?: SortOrder;
+  matchMode?: MatchMode;
   sortBy?: SortBy;
   filters?: ProblemFilters;
 }

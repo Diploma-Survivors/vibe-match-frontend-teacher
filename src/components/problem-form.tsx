@@ -65,8 +65,8 @@ export default function ProblemForm({
   const [showTestcaseError, setShowTestcaseError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [createProblemRequest, setProblemData] = useState<CreateProblemRequest>(
-    {
+  const [createProblemRequest, setCreateProblemRequest] =
+    useState<CreateProblemRequest>({
       title: '',
       description: '',
       inputDescription: '',
@@ -85,12 +85,11 @@ export default function ProblemForm({
           output: '',
         },
       ],
-    }
-  );
+    });
 
   useEffect(() => {
     if (initialData) {
-      setProblemData({
+      setCreateProblemRequest({
         title: initialData.title || '',
         description: initialData.description || '',
         inputDescription: initialData.inputDescription || '',
@@ -100,8 +99,8 @@ export default function ProblemForm({
         memoryLimitKb: initialData.memoryLimitKb || 262144,
         difficulty: initialData.difficulty || ProblemDifficulty.EASY,
         type: (initialData.type as ProblemType) || ProblemType.STANDALONE,
-        tagIds: initialData.tags || [],
-        topicIds: initialData.topic ? [initialData.topic] : [],
+        tagIds: initialData.tags?.map((tag) => tag.id) || [],
+        topicIds: initialData.topic?.map((topic) => topic.id) || [],
         testcase: (initialData.testcase as File) || undefined,
         testcaseSamples: initialData.testcaseSamples?.length
           ? initialData.testcaseSamples
@@ -149,7 +148,7 @@ export default function ProblemForm({
     value: string | string[] | number
   ) => {
     if (isReadOnly) return;
-    setProblemData((prev) => ({
+    setCreateProblemRequest((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -157,7 +156,7 @@ export default function ProblemForm({
 
   const handleTagChange = (tagId: number) => {
     if (isReadOnly) return;
-    setProblemData((prev) => {
+    setCreateProblemRequest((prev) => {
       const currentTags = prev.tagIds || [];
       const isSelected = currentTags.includes(tagId);
 
@@ -176,7 +175,7 @@ export default function ProblemForm({
 
   const handleTopicChange = (topicId: number) => {
     if (isReadOnly) return;
-    setProblemData((prev) => {
+    setCreateProblemRequest((prev) => {
       const currentTopics = prev.topicIds || [];
       const isSelected = currentTopics.includes(topicId);
 
@@ -199,7 +198,7 @@ export default function ProblemForm({
     value: string
   ) => {
     if (isReadOnly) return;
-    setProblemData((prev) => ({
+    setCreateProblemRequest((prev) => ({
       ...prev,
       testcaseSamples: prev.testcaseSamples.map((testCase, i) =>
         i === index ? { ...testCase, [field]: value } : testCase
@@ -209,7 +208,7 @@ export default function ProblemForm({
 
   const addTestCase = () => {
     if (isReadOnly) return;
-    setProblemData((prev) => ({
+    setCreateProblemRequest((prev) => ({
       ...prev,
       testcaseSamples: [
         ...prev.testcaseSamples,
@@ -224,7 +223,7 @@ export default function ProblemForm({
   const removeTestCase = (index: number) => {
     if (isReadOnly || (createProblemRequest.testcaseSamples?.length || 0) <= 1)
       return;
-    setProblemData((prev) => ({
+    setCreateProblemRequest((prev) => ({
       ...prev,
       testcaseSamples: (prev.testcaseSamples || []).filter(
         (_, i) => i !== index
@@ -265,7 +264,7 @@ export default function ProblemForm({
       );
 
       if (hasValidType || hasValidExtension) {
-        setProblemData((prev) => ({
+        setCreateProblemRequest((prev) => ({
           ...prev,
           testcase: file,
         }));
@@ -294,7 +293,7 @@ export default function ProblemForm({
       );
 
       if (hasValidType || hasValidExtension) {
-        setProblemData((prev) => ({
+        setCreateProblemRequest((prev) => ({
           ...prev,
           testcase: file,
         }));
@@ -306,7 +305,7 @@ export default function ProblemForm({
   };
 
   const removeFile = () => {
-    setProblemData((prev) => ({
+    setCreateProblemRequest((prev) => ({
       ...prev,
       testcase: undefined,
     }));
