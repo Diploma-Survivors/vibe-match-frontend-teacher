@@ -43,8 +43,8 @@ export default function ProblemScoreModal({
       return false;
     }
 
-    if (Number.isNaN(score) || score < 0) {
-      setError('Điểm phải là số không âm');
+    if (Number.isNaN(score) || score <= 0) {
+      setError('Điểm phải lớn hơn 0');
       return false;
     }
 

@@ -224,7 +224,7 @@ export default function ProblemTable({
                           )}
                           <TableCell className="text-center px-4 py-4">
                             <div className="inline-flex px-3 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse">
-                              <div className="w-12 h-4 bg-slate-300 dark:bg-slate-600 rounded" />
+                              <div className="w-4 h-4 bg-slate-300 dark:bg-slate-600 rounded" />
                             </div>
                           </TableCell>
                           <TableCell className="px-4 py-4">
@@ -346,56 +346,6 @@ export default function ProblemTable({
           </div>
         </div>
       </InfiniteScroll>
-
-      {/* Cursor-based Pagination */}
-      {/* {pageInfo && (pageInfo.hasNextPage || pageInfo.hasPreviousPage) && (
-        <div className="flex items-center justify-between p-6 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/30 dark:bg-slate-700/10">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onLoadPrevious}
-              disabled={!pageInfo.hasPreviousPage || isLoading}
-              className="px-4 py-2 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200 flex items-center gap-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Trang trước
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onLoadMore}
-              disabled={!pageInfo.hasNextPage || isLoading}
-              className="px-4 py-2 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200 flex items-center gap-2"
-            >
-              Trang sau
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-                Đang tải...
-              </div>
-            ) : (
-              <span>
-                Hiển thị{' '}
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {problems.length}
-                </span>{' '}
-                /{' '}
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {totalCount}
-                </span>{' '}
-                bài tập
-              </span>
-            )}
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

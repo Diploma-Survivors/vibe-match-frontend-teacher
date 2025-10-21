@@ -73,7 +73,7 @@ export default function ProblemList({
   };
 
   return (
-    <div className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8" style={{ maxWidth: 'none' }}>
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Left Sidebar - Filters */}
         <div className="xl:col-span-1">
