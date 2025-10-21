@@ -22,8 +22,6 @@ interface SortControlsProps {
 const SORT_OPTIONS = [
   { value: SortBy.TITLE, label: 'Tên bài' },
   { value: SortBy.DIFFICULTY, label: 'Độ khó' },
-  { value: SortBy.CREATED_AT, label: 'Ngày tạo' },
-  { value: SortBy.MAX_SCORE, label: 'Điểm tối đa' },
 ];
 
 export default function SortControls({
