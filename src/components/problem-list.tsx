@@ -12,6 +12,7 @@ import {
   SortOrder,
 } from '@/types/problems';
 import { useEffect, useState } from 'react';
+import ProblemFilter from './problem-filters/problem-filter';
 import ProblemTable, { type ProblemTableMode } from './problem-table';
 import SortControls from './sort-controls';
 
@@ -79,54 +80,15 @@ export default function ProblemList({
         <div className="xl:col-span-1">
           <div className="xl:sticky xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:custom-scrollbar xl:pr-2">
             <div className="space-y-6">
-              {/* <ProblemFilter
-                filters={getProblemsRequest.filters || {}}
-                onFiltersChange={(filters) => {
-                  console.log("Filters changed:", filters);
-                  setGetProblemsRequest(prev => ({
-                    ...prev,
-                    filters,
-                    // Reset pagination when filters change
-                    after: undefined,
-                    before: undefined,
-                    first: prev.first || 2,
-                    last: undefined
-                  }));
-                }}
-                onSearch={() => {
-                  console.log("Search triggered");
-                  // ProblemFilter handles search internally through filters
-                  // This is just a trigger callback
-                }}
-                onReset={() => {
-                  console.log("Reset filters");
-                  setGetProblemsRequest({
-                    keyword: "",
-                    first: 2,
-                    sortBy: SortBy.CREATED_AT,
-                    sortOrder: SortOrder.DESC,
-                    filters: {}
-                  });
-                }}
-              /> */}
-              {/* 
-                <QuickFilters
-                    activeFilters={getProblemsRequest.filters || {}}
-                    onRemoveFilter={(filterType) => {
-                      console.log("Removing filter:", filterType);
-                      const newFilters = { ...getProblemsRequest.filters };
-                      delete newFilters[filterType];
-                      setGetProblemsRequest(prev => ({
-                        ...prev,
-                        filters: newFilters,
-                        after: undefined,
-                        before: undefined,
-                        first: prev.first || 2,
-                        last: undefined
-                      }));
-                    }}
-                    onClearAll={handleResetPagination}
-                /> */}
+              <ProblemFilter
+                keyWord={keyword}
+                filters={filters}
+                onKeywordChange={handleKeywordChange}
+                onFiltersChange={handleFiltersChange}
+                onSearch={handleSearch}
+                onReset={handleReset}
+                isLoading={isLoading}
+              />
             </div>
           </div>
         </div>

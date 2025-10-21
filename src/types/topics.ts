@@ -1,11 +1,3 @@
-export interface Topic {
-  id: number;
-  name: string;
-  description: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface CreateTopicRequest {
   name: string;
   description: string;
@@ -20,3 +12,9 @@ export const TOPIC_OPTIONS = [
   { value: 'data-structures', label: 'Cấu trúc dữ liệu' },
   { value: 'math', label: 'Toán học' },
 ];
+export interface Topic {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

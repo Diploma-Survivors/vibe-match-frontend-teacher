@@ -7,15 +7,18 @@ import type {
   ProblemListResponse,
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
+import qs from 'qs';
 
 async function getProblemList(
   getProblemListRequest: GetProblemListRequest,
   endpointType: ProblemEndpointType
 ): Promise<AxiosResponse<ApiResponse<ProblemListResponse>>> {
-  const params = convertToQueryParams(getProblemListRequest);
+  const params = qs.stringify(getProblemListRequest, {
+    allowDots: true,
+    skipNulls: true,
+  });
   const endpoint = `/problems/${endpointType}`;
-  const queryString = params.toString();
-  const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+  const url = params ? `${endpoint}?${params}` : endpoint;
   return await clientApi.get(url);
 }
 
@@ -48,8 +51,6 @@ async function createProblemComplete(
       JSON.stringify(problemRequest.testcaseSamples || [])
     );
 
-    console.log('Final request payload:', JSON.stringify(formData, null, 2));
-
     const response = await clientApi.post('/problems', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -61,49 +62,6 @@ async function createProblemComplete(
     console.error('Error in complete problem creation:', error);
     throw error;
   }
-}
-
-function convertToQueryParams(request: GetProblemListRequest): URLSearchParams {
-  const params = new URLSearchParams();
-
-  if (request.keyword) {
-    params.append('keyword', request.keyword);
-  }
-  if (request.after) {
-    params.append('after', request.after);
-  }
-  if (request.before) {
-    params.append('before', request.before);
-  }
-  if (request.first) {
-    params.append('first', request.first.toString());
-  }
-  if (request.last) {
-    params.append('last', request.last.toString());
-  }
-  if (request.sortOrder) {
-    params.append('sortOrder', request.sortOrder);
-  }
-  if (request.sortBy) {
-    params.append('sortBy', request.sortBy);
-  }
-
-  // Handle filters
-  if (request.filters) {
-    if (request.filters.difficulty) {
-      params.append('difficulty', request.filters.difficulty);
-    }
-    if (request.filters.topic) {
-      params.append('topic', request.filters.topic.toString());
-    }
-    if (request.filters.tags && request.filters.tags.length > 0) {
-      for (const tag of request.filters.tags) {
-        params.append('tags', tag.toString());
-      }
-    }
-  }
-
-  return params;
 }
 
 export const ProblemsService = {
