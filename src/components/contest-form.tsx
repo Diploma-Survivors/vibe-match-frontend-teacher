@@ -56,6 +56,28 @@ interface ContestFormProps {
   subtitle: string;
 }
 
+const contestFormSchema = z
+  .object({
+    id: z.number().optional(),
+    name: z.string().min(1, 'Tên cuộc thi là bắt buộc'),
+    description: z.string().min(1, 'Mô tả cuộc thi là bắt buộc'),
+    status: z.nativeEnum(ContestStatus, {
+      errorMap: () => ({ message: 'Phạm vi truy cập là bắt buộc' }),
+    }),
+    startTime: z.string().min(1, 'Thời gian bắt đầu là bắt buộc'),
+    endTime: z.string().min(1, 'Thời gian kết thúc là bắt buộc'),
+    durationMinutes: z
+      .number()
+      .min(1, 'Thời lượng cuộc thi phải lớn hơn 0'),
+    problems: z.array(problemSchema).min(1, 'Cuộc thi phải có ít nhất 1 bài'),
+    createdBy: z.string().optional().nullable(),
+    // Add any other fields from your Contest type
+  })
+  .refine((data) => new Date(data.endTime) > new Date(data.startTime), {
+    message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
+    path: ['endTime'], // Error will be shown on the endTime field
+  });
+
 export default function ContestForm({
   initialData,
   mode,
