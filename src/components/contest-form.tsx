@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { mockProblems } from '@/lib/data/mock-problems';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { type Contest, ContestStatus } from '@/types/contest';
@@ -38,7 +37,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import ProblemForm, { ProblemFormMode } from './problem-form';
-import ProblemList from './problem-list';
+import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
 
 export enum ContestFormMode {
@@ -78,9 +77,7 @@ export default function ContestForm({
 
   // Score modal states
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [pendingProblem, setPendingProblem] = useState<ProblemData | null>(
-    null
-  );
+  const [pendingProblems, setPendingProblems] = useState<ProblemData[]>([]);
 
   const isReadOnly = mode === ContestFormMode.VIEW;
 
@@ -111,7 +108,26 @@ export default function ContestForm({
       ...prev,
       problems: [...prev.problems, problem],
     }));
-    setPendingProblem(problem);
+    setPendingProblems([problem]);
+    setShowScoreModal(true);
+    setShowProblemModal(false);
+    setProblemSearch('');
+  };
+
+  const handleAddMultipleProblems = (problems: ProblemData[]) => {
+    if (isReadOnly) return;
+    const newProblems = problems.filter(
+      (problem) => !contestData.problems.some((p) => p.id === problem.id)
+    );
+    if (newProblems.length === 0) {
+      toastService.error('Tất cả các bài thi đã được thêm vào cuộc thi.');
+      return;
+    }
+    setContestData((prev) => ({
+      ...prev,
+      problems: [...prev.problems, ...newProblems],
+    }));
+    setPendingProblems(newProblems);
     setShowScoreModal(true);
     setShowProblemModal(false);
     setProblemSearch('');
@@ -154,7 +170,7 @@ export default function ContestForm({
           problems: [...prevData.problems, problemData],
         }));
 
-        setPendingProblem(problemData);
+        setPendingProblems([problemData]);
         setShowScoreModal(true);
         setShowNewProblemModal(false);
       }
@@ -201,23 +217,32 @@ export default function ContestForm({
     }
   };
 
-  const handleSaveScore = (score: number) => {
-    if (pendingProblem) {
+  const handleSaveScore = (scores: Record<number, number>) => {
+    if (pendingProblems && pendingProblems.length > 0) {
       setContestData((prev) => ({
         ...prev,
-        problems: prev.problems.map((p) =>
-          p.id === pendingProblem.id ? { ...p, score } : p
-        ),
-      }));
-    }
+        problems: prev.problems.map((p) => {
+          // Check if this problem is in the pendingProblems array
+          const isTargetProblem = pendingProblems.some(
+            (pendingProblem) => pendingProblem.id === p.id
+          );
 
-    setShowScoreModal(false);
-    setPendingProblem(null);
+          if (isTargetProblem && scores[p.id] !== undefined) {
+            return { ...p, score: scores[p.id] };
+          }
+
+          return p;
+        }),
+      }));
+
+      setShowScoreModal(false);
+      setPendingProblems([]);
+    }
   };
 
   const handleEditProblemScore = (problem: ProblemData) => {
     if (isReadOnly) return;
-    setPendingProblem(problem);
+    setPendingProblems([problem]);
     setShowScoreModal(true);
   };
 
@@ -741,10 +766,11 @@ export default function ContestForm({
             </div>
             <div className="px-2 overflow-y-auto no-top-offset ">
               <ProblemList
-                mode="select"
+                mode={ProblemListMode.MULTIPLE_SELECT}
                 endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
                 onProblemSelect={handleAddProblem}
                 onProblemView={handleViewProblemDetail}
+                onMultipleProblemsSelect={handleAddMultipleProblems}
               />
             </div>
           </div>
@@ -804,11 +830,13 @@ export default function ContestForm({
 
       <ProblemScoreModal
         isOpen={showScoreModal}
-        problem={pendingProblem}
-        currentScore={pendingProblem?.score}
+        problems={pendingProblems}
+        currentScores={Object.fromEntries(
+          pendingProblems.map((problem) => [problem.id, problem.score || 0])
+        )}
         onSave={handleSaveScore}
         title={
-          pendingProblem?.score
+          pendingProblems && pendingProblems.length > 0
             ? 'Chỉnh sửa điểm bài tập'
             : 'Thiết lập điểm cho bài tập'
         }
