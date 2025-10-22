@@ -37,13 +37,9 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Controller,
-  type SubmitHandler,
-  useFieldArray,
-  useForm,
-} from 'react-hook-form';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import ContestStats from './contests/contest-stats';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
@@ -79,13 +75,12 @@ const contestSchema = z
     endTime: z.string().min(1, 'Thời gian kết thúc là bắt buộc'),
     durationMinutes: z.number().positive('Thời lượng cuộc thi phải lớn hơn 0'),
     problems: z.array(z.any()).min(1, 'Cuộc thi phải có ít nhất 1 bài'),
-    // Keep other fields if they don't need validation
     id: z.number().optional(),
     createdBy: z.string().optional(),
   })
   .refine((data) => new Date(data.endTime) > new Date(data.startTime), {
     message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
-    path: ['endTime'], // Apply the error to the endTime field
+    path: ['endTime'],
   });
 
 export default function ContestForm({
@@ -98,7 +93,6 @@ export default function ContestForm({
 }: ContestFormProps) {
   const [contestData, setContestData] = useState<Contest>(initialData);
   const [showProblemModal, setShowProblemModal] = useState(false);
-  const [problemSearch, setProblemSearch] = useState('');
   const [showNewProblemModal, setShowNewProblemModal] = useState(false);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
   const [showProblemDetailModal, setShowProblemDetailModal] = useState(false);
@@ -113,8 +107,8 @@ export default function ContestForm({
   const isReadOnly = mode === ContestFormMode.VIEW;
 
   const form = useForm<Contest>({
-    resolver: zodResolver(contestSchema), // We will create this schema next
-    mode: 'onTouched', // Or 'onBlur'
+    resolver: zodResolver(contestSchema),
+    mode: 'onTouched',
     defaultValues: initialData,
     disabled: isReadOnly,
   });
@@ -122,28 +116,14 @@ export default function ContestForm({
   const {
     control,
     handleSubmit,
-    setValue,
-    watch,
+    trigger,
     formState: { errors },
-    setError, // <-- Get setError
-    clearErrors, // <-- Get clearErrors
   } = form;
 
   // Add this handler function
   const handleViewProblemDetail = async (problem: ProblemData) => {
     setSelectedProblem(problem);
     setShowProblemDetailModal(true);
-  };
-
-  const handleInputChange = (
-    field: keyof Contest,
-    value: string | number | string[]
-  ) => {
-    if (isReadOnly) return;
-    setContestData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
   };
 
   const handleAddProblem = (problem: ProblemData) => {
@@ -159,7 +139,6 @@ export default function ContestForm({
     setPendingProblems([problem]);
     setShowScoreModal(true);
     setShowProblemModal(false);
-    setProblemSearch('');
   };
 
   const handleAddMultipleProblems = (problems: ProblemData[]) => {
@@ -178,7 +157,6 @@ export default function ContestForm({
     setPendingProblems(newProblems);
     setShowScoreModal(true);
     setShowProblemModal(false);
-    setProblemSearch('');
   };
 
   const handleCreateProblem = async (data: CreateProblemRequest) => {
@@ -238,33 +216,6 @@ export default function ContestForm({
     }));
   };
 
-  const calculateDuration = () => {
-    if (contestData.startTime && contestData.endTime) {
-      const start = new Date(contestData.startTime);
-      const end = new Date(contestData.endTime);
-      const durationMs = end.getTime() - start.getTime();
-      const durationMinutes = Math.floor(durationMs / (1000 * 60));
-      handleInputChange('durationMinutes', durationMinutes);
-    }
-  };
-
-  const handleSave = () => {
-    onSave(contestData);
-  };
-
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'chưa bắt đầu':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'đang diễn ra':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      case 'đã kết thúc':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
-    }
-  };
-
   const handleSaveScore = (scores: Record<number, number>) => {
     if (pendingProblems && pendingProblems.length > 0) {
       setContestData((prev) => ({
@@ -295,11 +246,6 @@ export default function ContestForm({
   };
 
   const onSubmit: SubmitHandler<Contest> = (data) => {
-    // Run manual validation first
-    // if (validateForm(data)) {
-    //   // If valid, call onSave
-    //   onSave(data);
-    // }
     onSave(data);
   };
 
@@ -317,86 +263,7 @@ export default function ContestForm({
       </div>
 
       {/* Contest Stats (View mode only) */}
-      {mode === ContestFormMode.VIEW && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600">
-                  <Trophy className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Trạng thái
-                  </p>
-                  <div
-                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
-                      contestData.status
-                    )}`}
-                  >
-                    {contestData.status}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                {/* <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Thí sinh
-                  </p>
-                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {contestData.participants || 0}
-                  </p>
-                </div> */}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Số bài
-                  </p>
-                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {contestData.problems.length}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Thời lượng
-                  </p>
-                  <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {Math.floor(contestData.durationMinutes / 60)}h{' '}
-                    {contestData.durationMinutes % 60}m
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {mode === ContestFormMode.VIEW && <ContestStats contest={contestData} />}
 
       {/* Basic Information */}
       <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
@@ -468,7 +335,7 @@ export default function ContestForm({
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
-                    // The disabled state is now handled automatically by the form config
+                    disabled={field.disabled}
                   >
                     <SelectTrigger
                       className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
@@ -531,19 +398,22 @@ export default function ContestForm({
                 control={control}
                 render={({ field }) => (
                   <Input
+                    {...field}
                     type="datetime-local"
                     value={
                       field.value
                         ? new Date(field.value).toISOString().slice(0, 16)
                         : ''
                     }
-                    onChange={(e) =>
+                    onChange={(e) => {
                       field.onChange(
                         e.target.value
                           ? new Date(e.target.value).toISOString()
                           : ''
-                      )
-                    }
+                      );
+                      trigger('startTime');
+                      trigger('endTime');
+                    }}
                     className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
                       errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
                     }`}
@@ -567,19 +437,21 @@ export default function ContestForm({
                 control={control}
                 render={({ field }) => (
                   <Input
+                    {...field}
                     type="datetime-local"
                     value={
                       field.value
                         ? new Date(field.value).toISOString().slice(0, 16)
                         : ''
                     }
-                    onChange={(e) =>
+                    onChange={(e) => {
                       field.onChange(
                         e.target.value
                           ? new Date(e.target.value).toISOString()
                           : ''
-                      )
-                    }
+                      );
+                      trigger('endTime');
+                    }}
                     className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
                       errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
                     }`}
@@ -659,6 +531,11 @@ export default function ContestForm({
                   ? 'Cuộc thi này chưa có bài tập nào'
                   : 'Chưa có bài tập nào được thêm vào cuộc thi'}
               </p>
+              {errors.problems && (
+                <p className="text-sm text-red-500 mb-2">
+                  {errors.problems.message}
+                </p>
+              )}
               {!isReadOnly && (
                 <Button
                   onClick={() => setShowProblemModal(true)}

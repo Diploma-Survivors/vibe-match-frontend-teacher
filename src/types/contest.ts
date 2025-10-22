@@ -8,7 +8,7 @@ export interface Contest {
   endTime: string;
   durationMinutes: number;
   problems: ProblemData[];
-  status?: ContestStatus;
+  status: ContestStatus;
   createdBy?: string;
   createdAt?: string;
 }
