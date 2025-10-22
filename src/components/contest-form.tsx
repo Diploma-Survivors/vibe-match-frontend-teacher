@@ -22,6 +22,7 @@ import {
   getDifficultyColor,
   getDifficultyLabel,
 } from '@/types/problems';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   BarChart3,
   Calendar,
@@ -37,17 +38,16 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
+import {
+  Controller,
+  type SubmitHandler,
+  useFieldArray,
+  useForm,
+} from 'react-hook-form';
+import { z } from 'zod';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
-import {
-  useForm,
-  Controller,
-  useFieldArray,
-  SubmitHandler,
-} from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 export enum ContestFormMode {
   CREATE = 'create',
@@ -68,14 +68,17 @@ const contestSchema = z
   .object({
     name: z.string().trim().min(1, 'Tên cuộc thi là bắt buộc'),
     description: z.string().trim().min(1, 'Mô tả cuộc thi là bắt buộc'),
-    status: z.nativeEnum(ContestStatus, {
+    status: z.enum(ContestStatus, {
       error: () => ({ message: 'Phạm vi truy cập là bắt buộc' }),
     }),
-    startTime: z.string().min(1, 'Thời gian bắt đầu là bắt buộc'),
+    startTime: z
+      .string()
+      .min(1, 'Thời gian bắt đầu là bắt buộc')
+      .refine((val) => new Date(val) > new Date(), {
+        message: 'Thời gian bắt đầu phải ở trong tương lai',
+      }),
     endTime: z.string().min(1, 'Thời gian kết thúc là bắt buộc'),
-    durationMinutes: z
-      .number()
-      .positive('Thời lượng cuộc thi phải lớn hơn 0'),
+    durationMinutes: z.number().positive('Thời lượng cuộc thi phải lớn hơn 0'),
     problems: z.array(z.any()).min(1, 'Cuộc thi phải có ít nhất 1 bài'),
     // Keep other fields if they don't need validation
     id: z.number().optional(),
@@ -85,8 +88,6 @@ const contestSchema = z
     message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
     path: ['endTime'], // Apply the error to the endTime field
   });
-
-
 
 export default function ContestForm({
   initialData,
@@ -106,8 +107,6 @@ export default function ContestForm({
     null
   );
 
-
-
   // Score modal states
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [pendingProblem, setPendingProblem] = useState<ProblemData | null>(
@@ -117,7 +116,7 @@ export default function ContestForm({
   const isReadOnly = mode === ContestFormMode.VIEW;
 
   const form = useForm<Contest>({
-     resolver: zodResolver(contestSchema), // We will create this schema next
+    resolver: zodResolver(contestSchema), // We will create this schema next
     mode: 'onTouched', // Or 'onBlur'
     defaultValues: initialData,
     disabled: isReadOnly,
@@ -279,11 +278,11 @@ export default function ContestForm({
     onSave(data);
   };
 
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-     className="max-w-6xl mx-auto space-y-8">
+      className="max-w-6xl mx-auto space-y-8"
+    >
       {/* Header Info */}
       <div className="text-center">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
@@ -425,7 +424,9 @@ export default function ContestForm({
               )}
             />
             {errors.description && (
-              <p className="text-sm text-red-500">{errors.description.message}</p>
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
@@ -466,9 +467,7 @@ export default function ContestForm({
               />
               {/* Display validation error message */}
               {errors.status && (
-                <p className="text-sm text-red-500">
-                  {errors.status.message}
-                </p>
+                <p className="text-sm text-red-500">{errors.status.message}</p>
               )}
             </div>
           </div>
@@ -504,19 +503,33 @@ export default function ContestForm({
               </label>
               <Controller
                 name="startTime"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type="datetime-local"
-                      value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : '')}
-                      className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                        errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
-                      }`}
-                    />
-                  )}
-                />
-                {errors.startTime && <p className="text-sm text-red-500">{errors.startTime.message}</p>}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="datetime-local"
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().slice(0, 16)
+                        : ''
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value
+                          ? new Date(e.target.value).toISOString()
+                          : ''
+                      )
+                    }
+                    className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                      errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
+                    }`}
+                  />
+                )}
+              />
+              {errors.startTime && (
+                <p className="text-sm text-red-500">
+                  {errors.startTime.message}
+                </p>
+              )}
             </div>
 
             {/* End Time */}
@@ -526,19 +539,31 @@ export default function ContestForm({
               </label>
               <Controller
                 name="endTime"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type="datetime-local"
-                      value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value).toISOString() : '')}
-                      className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                        errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
-                      }`}
-                    />
-                  )}
-                />
-                {errors.endTime && <p className="text-sm text-red-500">{errors.endTime.message}</p>}
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="datetime-local"
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().slice(0, 16)
+                        : ''
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value
+                          ? new Date(e.target.value).toISOString()
+                          : ''
+                      )
+                    }
+                    className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                      errors.startTime ? 'ring-red-500' : 'focus:ring-blue-500'
+                    }`}
+                  />
+                )}
+              />
+              {errors.endTime && (
+                <p className="text-sm text-red-500">{errors.endTime.message}</p>
+              )}
             </div>
           </div>
 
@@ -554,13 +579,19 @@ export default function ContestForm({
                 <Input
                   type="number"
                   {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) =>
+                    field.onChange(Number.parseInt(e.target.value, 10) || 0)
+                  }
                   placeholder="180"
                   className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
                 />
               )}
             />
-            {errors.durationMinutes && <p className="text-sm text-red-500">{errors.durationMinutes.message}</p>}
+            {errors.durationMinutes && (
+              <p className="text-sm text-red-500">
+                {errors.durationMinutes.message}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -680,7 +711,7 @@ export default function ContestForm({
       {!isReadOnly && (
         <div className="flex justify-end">
           <Button
-          type="submit"
+            type="submit"
             // onClick={handleSave}
             disabled={isSaving}
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg"
