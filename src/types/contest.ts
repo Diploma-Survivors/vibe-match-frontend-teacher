@@ -14,6 +14,8 @@ export interface Contest {
   createdAt?: string;
 }
 
+
+
 export interface ContestDTO {
   id?: number;
   name: string;
@@ -80,4 +82,14 @@ export const ContestSchema = z
     message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
     path: ['endTime'],
   });
+
+  export const initialContestData: Contest = {
+    name: '',
+      description: '',
+      startTime: '',
+      endTime: '',
+      durationMinutes: 180,
+      status: ContestStatus.PRIVATE,
+      problems: [],
+  }
 

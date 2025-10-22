@@ -48,7 +48,7 @@ export interface CreateProblemRequest {
 }
 
 export interface ProblemData {
-  id?: number;
+  id: number;
   title: string;
   description: string;
   inputDescription: string;
@@ -66,6 +66,23 @@ export interface ProblemData {
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
 }
+
+export const initialProblemData: ProblemData = {
+  id: 0,
+  title: '',
+  description: '',
+  inputDescription: '',
+  outputDescription: '',
+  maxScore: 100,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  difficulty: ProblemDifficulty.EASY,
+  tags: [],
+  topics: [],
+  testcase: null,
+  testcaseSamples: [],
+};
+
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
@@ -159,8 +176,9 @@ export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
 
 export const ProblemSchema = z
 .object({
+  id: z.number(),
   title: z.string().trim().min(1, 'Tên bài tập là bắt buộc'),
-  description: z.string().trim().min(1, 'Mô tả bài toán là bắt buộc'),
+  description: z.string().trim().min(1, 'Mô tả bài tập là bắt buộc'),
   inputDescription: z.string().trim().min(1, 'Mô tả đầu vào là bắt buộc'),
   outputDescription: z.string().trim().min(1, 'Mô tả đầu ra là bắt buộc'),
   maxScore: z.number().positive('Điểm tối đa phải là số dương'),
@@ -170,8 +188,10 @@ export const ProblemSchema = z
     error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
   }),
   type: z.enum(ProblemType).optional(),
-  topics: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một chủ đề'),
-  tags: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một tag'),
+  topics: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một chủ đề').max(3, 'Chỉ được chọn tối đa 3 chủ đề'),
+  // topics: z.any()
+  // .refine(() => false, { message: '⚠️ Luôn hiển thị lỗi (chế độ test)' }),
+  tags: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một tag').max(3, 'Chỉ được chọn tối đa 3 tag'),
   testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
   testcaseSamples: z
     .array(

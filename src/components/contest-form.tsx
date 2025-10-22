@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
-import { type Contest, ContestStatus, ContestSchema } from '@/types/contest';
+import { type Contest, ContestStatus, ContestSchema, initialContestData } from '@/types/contest';
 import {
   type CreateProblemRequest,
   type ProblemData,
@@ -51,7 +51,7 @@ export enum ContestFormMode {
 }
 
 interface ContestFormProps {
-  initialData: Contest;
+  initialData?: Contest;
   mode: ContestFormMode;
   onSave: (data: Contest) => Promise<void>;
   isSaving?: boolean;
@@ -67,7 +67,7 @@ export default function ContestForm({
   title,
   subtitle,
 }: ContestFormProps) {
-  const [contestData, setContestData] = useState<Contest>(initialData);
+  const [contestData, setContestData] = useState<Contest>(initialData ? initialData : initialContestData);
   const [showProblemModal, setShowProblemModal] = useState(false);
   const [showNewProblemModal, setShowNewProblemModal] = useState(false);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
@@ -85,7 +85,7 @@ export default function ContestForm({
   const form = useForm<Contest>({
     resolver: zodResolver(ContestSchema),
     mode: 'onTouched',
-    defaultValues: initialData,
+    defaultValues: initialData ? initialData : initialContestData,
     disabled: isReadOnly,
   });
 
@@ -459,7 +459,7 @@ export default function ContestForm({
                   onChange={(e) =>
                     field.onChange(Number.parseInt(e.target.value, 10) || 0)
                   }
-                  placeholder="180"
+                  placeholder="Nhập thời lượng cuộc thi..."
                   className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
                 />
               )}
