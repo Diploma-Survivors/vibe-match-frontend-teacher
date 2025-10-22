@@ -1,6 +1,8 @@
 import type { Tag } from './tags';
 import type { TestcaseSample } from './testcases';
 import type { Topic } from './topics';
+import { z } from 'zod';
+
 
 export enum ProblemDifficulty {
   EASY = 'easy',
@@ -46,7 +48,7 @@ export interface CreateProblemRequest {
 }
 
 export interface ProblemData {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   inputDescription: string;
@@ -59,8 +61,8 @@ export interface ProblemData {
   createdAt?: string;
   updatedAt?: string;
   tags: Tag[];
-  topic: Topic[];
-  testcase: File | number;
+  topics: Topic[];
+  testcase: File | null;
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
 }
@@ -154,3 +156,44 @@ export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
 export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
   return DIFFICULTY_LABELS.get(difficulty) || difficulty;
 };
+
+export const ProblemSchema = z
+.object({
+  title: z.string().trim().min(1, 'Tên bài tập là bắt buộc'),
+  description: z.string().trim().min(1, 'Mô tả bài toán là bắt buộc'),
+  inputDescription: z.string().trim().min(1, 'Mô tả đầu vào là bắt buộc'),
+  outputDescription: z.string().trim().min(1, 'Mô tả đầu ra là bắt buộc'),
+  maxScore: z.number().positive('Điểm tối đa phải là số dương'),
+  timeLimitMs: z.number().positive('Giới hạn thời gian phải là số dương'),
+  memoryLimitKb: z.number().positive('Giới hạn bộ nhớ phải là số dương'),
+  difficulty: z.enum(ProblemDifficulty, {
+    error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
+  }),
+  type: z.enum(ProblemType).optional(),
+  topics: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một chủ đề'),
+  tags: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một tag'),
+  testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
+  testcaseSamples: z
+    .array(
+      z.object({
+        input: z.string().trim().min(1, 'Đầu vào không được để trống'),
+        output: z.string().trim().min(1, 'Đầu ra không được để trống'),
+      })
+    )
+    .min(1, 'Phải có ít nhất một test case mẫu'),
+})
+.refine((data) => {
+  // Custom validation: testcase file is required in create mode
+  if (data.testcase === undefined || data.testcase === null) {
+  }
+}, {
+  message: 'File test case là bắt buộc',
+  path: ['testcase'],
+})
+
+
+export const AllowedTypes = [
+  'text/plain',
+];
+
+export const AllowedExtensions = ['.txt'];

@@ -18,6 +18,9 @@ import {
   type ProblemData,
   ProblemDifficulty,
   ProblemType,
+  ProblemSchema,
+  AllowedTypes,
+  AllowedExtensions
 } from '@/types/problems';
 import type { Tag } from '@/types/tags';
 import type { TestcaseSample } from '@/types/testcases';
@@ -32,6 +35,10 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, Controller, useFieldArray, type SubmitHandler } from 'react-hook-form';
+import path from 'path';
 
 export enum ProblemFormMode {
   CREATE = 'create',
@@ -41,12 +48,14 @@ export enum ProblemFormMode {
 
 interface ProblemFormProps {
   mode: ProblemFormMode;
-  onSave?: (data: CreateProblemRequest) => Promise<void>;
+  onSave?: (data: ProblemData) => Promise<void>;
   isSaving?: boolean;
   title?: string;
   subtitle?: string;
   initialData?: ProblemData;
 }
+
+
 
 export default function ProblemForm({
   mode,
@@ -64,28 +73,28 @@ export default function ProblemForm({
   const [dragActive, setDragActive] = useState(false);
   const [showTestcaseError, setShowTestcaseError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const form = useForm<ProblemData>({
+    resolver: zodResolver(ProblemSchema),
+    mode: 'onTouched',
+    defaultValues: initialData,
+    disabled: isReadOnly,
+  });
 
-  const [createProblemRequest, setCreateProblemRequest] =
-    useState<CreateProblemRequest>({
-      title: '',
-      description: '',
-      inputDescription: '',
-      outputDescription: '',
-      maxScore: 100,
-      timeLimitMs: 1000,
-      memoryLimitKb: 262144,
-      difficulty: ProblemDifficulty.EASY,
-      type: ProblemType.STANDALONE,
-      tagIds: [],
-      topicIds: [],
-      testcase: undefined,
-      testcaseSamples: [
-        {
-          input: '',
-          output: '',
-        },
-      ],
-    });
+  const {
+    control,
+    handleSubmit,
+    register,
+    watch,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = form;
+
+  const testcaseFile = watch('testcase');
+
+
 
   useEffect(() => {
     if (initialData) {
@@ -100,7 +109,7 @@ export default function ProblemForm({
         difficulty: initialData.difficulty || ProblemDifficulty.EASY,
         type: (initialData.type as ProblemType) || ProblemType.STANDALONE,
         tagIds: initialData.tags?.map((tag) => tag.id) || [],
-        topicIds: initialData.topic?.map((topic) => topic.id) || [],
+        topicIds: initialData.topics?.map((topic) => topic.id) || [],
         testcase: (initialData.testcase as File) || undefined,
         testcaseSamples: initialData.testcaseSamples?.length
           ? initialData.testcaseSamples
@@ -109,24 +118,34 @@ export default function ProblemForm({
     }
   }, [initialData]);
 
+  const mockTags : Tag[] = [
+    { id: 1, name: 'Array' },
+    { id: 2, name: 'String' },]
+
+  const mockTopics : Topic[] = [
+    { id: 1, name: 'Data Structures' },
+    { id: 2, name: 'Algorithms' },]
+
   // Load tags and topics when component mounts
   useEffect(() => {
-    const loadTagsAndTopics = async () => {
-      try {
-        const [tagsResponse, topicsResponse] = await Promise.all([
-          TagsService.getAllTags(),
-          TopicsService.getAllTopics(),
-        ]);
+    // const loadTagsAndTopics = async () => {
+    //   try {
+    //     const [tagsResponse, topicsResponse] = await Promise.all([
+    //       TagsService.getAllTags(),
+    //       TopicsService.getAllTopics(),
+    //     ]);
 
-        setAvailableTags(tagsResponse.data.data);
-        setAvailableTopics(topicsResponse.data.data);
-      } catch (error) {
-        setAvailableTags([]);
-        setAvailableTopics([]);
-      }
-    };
+    //     setAvailableTags(tagsResponse.data.data);
+    //     setAvailableTopics(topicsResponse.data.data);
+    //   } catch (error) {
+    //     setAvailableTags([]);
+    //     setAvailableTopics([]);
+    //   }
+    // };
 
-    loadTagsAndTopics();
+    // loadTagsAndTopics();
+    setAvailableTags(mockTags);
+    setAvailableTopics(mockTopics);
   }, []);
 
   // Test case pagination constants
@@ -144,16 +163,6 @@ export default function ProblemForm({
     endTestIndex
   );
 
-  const handleInputChange = (
-    field: keyof CreateProblemRequest,
-    value: string | string[] | number
-  ) => {
-    if (isReadOnly) return;
-    setCreateProblemRequest((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   const handleTagChange = (tagId: number) => {
     if (isReadOnly) return;
@@ -249,86 +258,75 @@ export default function ProblemForm({
     setDragActive(false);
 
     if (e.dataTransfer.files?.[0]) {
-      const file = e.dataTransfer.files[0];
-      const allowedTypes = [
-        'text/plain',
-        'text/csv',
-        'application/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ];
-      const allowedExtensions = ['.txt', '.csv', '.xlsx', '.xls'];
-
-      const hasValidType = allowedTypes.includes(file.type);
-      const hasValidExtension = allowedExtensions.some((ext) =>
-        file.name.toLowerCase().endsWith(ext)
-      );
-
-      if (hasValidType || hasValidExtension) {
-        setCreateProblemRequest((prev) => ({
-          ...prev,
-          testcase: file,
-        }));
-        setShowTestcaseError(false); // Hide error when file is uploaded
-      } else {
-        alert('Chỉ chấp nhận file .txt, .csv, .xlsx, .xls');
-      }
+      processFile(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      const file = e.target.files[0];
-      const allowedTypes = [
-        'text/plain',
-        'text/csv',
-        'application/csv',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ];
-      const allowedExtensions = ['.txt', '.csv', '.xlsx', '.xls'];
-
-      const hasValidType = allowedTypes.includes(file.type);
-      const hasValidExtension = allowedExtensions.some((ext) =>
-        file.name.toLowerCase().endsWith(ext)
-      );
-
-      if (hasValidType || hasValidExtension) {
-        setCreateProblemRequest((prev) => ({
-          ...prev,
-          testcase: file,
-        }));
-        setShowTestcaseError(false); // Hide error when file is uploaded
-      } else {
-        alert('Chỉ chấp nhận file .txt, .csv, .xlsx, .xls');
-      }
+      processFile(e.target.files[0]);
     }
   };
 
   const removeFile = () => {
-    setCreateProblemRequest((prev) => ({
-      ...prev,
-      testcase: undefined,
-    }));
+    setValue('testcase', null, { shouldValidate: true });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const handleSave = async () => {
-    // Validate testcase file is required for create mode
-    if (mode === ProblemFormMode.CREATE && !createProblemRequest.testcase) {
-      setShowTestcaseError(true);
-      return;
+  const onSubmit: SubmitHandler<ProblemData> = (data) => {
+    // 1. Conditional validation: check for the file only in 'create' mode
+    if (mode === ProblemFormMode.CREATE && !data.testcase) {
+      setError('testcase', {
+        type: 'manual',
+        message: 'File test case là bắt buộc khi tạo bài tập mới.',
+      });
+      return; // Stop submission
     }
-    // Hide error if validation passes
-    setShowTestcaseError(false);
 
-    // callback
+    // 2. If all validation passes, call the onSave prop
     if (onSave) {
-      onSave(createProblemRequest);
+      onSave(data);
     }
   };
+
+
+// --- NEW UNIFIED FILE PROCESSING LOGIC ---
+const processFile = (file: File | undefined) => {
+  if (!file) return;
+
+  const validationResult = validateTestcaseFile(file);
+
+  if (validationResult.isValid) {
+    setValue('testcase', file, { shouldValidate: true });
+    clearErrors('testcase'); // Clear any previous errors
+  } else {
+    setValue('testcase', null, { shouldValidate: true }); // Clear the invalid file from the form state
+    setError('testcase', { type: 'manual', message: validationResult.error });
+  }
+};
+
+function validateTestcaseFile(file: File | null): { isValid: boolean; error?: string } {
+  if (!file) {
+    // This is not an error in itself, but the file is not valid for upload.
+    return { isValid: false };
+  }
+
+  const hasValidType = AllowedTypes.includes(file.type);
+  const hasValidExtension = AllowedExtensions.some((ext) =>
+    file.name.toLowerCase().endsWith(ext)
+  );
+
+  if (hasValidType || hasValidExtension) {
+    return { isValid: true };
+  }
+
+  return {
+    isValid: false,
+    error: `Định dạng file không hợp lệ. Chỉ chấp nhận: ${AllowedExtensions.join(', ')}`,
+  };
+}
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -353,13 +351,20 @@ export default function ProblemForm({
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Tên bài tập <span className="text-red-500">*</span>
             </label>
-            <Input
-              placeholder="Nhập tên bài tập..."
-              value={createProblemRequest.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
-              disabled={isReadOnly}
+            <Controller
+              name="title"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="Nhập tên bài tập..."
+                  className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                    errors.title ? 'ring-red-500' : 'focus:ring-green-500'
+                  }`}
+                />
+              )}
             />
+            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
           </div>
 
           {/* Problems Description */}
@@ -367,13 +372,24 @@ export default function ProblemForm({
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mô tả bài toán <span className="text-red-500">*</span>
             </label>
-            <textarea
-              placeholder="Nhập mô tả chi tiết về bài toán..."
-              value={createProblemRequest.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className="w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
-              disabled={isReadOnly}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Nhập mô tả chi tiết về bài tập..."
+                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+                    errors.description ? 'ring-red-500' : 'focus:ring-blue-500'
+                  }`}
+                />
+              )}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Input Description */}
@@ -381,15 +397,24 @@ export default function ProblemForm({
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mô tả đầu vào <span className="text-red-500">*</span>
             </label>
-            <textarea
-              placeholder="Mô tả định dạng và ý nghĩa của đầu vào..."
-              value={createProblemRequest.inputDescription}
-              onChange={(e) =>
-                handleInputChange('inputDescription', e.target.value)
-              }
-              className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
-              disabled={isReadOnly}
+            <Controller
+              name="inputDescription"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Nhập mô tả đầu vào..."
+                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+                    errors.description ? 'ring-red-500' : 'focus:ring-blue-500'
+                  }`}
+                />
+              )}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Output Description */}
@@ -397,15 +422,24 @@ export default function ProblemForm({
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mô tả đầu ra <span className="text-red-500">*</span>
             </label>
-            <textarea
-              placeholder="Mô tả định dạng và ý nghĩa của đầu ra..."
-              value={createProblemRequest.outputDescription}
-              onChange={(e) =>
-                handleInputChange('outputDescription', e.target.value)
-              }
-              className="w-full h-24 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 resize-none"
-              disabled={isReadOnly}
+            <Controller
+              name="outputDescription"
+              control={control}
+              render={({ field }) => (
+                <textarea
+                  {...field}
+                  placeholder="Nhập mô tả đầu ra..."
+                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+                    errors.description ? 'ring-red-500' : 'focus:ring-blue-500'
+                  }`}
+                />
+              )}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -424,19 +458,20 @@ export default function ProblemForm({
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Giới hạn thời gian (ms)
               </label>
-              <Input
-                type="number"
-                placeholder="1000"
-                value={createProblemRequest.timeLimitMs}
-                onChange={(e) =>
-                  handleInputChange(
-                    'timeLimitMs',
-                    Number.parseInt(e.target.value) || 1000
-                  )
-                }
-                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
-                disabled={isReadOnly}
-              />
+              <Controller
+              name="timeLimitMs"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  // placeholder="Nhập tên bài tập..."
+                  className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                    errors.title ? 'ring-red-500' : 'focus:ring-green-500'
+                  }`}
+                />
+              )}
+            />
+            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
             </div>
 
             {/* Memory Limit */}
@@ -444,19 +479,20 @@ export default function ProblemForm({
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Giới hạn bộ nhớ (KB)
               </label>
-              <Input
-                type="number"
-                placeholder="262144"
-                value={createProblemRequest.memoryLimitKb}
-                onChange={(e) =>
-                  handleInputChange(
-                    'memoryLimitKb',
-                    Number.parseInt(e.target.value) || 262144
-                  )
-                }
-                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
-                disabled={isReadOnly}
-              />
+              <Controller
+              name="memoryLimitKb"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  // placeholder="Nhập tên bài tập..."
+                  className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                    errors.title ? 'ring-red-500' : 'focus:ring-green-500'
+                  }`}
+                />
+              )}
+            />
+            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
             </div>
 
             {/* Max Score */}
@@ -464,19 +500,20 @@ export default function ProblemForm({
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Điểm tối đa
               </label>
-              <Input
-                type="number"
-                placeholder="100"
-                value={createProblemRequest.maxScore}
-                onChange={(e) =>
-                  handleInputChange(
-                    'maxScore',
-                    Number.parseInt(e.target.value) || 100
-                  )
-                }
-                className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500"
-                disabled={isReadOnly}
-              />
+              <Controller
+              name="maxScore"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  // placeholder="Nhập tên bài tập..."
+                  className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                    errors.title ? 'ring-red-500' : 'focus:ring-green-500'
+                  }`}
+                />
+              )}
+            />
+            {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
             </div>
           </div>
 
@@ -485,22 +522,29 @@ export default function ProblemForm({
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mức độ khó <span className="text-red-500">*</span>
             </label>
-            <Select
-              value={createProblemRequest.difficulty}
-              onValueChange={(value) => handleInputChange('difficulty', value)}
-              disabled={isReadOnly}
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                <SelectValue placeholder="Chọn mức độ khó" />
-              </SelectTrigger>
-              <SelectContent>
-                {DIFFICULTY_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="difficulty"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={field.disabled}
+                >
+                  <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
+                    <SelectValue placeholder="Chọn mức độ khó" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DIFFICULTY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.difficulty && <p className="text-sm text-red-500">{errors.difficulty.message}</p>}            
           </div>
         </CardContent>
       </Card>
