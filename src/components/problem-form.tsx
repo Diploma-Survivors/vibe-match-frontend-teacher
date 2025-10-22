@@ -113,15 +113,16 @@ export default function ProblemForm({
   useEffect(() => {
     const loadTagsAndTopics = async () => {
       try {
-        const [tagsData, topicsData] = await Promise.all([
-          TagsService.getTags(),
-          TopicsService.getTopics(),
+        const [tagsResponse, topicsResponse] = await Promise.all([
+          TagsService.getAllTags(),
+          TopicsService.getAllTopics(),
         ]);
 
-        setAvailableTags(tagsData);
-        setAvailableTopics(topicsData);
+        setAvailableTags(tagsResponse.data.data);
+        setAvailableTopics(topicsResponse.data.data);
       } catch (error) {
-        console.error('Failed to load tags and topics:', error);
+        setAvailableTags([]);
+        setAvailableTopics([]);
       }
     };
 

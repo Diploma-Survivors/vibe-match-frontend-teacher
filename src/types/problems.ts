@@ -1,4 +1,6 @@
+import type { Tag } from './tags';
 import type { TestcaseSample } from './testcases';
+import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
   EASY = 'easy',
@@ -25,16 +27,6 @@ export enum ProblemType {
 export enum MatchMode {
   ANY = 'any',
   ALL = 'all',
-}
-
-export interface Tag {
-  id: number;
-  name: string;
-}
-
-export interface Topic {
-  id: number;
-  name: string;
 }
 
 export interface CreateProblemRequest {
@@ -75,8 +67,9 @@ export interface ProblemData {
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
-  topic?: number;
-  tags?: number[];
+  type?: ProblemType;
+  topicIds?: number[];
+  tagIds?: number[];
 }
 
 export interface GetProblemListRequest {
