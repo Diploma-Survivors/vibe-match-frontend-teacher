@@ -1,7 +1,7 @@
 'use client';
 
 import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
-import ProblemList from '@/components/problem-list';
+import ProblemList, { ProblemListMode } from '@/components/problem-list';
 import { Button } from '@/components/ui/button';
 import { LtiService } from '@/services/lti-service';
 import { type ProblemData, ProblemEndpointType } from '@/types/problems';
@@ -135,7 +135,7 @@ export default function OptionsPage() {
             </div>
             <div className="px-2 overflow-y-auto no-top-offset ">
               <ProblemList
-                mode="select"
+                mode={ProblemListMode.SELECT}
                 endpointType={ProblemEndpointType.SELECTABLE_FOR_ASSIGNMENT}
                 onProblemView={handleViewProblemDetail}
                 onProblemSelect={handleProblemSelectForDeeplinkingResponse}
