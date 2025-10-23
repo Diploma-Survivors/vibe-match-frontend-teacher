@@ -15,6 +15,6 @@ export const TOPIC_OPTIONS = [
 export interface Topic {
   id: number;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
