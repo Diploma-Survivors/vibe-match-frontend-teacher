@@ -10,41 +10,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TagsService } from "@/services/tags-service";
-import { TopicsService } from "@/services/topics-service";
 import {
-  type CreateProblemRequest,
   DIFFICULTY_OPTIONS,
-  type ProblemData,
-  ProblemDifficulty,
-  ProblemType,
-  ProblemSchema,
-  AllowedTypes,
-  AllowedExtensions,
   initialProblemData,
+  type ProblemData,
+  ProblemSchema
 } from "@/types/problems";
 import type { Tag } from "@/types/tags";
-import type { TestcaseSample } from "@/types/testcases";
 import type { Topic } from "@/types/topics";
-import {
-  FileSpreadsheet,
-  FileText,
-  Plus,
-  Save,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  useForm,
+  Save
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import {
   Controller,
-  useFieldArray,
   type SubmitHandler,
+  useForm
 } from "react-hook-form";
-import path from "path";
+import SampleTestcases from "./testcases/sample-testcases";
+import TestCaseUploader from "./testcases/testcases-uploader";
 
 export enum ProblemFormMode {
   CREATE = "create",
@@ -73,10 +58,6 @@ export default function ProblemForm({
 
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-  const [currentTestPage, setCurrentTestPage] = useState(1);
-  const [dragActive, setDragActive] = useState(false);
-  const [showTestcaseError, setShowTestcaseError] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProblemData>({
     resolver: zodResolver(ProblemSchema),
@@ -89,34 +70,45 @@ export default function ProblemForm({
     control,
     handleSubmit,
     trigger,
-    watch,
     setValue,
     setError,
     clearErrors,
     formState: { errors },
   } = form;
 
-  const testcaseFile = watch("testcase");
 
-  // Load tags and topics when component mounts
   useEffect(() => {
-
     loadTagsAndTopics();
   }, []);
 
   const loadTagsAndTopics = async () => {
-    try {
-      const [tagsResponse, topicsResponse] = await Promise.all([
-        TagsService.getAllTags(),
-        TopicsService.getAllTopics(),
-      ]);
+    // try {
+    //   const [tagsResponse, topicsResponse] = await Promise.all([
+    //     TagsService.getAllTags(),
+    //     TopicsService.getAllTopics(),
+    //   ]);
 
-      setAvailableTags(tagsResponse.data.data);
-      setAvailableTopics(topicsResponse.data.data);
-    } catch (error) {
-      setAvailableTags([]);
-      setAvailableTopics([]);
-    }
+    //   setAvailableTags(tagsResponse.data.data);
+    //   setAvailableTopics(topicsResponse.data.data);
+    // } catch (error) {
+    //   setAvailableTags([]);
+    //   setAvailableTopics([]);
+    // }
+    const mockTags = [
+      { id: 1, name: "Array" },
+      { id: 2, name: "String" },
+      { id: 3, name: "Dynamic Programming" },
+      { id: 4, name: "Graph" },
+    ];
+    const mockTopics = [
+      { id: 1, name: "Beginner" },
+      { id: 2, name: "Intermediate" },
+      { id: 3, name: "Advanced" },
+      { id: 4, name: "Expert" },
+    ];
+    setAvailableTags(mockTags);
+    setAvailableTopics(mockTopics);
+
   };
 
   const handleToggleSelection = (
@@ -139,195 +131,14 @@ export default function ProblemForm({
       newSelection = [...selection, itemId];
     }
 
-    // Call the onChange function from react-hook-form's Controller with the new array
     onChange(newSelection);
   };
 
-  // // Test case pagination constants
-  // const testCasesPerPage = 3;
-  // const totalTestPages = Math.ceil(
-  //   (createProblemRequest.testcaseSamples?.length || 0) / testCasesPerPage
-  // );
-  // const startTestIndex = (currentTestPage - 1) * testCasesPerPage;
-  // const endTestIndex = Math.min(
-  //   startTestIndex + testCasesPerPage,
-  //   createProblemRequest.testcaseSamples?.length || 0
-  // );
-  // const currentTestCases = (createProblemRequest.testcaseSamples || []).slice(
-  //   startTestIndex,
-  //   endTestIndex
-  // );
-
-  // const handleTagChange = (tagId: number) => {
-  //   if (isReadOnly) return;
-  //   setCreateProblemRequest((prev) => {
-  //     const currentTags = prev.tagIds || [];
-  //     const isSelected = currentTags.includes(tagId);
-
-  //     if (isSelected) {
-  //       return {
-  //         ...prev,
-  //         tagIds: currentTags.filter((t: number) => t !== tagId),
-  //       };
-  //     }
-  //     return {
-  //       ...prev,
-  //       tagIds: [...currentTags, tagId],
-  //     };
-  //   });
-  // };
-
-  // const handleTopicChange = (topicId: number) => {
-  //   if (isReadOnly) return;
-  //   setCreateProblemRequest((prev) => {
-  //     const currentTopics = prev.topicIds || [];
-  //     const isSelected = currentTopics.includes(topicId);
-
-  //     if (isSelected) {
-  //       return {
-  //         ...prev,
-  //         topicIds: currentTopics.filter((t: number) => t !== topicId),
-  //       };
-  //     }
-  //     return {
-  //       ...prev,
-  //       topicIds: [...currentTopics, topicId],
-  //     };
-  //   });
-  // };
-
-  // const handleTestCaseChange = (
-  //   index: number,
-  //   field: keyof TestcaseSample,
-  //   value: string
-  // ) => {
-  //   if (isReadOnly) return;
-  //   setCreateProblemRequest((prev) => ({
-  //     ...prev,
-  //     testcaseSamples: prev.testcaseSamples.map((testCase, i) =>
-  //       i === index ? { ...testCase, [field]: value } : testCase
-  //     ),
-  //   }));
-  // };
-
-  // const addTestCase = () => {
-  //   if (isReadOnly) return;
-  //   setCreateProblemRequest((prev) => ({
-  //     ...prev,
-  //     testcaseSamples: [
-  //       ...prev.testcaseSamples,
-  //       {
-  //         input: "",
-  //         output: "",
-  //       },
-  //     ],
-  //   }));
-  // };
-
-  // const removeTestCase = (index: number) => {
-  //   if (isReadOnly || (createProblemRequest.testcaseSamples?.length || 0) <= 1)
-  //     return;
-  //   setCreateProblemRequest((prev) => ({
-  //     ...prev,
-  //     testcaseSamples: (prev.testcaseSamples || []).filter(
-  //       (_, i) => i !== index
-  //     ),
-  //   }));
-  // };
-
-  // File upload handlers
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files?.[0]) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      processFile(e.target.files[0]);
-    }
-  };
-
-  const removeFile = () => {
-    setValue("testcase", null, { shouldValidate: true });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   const onSubmit: SubmitHandler<ProblemData> = (data) => {
-    if (mode === ProblemFormMode.CREATE && !data.testcase) {
-      setError("testcase", {
-        type: "manual",
-        message: "File test case là bắt buộc khi tạo bài tập mới.",
-      });
-      return;
-    }
-
     if (onSave) {
       onSave(data);
     }
   };
-
-  const processFile = (file: File | undefined) => {
-    if (!file) return;
-
-    const validationResult = validateTestcaseFile(file);
-
-    if (validationResult.isValid) {
-      console.log("Valid file:", file);
-      setValue("testcase", file, { shouldValidate: true });
-      clearErrors("testcase");
-      console.log("After setting value, errors:", errors);
-    } else {
-      setValue("testcase", null, { shouldValidate: true }); // Clear the invalid file from the form state
-      setError("testcase", { type: "manual", message: validationResult.error });
-    }
-  };
-
-  useEffect(() => {
-    console.log("The errors object has been updated:", errors);
-  }, [errors]);
-
-  function validateTestcaseFile(file: File | null): {
-    isValid: boolean;
-    error?: string;
-  } {
-    if (!file) {
-      // This is not an error in itself, but the file is not valid for upload.
-      return { isValid: false };
-    }
-
-    const hasValidType = AllowedTypes.includes(file.type);
-    const hasValidExtension = AllowedExtensions.some((ext) =>
-      file.name.toLowerCase().endsWith(ext)
-    );
-
-    if (hasValidType || hasValidExtension) {
-      return { isValid: true };
-    }
-
-    return {
-      isValid: false,
-      error: `Định dạng file không hợp lệ. Chỉ chấp nhận: ${AllowedExtensions.join(
-        ", "
-      )}`,
-    };
-  }
 
   return (
     <form 
@@ -721,121 +532,45 @@ export default function ProblemForm({
       </Card>
 
       {/* Test Cases Upload */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
-            Test Cases File (Tùy chọn)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div
-            className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
-              dragActive
-                ? "border-green-400 bg-green-50 dark:bg-green-900/20"
-                : "border-slate-300 dark:border-slate-600"
-            }`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            {testcaseFile ? (
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                    {testcaseFile.name}
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {(testcaseFile.size / 1024).toFixed(2)} KB
-                  </p>
-                  <span className="inline-block px-2 py-1 mt-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-md">
-                    {testcaseFile.name
-                      .split(".")
-                      .pop()
-                      ?.toUpperCase()}
-                  </span>
-                </div>
-                <Button
-                  onClick={removeFile}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
-                >
-                  <X className="w-4 h-4" />
-                  Xóa file
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center w-16 h-16 mx-auto bg-slate-100 dark:bg-slate-700 rounded-full">
-                  <Upload className="w-8 h-8 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
-                    Tải lên file test cases
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                    Kéo thả file .txt vào đây hoặc click để
-                    chọn file
-                  </p>
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="outline"
-                    className="gap-2"
-                    disabled={isReadOnly}
-                  >
-                    <Upload className="w-4 h-4" />
-                    Chọn file
-                  </Button>
-                </div>
-              </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".txt"
-              onChange={handleFileSelect}
-              className="hidden"
-              disabled={isReadOnly}
-            />
-          </div>
+      <Controller
+        name="testcase"
+        control={control}
+        render={({ field, fieldState }) => (
+          <TestCaseUploader
+            value={field.value}
+            onChange={(val) => {
+              field.onChange(val);
+            }}
+            onError={(message) => {
+              if (message) {
+                setError("testcase", { type: "manual", message });
+              } else {
+                clearErrors("testcase");
+              }
+            }}
+            errorMessage={fieldState.error?.message}
+            isReadOnly={isReadOnly}
+            title="Tải lên File Test Cases"
+          />
+        )}
+      />
 
-          {/* Error message for missing testcase file */}
-          {errors.testcase && (
-            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-5 h-5 text-red-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    aria-label="Error icon"
-                    role="img"
-                  >
-                    <title>Error</title>
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                    {errors.testcase.message}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Manual Test Cases */}
-      
+      {/* Sample Test Cases */}
+      <Controller
+        name="testcaseSamples"
+        control={control}
+        render={({ field, fieldState }) => (
+          <SampleTestcases
+            sampleTestcases={field.value}
+            onChange={(val) => {
+              field.onChange(val);
+              trigger('testcaseSamples');
+            }}
+            errorMessage={fieldState.error?.message}
+            isReadOnly={isReadOnly}
+          />
+        )}
+      />
 
       {/* Save Button */}
       {!isReadOnly && (

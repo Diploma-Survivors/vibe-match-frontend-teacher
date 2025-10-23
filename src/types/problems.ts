@@ -189,27 +189,17 @@ export const ProblemSchema = z
   }),
   type: z.enum(ProblemType).optional(),
   topics: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một chủ đề').max(3, 'Chỉ được chọn tối đa 3 chủ đề'),
-  // topics: z.any()
-  // .refine(() => false, { message: '⚠️ Luôn hiển thị lỗi (chế độ test)' }),
   tags: z.array(z.any()).min(1, 'Vui lòng chọn ít nhất một tag').max(3, 'Chỉ được chọn tối đa 3 tag'),
   testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
-  testcaseSamples: z
-    .array(
-      z.object({
-        input: z.string().trim().min(1, 'Đầu vào không được để trống'),
-        output: z.string().trim().min(1, 'Đầu ra không được để trống'),
-      })
-    )
-    .min(1, 'Phải có ít nhất một test case mẫu'),
+  testcaseSamples: z.array(z.any()).min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
 })
-.refine((data) => {
-  // Custom validation: testcase file is required in create mode
-  if (data.testcase === undefined || data.testcase === null) {
+.refine(
+  (data) => data.testcase !== undefined && data.testcase !== null,
+  {
+    message: 'File test case là bắt buộc',
+    path: ['testcase'],
   }
-}, {
-  message: 'File test case là bắt buộc',
-  path: ['testcase'],
-})
+)
 
 
 export const AllowedTypes = [
