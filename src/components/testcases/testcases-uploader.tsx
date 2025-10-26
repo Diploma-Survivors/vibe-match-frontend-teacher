@@ -142,7 +142,7 @@ export default function TestCaseUploader({
                 <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <p className="text-lg font-semibvalue ?old text-slate-800 dark:text-slate-200">
+                <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
                   {value.name}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -167,7 +167,7 @@ export default function TestCaseUploader({
             </div>
           ) : isReadOnly && !testCaseResponse ? (
             <div className="text-center space-y-4">
-              <p className="text-lg font-semibvalue ?old text-slate-800 dark:text-slate-200">
+              <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
                 Không có file test cases nào được tải lên.
               </p>
             </div>

@@ -365,7 +365,6 @@ export default function ProblemForm({
                     <SelectValue placeholder="Chọn mức độ khó" />
                   </SelectTrigger>
                   <SelectContent>
-                    generate test case
                     {DIFFICULTY_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -422,8 +421,8 @@ export default function ProblemForm({
                       availableItems={availableTopics}
                       selectedItemIds={field.value.map((t) => t.id)}
                       isLoading={isLoadingTopics}
-                      onChange={(newTopicss) => {
-                        field.onChange(newTopicss);
+                      onChange={(newTopics) => {
+                        field.onChange(newTopics);
                         trigger('topics');
                       }}
                     />
