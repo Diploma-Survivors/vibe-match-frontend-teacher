@@ -1,5 +1,7 @@
+import { z } from 'zod';
+import type { UserInfo } from './states';
 import type { Tag } from './tags';
-import type { TestcaseSample } from './testcases';
+import type { TestCase, TestcaseSample } from './testcases';
 import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
@@ -38,11 +40,24 @@ export interface CreateProblemRequest {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
-  type: ProblemType;
+  type?: ProblemType;
   tagIds: number[];
   topicIds: number[];
-  testcase?: File;
+  testcase: File | null;
   testcaseSamples: TestcaseSample[];
+}
+
+export interface TestcaseFileResponse {
+  id: number;
+  fileUrl: string;
+}
+
+export interface ProblemQuickStats {
+  totalSubmissions: number;
+  totalAcceptedSubmissions: number;
+  acceptanceRate: number;
+  solvedUsers: number;
+  averageAttempts: number;
 }
 
 export interface ProblemData {
@@ -59,11 +74,50 @@ export interface ProblemData {
   createdAt?: string;
   updatedAt?: string;
   tags: Tag[];
-  topic: Topic[];
-  testcase: File | number;
+  topics: Topic[];
+  testcase: File | null;
   testcaseSamples: TestcaseSample[];
   score?: number; // For use in contests or assignments
+  testcaseResponse?: TestcaseFileResponse;
+  quickStats?: ProblemQuickStats;
 }
+
+export interface ProblemDataResponse {
+  id: number;
+  title: string;
+  description: string;
+  inputDescription: string;
+  outputDescription: string;
+  maxScore: number;
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  difficulty: ProblemDifficulty;
+  type: ProblemType;
+  createdAt?: string;
+  updatedAt?: string;
+  author: UserInfo;
+  tags: Tag[];
+  topics: Topic[];
+  testcase: TestcaseFileResponse;
+  testcaseSamples: TestcaseSample[];
+  quickStats: ProblemQuickStats;
+}
+
+export const initialProblemData: ProblemData = {
+  id: 0,
+  title: '',
+  description: '',
+  inputDescription: '',
+  outputDescription: '',
+  maxScore: 100,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  difficulty: ProblemDifficulty.EASY,
+  tags: [],
+  topics: [],
+  testcase: null,
+  testcaseSamples: [],
+};
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
@@ -154,3 +208,68 @@ export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
 export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
   return DIFFICULTY_LABELS.get(difficulty) || difficulty;
 };
+
+export const ProblemSchema = z
+  .object({
+    id: z.number(),
+    title: z
+      .string()
+      .trim()
+      .min(3, 'Tên bài tập phải có ít nhất 3 ký tự')
+      .max(128, 'Tên bài tập không được vượt quá 128 ký tự'),
+
+    description: z
+      .string()
+      .trim()
+      .min(16, 'Mô tả bài tập phải có ít nhất 16 ký tự')
+      .max(512, 'Mô tả bài tập không được vượt quá 512 ký tự'),
+
+    inputDescription: z
+      .string()
+      .trim()
+      .min(3, 'Mô tả đầu vào phải có ít nhất 3 ký tự')
+      .max(512, 'Mô tả đầu vào không được vượt quá 512 ký tự'),
+
+    outputDescription: z
+      .string()
+      .trim()
+      .min(1, 'Mô tả đầu ra phải có ít nhất 1 ký tự')
+      .max(512, 'Mô tả đầu ra không được vượt quá 512 ký tự'),
+
+    maxScore: z
+      .number('Điểm tối đa phải là số')
+      .positive('Điểm tối đa phải là số dương'),
+
+    timeLimitMs: z
+      .number('Giới hạn thời gian phải là số')
+      .positive('Giới hạn thời gian phải là số dương'),
+
+    memoryLimitKb: z
+      .number('Giới hạn bộ nhớ phải là số')
+      .positive('Giới hạn bộ nhớ phải là số dương'),
+
+    difficulty: z.enum(ProblemDifficulty, {
+      error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
+    }),
+    type: z.enum(ProblemType).optional(),
+    topics: z
+      .array(z.any())
+      .min(1, 'Vui lòng chọn ít nhất một chủ đề')
+      .max(4, 'Chỉ được chọn tối đa 4 chủ đề'),
+    tags: z
+      .array(z.any())
+      .min(1, 'Vui lòng chọn ít nhất một tag')
+      .max(4, 'Chỉ được chọn tối đa 4 tag'),
+    testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
+    testcaseSamples: z
+      .array(z.any())
+      .min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
+  })
+  .refine((data) => data.testcase !== undefined && data.testcase !== null, {
+    message: 'File test case là bắt buộc',
+    path: ['testcase'],
+  });
+
+export const AllowedTypes = ['text/plain'];
+
+export const AllowedExtensions = ['.txt'];

@@ -4,6 +4,7 @@ import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import ProblemList, { ProblemListMode } from '@/components/problem-list';
 import { Button } from '@/components/ui/button';
 import { LtiService } from '@/services/lti-service';
+import { ProblemsService } from '@/services/problems-service';
 import { type ProblemData, ProblemEndpointType } from '@/types/problems';
 import { ChevronRight, File, FilePlus, Trophy, X } from 'lucide-react';
 import Link from 'next/link';
@@ -22,8 +23,16 @@ export default function OptionsPage() {
   };
 
   const handleViewProblemDetail = async (problem: ProblemData) => {
-    setSelectedProblem(problem);
-    setShowProblemDetailModal(true);
+    try {
+      const response = await ProblemsService.getProblemDetail(problem.id);
+      const responseData = response.data.data;
+      const detailedProblem =
+        ProblemsService.mapProblemDataResponseToProblemData(responseData);
+      setSelectedProblem(detailedProblem);
+      setShowProblemDetailModal(true);
+    } catch (error) {
+      console.error('Error fetching problem details:', error);
+    }
   };
 
   const handleProblemSelectForDeeplinkingResponse = async (

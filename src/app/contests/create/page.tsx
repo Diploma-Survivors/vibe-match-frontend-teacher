@@ -33,7 +33,6 @@ export default function CreateContestPage() {
 
       const response = await ContestsService.createContest(contestDTO);
       const newContestId = response?.data?.data?.id;
-      console.log(response.data.data);
 
       if (newContestId) {
         await LtiService.sendDeepLinkingResponse(

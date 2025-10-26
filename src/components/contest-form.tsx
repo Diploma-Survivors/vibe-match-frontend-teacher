@@ -12,7 +12,12 @@ import {
 } from '@/components/ui/select';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
-import { type Contest, ContestStatus } from '@/types/contest';
+import {
+  type Contest,
+  ContestSchema,
+  ContestStatus,
+  initialContestData,
+} from '@/types/contest';
 import {
   type CreateProblemRequest,
   type ProblemData,
@@ -51,37 +56,13 @@ export enum ContestFormMode {
 }
 
 interface ContestFormProps {
-  initialData: Contest;
+  initialData?: Contest;
   mode: ContestFormMode;
   onSave: (data: Contest) => Promise<void>;
   isSaving?: boolean;
   title: string;
   subtitle: string;
 }
-
-const contestSchema = z
-  .object({
-    name: z.string().trim().min(1, 'Tên cuộc thi là bắt buộc'),
-    description: z.string().trim().min(1, 'Mô tả cuộc thi là bắt buộc'),
-    status: z.enum(ContestStatus, {
-      error: () => ({ message: 'Phạm vi truy cập là bắt buộc' }),
-    }),
-    startTime: z
-      .string()
-      .min(1, 'Thời gian bắt đầu là bắt buộc')
-      .refine((val) => new Date(val) > new Date(), {
-        message: 'Thời gian bắt đầu phải ở trong tương lai',
-      }),
-    endTime: z.string().min(1, 'Thời gian kết thúc là bắt buộc'),
-    durationMinutes: z.number().positive('Thời lượng cuộc thi phải lớn hơn 0'),
-    problems: z.array(z.any()).min(1, 'Cuộc thi phải có ít nhất 1 bài'),
-    id: z.number().optional(),
-    createdBy: z.string().optional(),
-  })
-  .refine((data) => new Date(data.endTime) > new Date(data.startTime), {
-    message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
-    path: ['endTime'],
-  });
 
 export default function ContestForm({
   initialData,
@@ -91,7 +72,9 @@ export default function ContestForm({
   title,
   subtitle,
 }: ContestFormProps) {
-  const [contestData, setContestData] = useState<Contest>(initialData);
+  const [contestData, setContestData] = useState<Contest>(
+    initialData ? initialData : initialContestData
+  );
   const [showProblemModal, setShowProblemModal] = useState(false);
   const [showNewProblemModal, setShowNewProblemModal] = useState(false);
   const [isCreatingProblem, setIsCreatingProblem] = useState(false);
@@ -107,9 +90,9 @@ export default function ContestForm({
   const isReadOnly = mode === ContestFormMode.VIEW;
 
   const form = useForm<Contest>({
-    resolver: zodResolver(contestSchema),
+    resolver: zodResolver(ContestSchema),
     mode: 'onTouched',
-    defaultValues: initialData,
+    defaultValues: initialData ? initialData : initialContestData,
     disabled: isReadOnly,
   });
 
@@ -159,53 +142,54 @@ export default function ContestForm({
     setShowProblemModal(false);
   };
 
-  const handleCreateProblem = async (data: CreateProblemRequest) => {
+  // we will update it later when the api is
+  const handleCreateProblem = async (data: ProblemData) => {
     setIsCreatingProblem(true);
 
-    try {
-      let result: any;
+    // try {
+    //   let result: any;
 
-      if (data.testcase) {
-        result = await ProblemsService.createProblemComplete({
-          ...data,
-          type: ProblemType.CONTEST,
-        });
-      }
-      if (result) {
-        const newProblem = result;
+    //   if (data.testcase) {
+    //     result = await ProblemsService.createProblemComplete({
+    //       ...data,
+    //       type: ProblemType.CONTEST,
+    //     });
+    //   }
+    //   if (result) {
+    //     const newProblem = result;
 
-        // Transform API response to ProblemData format if needed
-        const problemData: ProblemData = {
-          id: newProblem.id,
-          title: newProblem.title,
-          description: newProblem.description,
-          inputDescription: newProblem.inputDescription,
-          outputDescription: newProblem.outputDescription,
-          maxScore: newProblem.maxScore,
-          timeLimitMs: newProblem.timeLimitMs,
-          memoryLimitKb: newProblem.memoryLimitKb,
-          difficulty: newProblem.difficulty,
-          tags: newProblem.tagIds || [],
-          topic: newProblem.topicIds?.[0] || '',
-          testcase: newProblem.testcaseId || '',
-          testcaseSamples: newProblem.testcaseSamples || [],
-        };
+    //     // Transform API response to ProblemData format if needed
+    //     const problemData: ProblemData = {
+    //       id: newProblem.id,
+    //       title: newProblem.title,
+    //       description: newProblem.description,
+    //       inputDescription: newProblem.inputDescription,
+    //       outputDescription: newProblem.outputDescription,
+    //       maxScore: newProblem.maxScore,
+    //       timeLimitMs: newProblem.timeLimitMs,
+    //       memoryLimitKb: newProblem.memoryLimitKb,
+    //       difficulty: newProblem.difficulty,
+    //       tags: newProblem.tagIds || [],
+    //       topic: newProblem.topicIds?.[0] || '',
+    //       testcase: newProblem.testcaseId || '',
+    //       testcaseSamples: newProblem.testcaseSamples || [],
+    //     };
 
-        setContestData((prevData) => ({
-          ...prevData,
-          problems: [...prevData.problems, problemData],
-        }));
+    //     setContestData((prevData) => ({
+    //       ...prevData,
+    //       problems: [...prevData.problems, problemData],
+    //     }));
 
-        setPendingProblems([problemData]);
-        setShowScoreModal(true);
-        setShowNewProblemModal(false);
-      }
-    } catch (error) {
-      console.error('Failed to create problem:', error);
-      alert('Failed to create problem. Please try again.');
-    } finally {
-      setIsCreatingProblem(false);
-    }
+    //     setPendingProblems([problemData]);
+    //     setShowScoreModal(true);
+    //     setShowNewProblemModal(false);
+    //   }
+    // } catch (error) {
+    //   console.error('Failed to create problem:', error);
+    //   alert('Failed to create problem. Please try again.');
+    // } finally {
+    //   setIsCreatingProblem(false);
+    // }
   };
 
   const handleRemoveProblem = (problemId: number) => {
@@ -226,7 +210,11 @@ export default function ContestForm({
             (pendingProblem) => pendingProblem.id === p.id
           );
 
-          if (isTargetProblem && scores[p.id] !== undefined) {
+          if (
+            isTargetProblem &&
+            typeof p.id !== 'undefined' &&
+            scores[p.id] !== undefined
+          ) {
             return { ...p, score: scores[p.id] };
           }
 
@@ -479,7 +467,7 @@ export default function ContestForm({
                   onChange={(e) =>
                     field.onChange(Number.parseInt(e.target.value, 10) || 0)
                   }
-                  placeholder="180"
+                  placeholder="Nhập thời lượng cuộc thi..."
                   className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
                 />
               )}
