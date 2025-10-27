@@ -73,8 +73,6 @@ export default function CheckBoxList({
                       }
                     )
                   }
-                  role="button"
-                  tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ')
                       handleToggleSelection(

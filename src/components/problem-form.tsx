@@ -403,7 +403,7 @@ export default function ProblemForm({
               render={({ field }) => (
                 <div className="space-y-3">
                   {(field.value?.length ?? 0) > 0 && (
-                    <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div className="mb-0 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-700">
                       <div className="flex flex-wrap gap-2">
                         {field.value?.map((tag) => (
                           <div
@@ -417,15 +417,27 @@ export default function ProblemForm({
                     </div>
                   )}
                   {!isReadOnly && (
-                    <CheckBoxList
-                      availableItems={availableTopics}
-                      selectedItemIds={field.value.map((t) => t.id)}
-                      isLoading={isLoadingTopics}
-                      onChange={(newTopics) => {
-                        field.onChange(newTopics);
-                        trigger('topics');
-                      }}
-                    />
+                    <>
+                      {/* add this hidden Input to make this field focusable */}
+                      <Input
+                        {...field}
+                        value={JSON.stringify(field.value)}
+                        style={{
+                          height: '0.1px',
+                          opacity: 0,
+                          marginBottom: 0,
+                        }}
+                      />
+                      <CheckBoxList
+                        availableItems={availableTopics}
+                        selectedItemIds={field.value.map((t) => t.id)}
+                        isLoading={isLoadingTopics}
+                        onChange={(newTopics) => {
+                          field.onChange(newTopics);
+                          trigger('topics');
+                        }}
+                      />
+                    </>
                   )}
                 </div>
               )}
@@ -446,7 +458,7 @@ export default function ProblemForm({
               render={({ field }) => (
                 <div className="space-y-3">
                   {(field.value?.length ?? 0) > 0 && (
-                    <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <div className="mb-0 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-700">
                       <div className="flex flex-wrap gap-2">
                         {field.value?.map((topic) => (
                           <div
@@ -460,15 +472,27 @@ export default function ProblemForm({
                     </div>
                   )}
                   {!isReadOnly && (
-                    <CheckBoxList
-                      availableItems={availableTags}
-                      selectedItemIds={field.value.map((t) => t.id)}
-                      isLoading={isLoadingTags}
-                      onChange={(newTags) => {
-                        field.onChange(newTags);
-                        trigger('tags');
-                      }}
-                    />
+                    <>
+                      {/* add this hidden Input to make this field focusable */}
+                      <Input
+                        {...field}
+                        value={JSON.stringify(field.value)}
+                        style={{
+                          height: '0.1px',
+                          opacity: 0,
+                          marginBottom: 0,
+                        }}
+                      />
+                      <CheckBoxList
+                        availableItems={availableTags}
+                        selectedItemIds={field.value.map((t) => t.id)}
+                        isLoading={isLoadingTags}
+                        onChange={(newTags) => {
+                          field.onChange(newTags);
+                          trigger('tags');
+                        }}
+                      />
+                    </>
                   )}
                 </div>
               )}
@@ -485,23 +509,34 @@ export default function ProblemForm({
         name="testcase"
         control={control}
         render={({ field, fieldState }) => (
-          <TestCaseUploader
-            value={field.value}
-            onChange={(val) => {
-              field.onChange(val);
-            }}
-            onError={(message) => {
-              if (message) {
-                setError('testcase', { type: 'manual', message });
-              } else {
-                clearErrors('testcase');
-              }
-            }}
-            errorMessage={fieldState.error?.message}
-            isReadOnly={isReadOnly}
-            title="Tải lên File Test Cases"
-            testCaseResponse={initialData?.testcaseResponse}
-          />
+          <>
+            <Input
+              {...field}
+              value={JSON.stringify(field.value)}
+              style={{
+                height: '0.1px',
+                opacity: 0,
+                marginBottom: 0,
+              }}
+            />
+            <TestCaseUploader
+              value={field.value}
+              onChange={(val) => {
+                field.onChange(val);
+              }}
+              onError={(message) => {
+                if (message) {
+                  setError('testcase', { type: 'manual', message });
+                } else {
+                  clearErrors('testcase');
+                }
+              }}
+              errorMessage={fieldState.error?.message}
+              isReadOnly={isReadOnly}
+              title="Tải lên File Test Cases"
+              testCaseResponse={initialData?.testcaseResponse}
+            />
+          </>
         )}
       />
 
@@ -510,12 +545,23 @@ export default function ProblemForm({
         name="testcaseSamples"
         control={control}
         render={({ field, fieldState }) => (
-          <SampleTestcases
-            sampleTestcases={field.value}
-            onChange={handleTestcasesSampleChange}
-            errorMessage={fieldState.error?.message}
-            isReadOnly={isReadOnly}
-          />
+          <>
+            <Input
+              {...field}
+              value={JSON.stringify(field.value)}
+              style={{
+                height: '0.1px',
+                opacity: 0,
+                marginBottom: 0,
+              }}
+            />
+            <SampleTestcases
+              sampleTestcases={field.value}
+              onChange={handleTestcasesSampleChange}
+              errorMessage={fieldState.error?.message}
+              isReadOnly={isReadOnly}
+            />
+          </>
         )}
       />
 
