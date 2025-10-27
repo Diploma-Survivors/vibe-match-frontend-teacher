@@ -97,6 +97,7 @@ export default function ProblemScoreModal({
           </h2>
           {onCancel && (
             <Button
+              type="button"
               onClick={handleCancel}
               variant="ghost"
               size="sm"
@@ -106,6 +107,7 @@ export default function ProblemScoreModal({
             </Button>
           )}
           <Button
+            type="button"
             onClick={handleSave}
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6"
           >

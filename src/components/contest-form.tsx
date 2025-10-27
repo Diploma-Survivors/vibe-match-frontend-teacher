@@ -41,7 +41,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import ContestStats from './contests/contest-stats';
@@ -491,6 +491,7 @@ export default function ContestForm({
             {!isReadOnly && (
               <div>
                 <Button
+                  type="button"
                   className="cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
                   onClick={() => setShowNewProblemModal(true)}
                 >
@@ -498,6 +499,7 @@ export default function ContestForm({
                   Tạo bài tập mới
                 </Button>
                 <Button
+                  type="button"
                   onClick={() => setShowProblemModal(true)}
                   className="ml-3 cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
                 >
@@ -526,6 +528,7 @@ export default function ContestForm({
               )}
               {!isReadOnly && (
                 <Button
+                  type="button"
                   onClick={() => setShowProblemModal(true)}
                   variant="outline"
                   className="border-green-200 text-green-600 hover:bg-green-50"
@@ -572,6 +575,7 @@ export default function ContestForm({
                     {!isReadOnly && (
                       <>
                         <Button
+                          type="button"
                           onClick={() => handleEditProblemScore(problem)}
                           variant="outline"
                           size="sm"
@@ -580,6 +584,7 @@ export default function ContestForm({
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
+                          type="button"
                           onClick={() => handleRemoveProblem(problem.id)}
                           variant="outline"
                           size="sm"
@@ -624,6 +629,7 @@ export default function ContestForm({
                 Tạo bài tập mới
               </h2>
               <Button
+                type="button"
                 onClick={() => setShowNewProblemModal(false)}
                 variant="ghost"
                 size="sm"
@@ -654,6 +660,7 @@ export default function ContestForm({
                   Chọn bài tập
                 </h2>
                 <Button
+                  type="button"
                   onClick={() => setShowProblemModal(false)}
                   variant="ghost"
                   size="sm"
@@ -686,6 +693,7 @@ export default function ContestForm({
               <div>
                 {selectedProblem && (
                   <Button
+                    type="button"
                     onClick={() => {
                       if (selectedProblem) {
                         handleAddProblem(selectedProblem);
@@ -698,6 +706,7 @@ export default function ContestForm({
                   </Button>
                 )}
                 <Button
+                  type="button"
                   onClick={() => setShowProblemDetailModal(false)}
                   variant="ghost"
                   size="sm"

@@ -111,6 +111,7 @@ export default function ProblemFilter({
           {/* Mobile Filter Toggle Button */}
           <div className="flex items-center gap-2">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={toggleFilters}
@@ -125,6 +126,7 @@ export default function ProblemFilter({
             </Button>
 
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={onReset}
@@ -194,6 +196,7 @@ export default function ProblemFilter({
       {/* Buttons */}
       <div className="border-t border-slate-200 dark:border-slate-700">
         <Button
+          type="button"
           onClick={onSearch}
           className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
         >
