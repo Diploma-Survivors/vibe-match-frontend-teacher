@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
 import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
-import type { CreateProblemRequest } from '@/types/problems';
+import type { CreateProblemRequest, ProblemData } from '@/types/problems';
 import { IssuerType } from '@/types/states';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -15,21 +15,23 @@ export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation, issuer } = useApp();
 
-  const handleSave = async (data: CreateProblemRequest) => {
+  const handleSave = async (data: ProblemData) => {
     setIsSaving(true);
 
     try {
       let result: any;
 
+      const problemDTO: CreateProblemRequest =
+        ProblemsService.mapProblemToDTO(data);
+
       if (data.testcase) {
-        result = await ProblemsService.createProblemComplete(data);
+        result = await ProblemsService.createProblem(problemDTO);
       }
 
       // Handle deep linking response
       if (issuer === IssuerType.MOODLE && result.id) {
         try {
           await LtiService.sendDeepLinkingResponse(result.id);
-          console.log('Deep linking response sent successfully');
         } catch (dlError) {
           console.error('Failed to send deep linking response:', dlError);
         }

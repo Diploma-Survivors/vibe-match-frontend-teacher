@@ -53,8 +53,6 @@ clientApi.interceptors.response.use(
           toastService.error(`Error ${status}: ${message}`);
           break;
       }
-    } else if (error.request) {
-      toastService.error('Network error. Please check your connection.');
     } else {
       toastService.error(error.message || 'An unexpected error occurred');
     }

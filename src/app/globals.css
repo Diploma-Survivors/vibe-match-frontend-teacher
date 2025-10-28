@@ -178,3 +178,8 @@
 .no-top-offset .xl\:top-32 {
   top: auto !important; /* overrides xl:top-32 */
 }
+
+input:disabled,
+textarea:disabled {
+  opacity: 0.5;
+}

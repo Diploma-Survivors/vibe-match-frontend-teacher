@@ -135,6 +135,7 @@ export default function ProblemTable({
           </h3>
           {selectionMode && (
             <Button
+              type="button"
               onClick={handleConfirmSelection}
               disabled={!hasSelection}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-lg"
@@ -322,8 +323,8 @@ export default function ProblemTable({
                         <TableCell className="text-center px-4 py-4">
                           <div className="space-y-2">
                             <div className="flex flex-wrap gap-1 justify-center">
-                              {problem.topic && problem.topic.length > 0 ? (
-                                problem.topic.map((topicItem) => (
+                              {problem.topics && problem.topics.length > 0 ? (
+                                problem.topics.map((topicItem) => (
                                   <span
                                     key={topicItem.id}
                                     className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg font-medium"
