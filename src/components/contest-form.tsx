@@ -696,6 +696,9 @@ export default function ContestForm({
                 <ProblemList
                   mode={ProblemListMode.MULTIPLE_SELECT}
                   endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
+                  initialSelectedProblemIds={
+                    new Set(contestData.problems.map((p) => p.id))
+                  }
                   onProblemSelect={handleAddProblem}
                   onProblemView={handleViewProblemDetail}
                   onMultipleProblemsSelect={handleAddMultipleProblems}

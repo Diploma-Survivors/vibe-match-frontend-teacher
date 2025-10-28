@@ -25,6 +25,7 @@ export enum ProblemListMode {
 interface ProblemListProps {
   mode: ProblemListMode;
   endpointType: ProblemEndpointType;
+  initialSelectedProblemIds?: Set<number>;
   onProblemView?: (problem: ProblemData) => void;
   onProblemSelect?: (problem: ProblemData) => void;
   onMultipleProblemsSelect?: (problems: ProblemData[]) => void;
@@ -33,6 +34,7 @@ interface ProblemListProps {
 export default function ProblemList({
   mode,
   endpointType,
+  initialSelectedProblemIds,
   onProblemView,
   onProblemSelect,
   onMultipleProblemsSelect,
@@ -125,6 +127,7 @@ export default function ProblemList({
                 mode={mode as unknown as ProblemTableMode}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
+                initialSelectedProblemIds={initialSelectedProblemIds}
                 onSortByChange={handleSortByChange}
                 onSortOrderChange={handleSortOrderChange}
                 onProblemSelect={handleProblemSelection}
