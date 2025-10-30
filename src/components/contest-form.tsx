@@ -460,9 +460,7 @@ export default function ContestForm({
                         trigger('endTime');
                       }}
                       className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                        errors.startTime
-                          ? 'ring-red-500'
-                          : 'focus:ring-blue-500'
+                        errors.endTime ? 'ring-red-500' : 'focus:ring-blue-500'
                       }`}
                     />
                   )}
