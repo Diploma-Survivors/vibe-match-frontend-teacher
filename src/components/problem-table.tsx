@@ -41,6 +41,7 @@ interface ProblemTableProps {
   mode: ProblemTableMode;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  initialSelectedProblemIds?: Set<number>;
   onSortByChange: (newSortBy: SortBy) => void;
   onSortOrderChange: (newSortOrder: SortOrder) => void;
   onProblemSelect?: (problem: ProblemData) => void;
@@ -57,6 +58,7 @@ export default function ProblemTable({
   mode,
   sortBy,
   sortOrder,
+  initialSelectedProblemIds,
   onSortByChange,
   onSortOrderChange,
   onProblemSelect,
@@ -245,103 +247,117 @@ export default function ProblemTable({
                         </TableRow>
                       )
                     )
-                  : problems.map((problem, index) => (
-                      <TableRow
-                        key={problem.id}
-                        className="border-b border-slate-100/50 dark:border-slate-700/30 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-all duration-200 group"
-                      >
-                        {selectionMode && (
+                  : problems.map((problem, index) => {
+                      const isInitialSelected =
+                        isMultipleSelect &&
+                        initialSelectedProblemIds?.has(problem.id);
+                      return (
+                        <TableRow
+                          key={problem.id}
+                          className={`border-b border-slate-100/50 dark:border-slate-700/30 transition-all duration-200 group ${
+                            isInitialSelected
+                              ? 'opacity-60 bg-slate-50 dark:bg-slate-800 cursor-not-allowed'
+                              : 'hover:bg-slate-50/80 dark:hover:bg-slate-700/30'
+                          }`}
+                        >
+                          {selectionMode && (
+                            <TableCell className="text-center px-4 py-4">
+                              <input
+                                type={isMultipleSelect ? 'checkbox' : 'radio'}
+                                name={
+                                  isMultipleSelect
+                                    ? undefined
+                                    : 'problem-selection'
+                                }
+                                value={problem.id}
+                                checked={
+                                  isMultipleSelect
+                                    ? selectedProblemIds.has(problem.id)
+                                    : selectedProblemId === problem.id
+                                }
+                                onChange={() =>
+                                  handleProblemSelection(problem.id)
+                                }
+                                disabled={isInitialSelected}
+                                className="w-4 h-4 text-green-600 focus:ring-green-500 border-2 border-slate-300"
+                              />
+                            </TableCell>
+                          )}
                           <TableCell className="text-center px-4 py-4">
-                            <input
-                              type={isMultipleSelect ? 'checkbox' : 'radio'}
-                              name={
-                                isMultipleSelect
-                                  ? undefined
-                                  : 'problem-selection'
-                              }
-                              value={problem.id}
-                              checked={
-                                isMultipleSelect
-                                  ? selectedProblemIds.has(problem.id)
-                                  : selectedProblemId === problem.id
-                              }
-                              onChange={() =>
-                                handleProblemSelection(problem.id)
-                              }
-                              className="w-4 h-4 text-green-600 focus:ring-green-500 border-2 border-slate-300"
-                            />
+                            <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
+                              <code className="text-green-700 dark:text-green-300 font-bold text-sm">
+                                {problem.id}
+                              </code>
+                            </div>
                           </TableCell>
-                        )}
-                        <TableCell className="text-center px-4 py-4">
-                          <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
-                            <code className="text-green-700 dark:text-green-300 font-bold text-sm">
-                              {problem.id}
-                            </code>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-4">
-                          <div className="space-y-3">
-                            {selectionMode ? (
-                              <button
-                                type="button"
-                                className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
-                                onClick={() => handleProblemClick(problem.id)}
-                              >
-                                {problem.title}
-                              </button>
-                            ) : (
-                              <Link href={`/problems/${problem.id}`}>
+                          <TableCell className="px-4 py-4">
+                            <div className="space-y-3">
+                              {isInitialSelected ? (
+                                <span className="text-left font-semibold text-slate-500 dark:text-slate-400 italic block w-full">
+                                  {problem.title} (Đã được chọn trong cuộc thi)
+                                </span>
+                              ) : selectionMode ? (
                                 <button
                                   type="button"
                                   className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+                                  onClick={() => handleProblemClick(problem.id)}
                                 >
                                   {problem.title}
                                 </button>
-                              </Link>
-                            )}
-                            <div className="flex items-center gap-3 flex-wrap">
-                              <div
-                                className={`${getDifficultyColor(
-                                  problem.difficulty
-                                )} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
-                              >
-                                {getDifficultyLabel(problem.difficulty)}
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {problem.tags.map((tag) => (
-                                  <span
-                                    key={tag.id}
-                                    className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg"
-                                  >
-                                    {tag.name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center px-4 py-4">
-                          <div className="space-y-2">
-                            <div className="flex flex-wrap gap-1 justify-center">
-                              {problem.topics && problem.topics.length > 0 ? (
-                                problem.topics.map((topicItem) => (
-                                  <span
-                                    key={topicItem.id}
-                                    className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg font-medium"
-                                  >
-                                    {topicItem.name}
-                                  </span>
-                                ))
                               ) : (
-                                <span className="text-xs text-slate-500 dark:text-slate-400 italic">
-                                  Chưa phân loại
-                                </span>
+                                <Link href={`/problems/${problem.id}`}>
+                                  <button
+                                    type="button"
+                                    className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+                                  >
+                                    {problem.title}
+                                  </button>
+                                </Link>
                               )}
+                              <div className="flex items-center gap-3 flex-wrap">
+                                <div
+                                  className={`${getDifficultyColor(
+                                    problem.difficulty
+                                  )} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
+                                >
+                                  {getDifficultyLabel(problem.difficulty)}
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {problem.tags.map((tag) => (
+                                    <span
+                                      key={tag.id}
+                                      className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg"
+                                    >
+                                      {tag.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          </TableCell>
+                          <TableCell className="text-center px-4 py-4">
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap gap-1 justify-center">
+                                {problem.topics && problem.topics.length > 0 ? (
+                                  problem.topics.map((topicItem) => (
+                                    <span
+                                      key={topicItem.id}
+                                      className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg font-medium"
+                                    >
+                                      {topicItem.name}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-xs text-slate-500 dark:text-slate-400 italic">
+                                    Chưa phân loại
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
               </TableBody>
             </Table>
           </div>
