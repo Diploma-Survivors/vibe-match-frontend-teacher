@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
+import { HttpStatus } from '@/types/api';
 import {
   type Contest,
   ContestSchema,
@@ -21,6 +22,7 @@ import {
 import {
   type CreateProblemRequest,
   type ProblemData,
+  ProblemDataResponse,
   ProblemEndpointType,
   ProblemType,
   getDifficultyColor,
@@ -150,54 +152,29 @@ export default function ContestForm({
     setShowProblemModal(false);
   };
 
-  // TODO: we will update it later when the api is ready
   const handleCreateProblem = async (data: ProblemData) => {
     setIsCreatingProblem(true);
+    try {
+      const problemRequest: CreateProblemRequest =
+        ProblemsService.mapProblemToDTO(data);
+      const result = await ProblemsService.createProblem(problemRequest);
+      if (result.data.status === HttpStatus.OK) {
+        toastService.success('Tạo bài tập thành công!');
+        const newProblem: ProblemData = result.data.data;
+        setContestData((prevData) => ({
+          ...prevData,
+          problems: [...prevData.problems, newProblem],
+        }));
 
-    // try {
-    //   let result: any;
-
-    //   if (data.testcase) {
-    //     result = await ProblemsService.createProblemComplete({
-    //       ...data,
-    //       type: ProblemType.CONTEST,
-    //     });
-    //   }
-    //   if (result) {
-    //     const newProblem = result;
-
-    //     // Transform API response to ProblemData format if needed
-    //     const problemData: ProblemData = {
-    //       id: newProblem.id,
-    //       title: newProblem.title,
-    //       description: newProblem.description,
-    //       inputDescription: newProblem.inputDescription,
-    //       outputDescription: newProblem.outputDescription,
-    //       maxScore: newProblem.maxScore,
-    //       timeLimitMs: newProblem.timeLimitMs,
-    //       memoryLimitKb: newProblem.memoryLimitKb,
-    //       difficulty: newProblem.difficulty,
-    //       tags: newProblem.tagIds || [],
-    //       topic: newProblem.topicIds?.[0] || '',
-    //       testcase: newProblem.testcaseId || '',
-    //       testcaseSamples: newProblem.testcaseSamples || [],
-    //     };
-
-    //     setContestData((prevData) => ({
-    //       ...prevData,
-    //       problems: [...prevData.problems, problemData],
-    //     }));
-
-    //     setPendingProblems([problemData]);
-    //     setShowScoreModal(true);
-    //     setShowNewProblemModal(false);
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to create problem:', error);
-    //   alert('Failed to create problem. Please try again.');
-    // } finally {
-    //   setIsCreatingProblem(false);
-    // }
+        setPendingProblems([newProblem]);
+        setShowScoreModal(true);
+        setShowNewProblemModal(false);
+      }
+    } catch (error) {
+      toastService.error('Tạo bài tập không thành công!');
+    } finally {
+      setIsCreatingProblem(false);
+    }
   };
 
   const handleRemoveProblem = (problemId: number) => {
@@ -641,85 +618,85 @@ export default function ContestForm({
             </Button>
           </div>
         )}
+      </form>
 
-        {showNewProblemModal && !isReadOnly && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-              <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+      {showNewProblemModal && !isReadOnly && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                Tạo bài tập mới
+              </h2>
+              <Button
+                type="button"
+                onClick={() => setShowNewProblemModal(false)}
+                variant="ghost"
+                size="sm"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              <ProblemForm
+                mode={ProblemFormMode.CREATE}
+                onSave={handleCreateProblem}
+                isSaving={isCreatingProblem}
+                title="Tạo bài tập mới"
+                subtitle="Nhập thông tin chi tiết về bài tập mới"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Problems Selection Modal */}
+      {showProblemModal && !isReadOnly && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-2 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                  Tạo bài tập mới
+                  Chọn bài tập
                 </h2>
                 <Button
                   type="button"
-                  onClick={() => setShowNewProblemModal(false)}
+                  onClick={() => setShowProblemModal(false)}
                   variant="ghost"
                   size="sm"
                 >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-                <ProblemForm
-                  mode={ProblemFormMode.CREATE}
-                  onSave={handleCreateProblem}
-                  isSaving={isCreatingProblem}
-                  title="Tạo bài tập mới"
-                  subtitle="Nhập thông tin chi tiết về bài tập mới"
-                />
-              </div>
+            </div>
+            <div className="px-2 overflow-y-auto no-top-offset ">
+              <ProblemList
+                mode={ProblemListMode.MULTIPLE_SELECT}
+                endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
+                initialSelectedProblemIds={
+                  new Set(contestData.problems.map((p) => p.id))
+                }
+                onProblemSelect={handleAddProblem}
+                onProblemView={handleViewProblemDetail}
+                onMultipleProblemsSelect={handleAddMultipleProblems}
+              />
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Problems Selection Modal */}
-        {showProblemModal && !isReadOnly && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-2 border-b border-slate-200 dark:border-slate-700">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                    Chọn bài tập
-                  </h2>
-                  <Button
-                    type="button"
-                    onClick={() => setShowProblemModal(false)}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="px-2 overflow-y-auto no-top-offset ">
-                <ProblemList
-                  mode={ProblemListMode.MULTIPLE_SELECT}
-                  endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
-                  initialSelectedProblemIds={
-                    new Set(contestData.problems.map((p) => p.id))
-                  }
-                  onProblemSelect={handleAddProblem}
-                  onProblemView={handleViewProblemDetail}
-                  onMultipleProblemsSelect={handleAddMultipleProblems}
-                />
-              </div>
-            </div>
-          </div>
+      <ProblemScoreModal
+        isOpen={showScoreModal}
+        problems={pendingProblems}
+        currentScores={Object.fromEntries(
+          pendingProblems.map((problem) => [problem.id, problem.score || 0])
         )}
-
-        <ProblemScoreModal
-          isOpen={showScoreModal}
-          problems={pendingProblems}
-          currentScores={Object.fromEntries(
-            pendingProblems.map((problem) => [problem.id, problem.score || 0])
-          )}
-          onSave={handleSaveScore}
-          title={
-            pendingProblems && pendingProblems.length > 0
-              ? 'Chỉnh sửa điểm bài tập'
-              : 'Thiết lập điểm cho bài tập'
-          }
-        />
-      </form>
+        onSave={handleSaveScore}
+        title={
+          pendingProblems && pendingProblems.length > 0
+            ? 'Chỉnh sửa điểm bài tập'
+            : 'Thiết lập điểm cho bài tập'
+        }
+      />
 
       {/* Problems Detail Modal */}
       {showProblemDetailModal && (

@@ -27,7 +27,7 @@ async function getProblemList(
 // TODO: We will update this when the api is ready
 async function createProblem(
   problemRequest: CreateProblemRequest
-): Promise<ApiResponse<ApiResponse<ProblemData>>> {
+): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
   if (!problemRequest.testcase) {
     throw new Error('Testcase file is required for complete problem creation.');
   }
@@ -41,7 +41,8 @@ async function createProblem(
   formData.append('timeLimitMs', problemRequest.timeLimitMs.toString());
   formData.append('memoryLimitKb', problemRequest.memoryLimitKb.toString());
   formData.append('difficulty', problemRequest.difficulty);
-  formData.append('type', problemRequest.type || '');
+  formData.append('visibility', problemRequest.visibility);
+  formData.append('type', problemRequest.type);
   formData.append('tagIds', JSON.stringify(problemRequest.tagIds));
   formData.append('topicIds', JSON.stringify(problemRequest.topicIds));
   formData.append('testcaseFile', problemRequest.testcase);
