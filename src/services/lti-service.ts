@@ -1,4 +1,6 @@
 import clientApi from '@/lib/apis/axios-client';
+import { ApiResponse, HttpStatus } from '@/types/api';
+import { AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
 
 export enum ResourceType {
@@ -19,8 +21,6 @@ async function sendDeepLinkingResponse(
   resourceId: number,
   type: ResourceType = ResourceType.PROBLEM
 ): Promise<any> {
-  try {
-    const url = process.env.NEXT_PUBLIC_API_LAUNCH_URL;
     const deviceId = await LtiService.getDeviceId();
 
     const custom =
@@ -29,7 +29,6 @@ async function sendDeepLinkingResponse(
         : { contestId: resourceId };
 
     const deepLinkResponse = {
-      url,
       deviceId,
       custom,
     };
@@ -40,21 +39,18 @@ async function sendDeepLinkingResponse(
       { withCredentials: true, responseType: 'text' }
     );
 
-    const html = response.data;
+    if(response.status === 201) {
+      const html = response.data;
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Lấy form ra
-    const form = doc.querySelector('form');
-    if (form) {
-      document.body.appendChild(form);
-      form.submit();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const form = doc.querySelector('form');
+      if (form) {
+        document.body.appendChild(form);
+        form.submit();
+      }
     }
-  } catch (error) {
-    console.error('Error sending deep linking response:', error);
-    throw error;
-  }
+    return response;
 }
 
 export const LtiService = {

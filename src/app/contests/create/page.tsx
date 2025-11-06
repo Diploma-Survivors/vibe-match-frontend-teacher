@@ -6,6 +6,7 @@ import { useApp } from '@/contexts/app-context';
 import { ContestsService } from '@/services/contests-service';
 import { LtiService, ResourceType } from '@/services/lti-service';
 import { toastService } from '@/services/toasts-service';
+import { HttpStatus } from '@/types/api';
 import { type Contest, ContestStatus } from '@/types/contest';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -15,16 +16,6 @@ export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation } = useApp();
 
-  const initialData: Contest = {
-    name: '',
-    description: '',
-    startTime: '',
-    endTime: '',
-    durationMinutes: 180,
-    status: ContestStatus.PRIVATE,
-    problems: [],
-  };
-
   const handleSave = async (data: Contest) => {
     setIsSaving(true);
 
@@ -32,19 +23,19 @@ export default function CreateContestPage() {
       const contestDTO = ContestsService.mapContestToDTO(data);
 
       const response = await ContestsService.createContest(contestDTO);
-      const newContestId = response?.data?.data?.id;
+      const newContestId = response.data.data.id;
 
       if (newContestId) {
-        await LtiService.sendDeepLinkingResponse(
+        const response = await LtiService.sendDeepLinkingResponse(
           newContestId,
           ResourceType.CONTEST
         );
-        toastService.success(
-          'Contest created and deep linking completed successfully!'
-        );
+
+        if(response.status === 201) {         
+          toastService.success('Activity đã được tạo thành công và gửi về hệ thống LMS!');
+        }
       }
     } catch (error) {
-      // do nothing as error is handled in axios interceptor
     } finally {
       setIsSaving(false);
     }
@@ -88,7 +79,6 @@ export default function CreateContestPage() {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <ContestForm
-          initialData={initialData}
           mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}

@@ -7,9 +7,11 @@ export interface Contest {
   description: string;
   startTime: string;
   endTime: string;
-  durationMinutes: number;
+  isHasDurationMinutes?: boolean;
+  durationMinutes?: number;
+  lateDeadline?: string;
+  deadlineEnforcement: ContestDeadlineEnforcement;
   problems: ProblemData[];
-  status: ContestStatus;
   createdBy?: string;
   createdAt?: string;
 }
@@ -20,9 +22,10 @@ export interface ContestDTO {
   description: string;
   startTime: string;
   endTime: string;
-  durationMinutes: number;
+  durationMinutes?: number;
+  lateDeadline?: string;
+  deadlineEnforcement: ContestDeadlineEnforcement;
   problems: ContestProblemDTO[];
-  status?: ContestStatus;
   createdBy?: string;
   createdAt?: string;
 }
@@ -30,6 +33,11 @@ export interface ContestDTO {
 export enum ContestStatus {
   PRIVATE = 'private',
   PUBLIC = 'public',
+}
+
+export enum ContestDeadlineEnforcement {
+  STRICT = 'strict',
+  FLEXIBLE = 'flexible',
 }
 
 export interface ContestFilters {
@@ -52,6 +60,11 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'private', label: 'Riêng tư' },
 ];
 
+export const CONTEST_DEADLINE_ENFORCEMENT_OPTIONS = [
+  { value: ContestDeadlineEnforcement.STRICT, label: 'Không cho phép nộp muộn' },
+  { value: ContestDeadlineEnforcement.FLEXIBLE, label: 'Cho phép nộp muộn' },
+];
+
 export interface ContestProblemDTO {
   problemId: number;
   score: number;
@@ -69,9 +82,12 @@ export const ContestSchema = z
       .trim()
       .min(10, 'Mô tả cuộc thi phải có ít nhất 10 ký tự')
       .max(500, 'Mô tả cuộc thi không được vượt quá 500 ký tự'),
-    status: z.enum(ContestStatus, {
-      error: () => ({ message: 'Phạm vi truy cập là bắt buộc' }),
+    deadlineEnforcement: z.enum(ContestDeadlineEnforcement, {
+      error: () => ({ message: 'Quy định nộp muộn là bắt buộc' }),
     }),
+    isHasDurationMinutes: z.any().optional(),
+    durationMinutes: z.any().optional(),
+    lateDeadline: z.any().optional(),
     startTime: z
       .string()
       .min(1, 'Thời gian bắt đầu là bắt buộc')
@@ -79,22 +95,43 @@ export const ContestSchema = z
         message: 'Thời gian bắt đầu phải ở trong tương lai',
       }),
     endTime: z.string().min(1, 'Thời gian kết thúc là bắt buộc'),
-    durationMinutes: z.number().positive('Thời lượng cuộc thi phải lớn hơn 0'),
+    // durationMinutes: z.number().positive('Thời lượng cuộc thi phải lớn hơn 0'),
     problems: z.array(z.any()).min(1, 'Cuộc thi phải có ít nhất 1 bài'),
     id: z.number().optional(),
     createdBy: z.string().optional(),
   })
+  .refine((data) => {
+    if (data.isHasDurationMinutes !== true) return true;
+    return data.durationMinutes > 0;
+  }, {
+    message: 'Thời lượng cuộc thi phải lớn hơn 0',
+    path: ['durationMinutes'],
+  })
+  .refine((data) => {
+    if (data.isHasDurationMinutes === true || data.deadlineEnforcement === ContestDeadlineEnforcement.STRICT) return true;
+    return data.lateDeadline;
+  }, {
+    message: 'Deadline nộp muộn là bắt buộc',
+    path: ['lateDeadline'],
+  })
   .refine((data) => new Date(data.endTime) > new Date(data.startTime), {
     message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
     path: ['endTime'],
-  });
+  })
+  .refine((data) => {
+    if (data.isHasDurationMinutes === true || data.deadlineEnforcement === ContestDeadlineEnforcement.STRICT) return true;
+    return new Date(data.lateDeadline) > new Date(data.endTime);
+  }, {
+    message: 'Deadline nộp muộn phải sau thời gian kết thúc',
+    path: ['lateDeadline'],
+  })
 
 export const initialContestData: Contest = {
   name: '',
   description: '',
   startTime: '',
   endTime: '',
-  durationMinutes: 180,
-  status: ContestStatus.PRIVATE,
+  deadlineEnforcement: ContestDeadlineEnforcement.STRICT,
+  isHasDurationMinutes: false,
   problems: [],
 };
