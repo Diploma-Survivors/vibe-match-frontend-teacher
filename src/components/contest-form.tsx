@@ -14,7 +14,9 @@ import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { HttpStatus } from '@/types/api';
 import {
+  CONTEST_DEADLINE_ENFORCEMENT_OPTIONS,
   type Contest,
+  ContestDeadlineEnforcement,
   ContestSchema,
   ContestStatus,
   initialContestData,
@@ -29,6 +31,8 @@ import {
   getDifficultyLabel,
 } from '@/types/problems';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
 import {
   BarChart3,
   Calendar,
@@ -44,12 +48,17 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import {
+  Controller,
+  FieldErrors,
+  type SubmitHandler,
+  useForm,
+} from 'react-hook-form';
 import ContestStats from './contests/contest-stats';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
+import AppLocalizationProvider from './providers/localization-provider';
 
 export enum ContestFormMode {
   CREATE = 'create',
@@ -102,8 +111,12 @@ export default function ContestForm({
     control,
     handleSubmit,
     trigger,
+    setValue,
     formState: { errors },
   } = form;
+  const isHasDurationMinutes = form.watch('isHasDurationMinutes');
+  const deadlineEnforcement = form.watch('deadlineEnforcement');
+  const problems = form.watch('problems');
 
   // Add this handler function
   const handleViewProblemDetail = async (problem: ProblemData) => {
@@ -121,33 +134,29 @@ export default function ContestForm({
 
   const handleAddProblem = (problem: ProblemData) => {
     if (isReadOnly) return;
-    if (contestData.problems.some((obj) => obj.id === problem.id)) {
+    if (problems.some((obj) => obj.id === problem.id)) {
       toastService.error('Bài thi đã được thêm vào cuộc thi.');
       return;
     }
-    setContestData((prev) => ({
-      ...prev,
-      problems: [...prev.problems, problem],
-    }));
+    setValue('problems', [...problems, problem], { shouldValidate: true });
     setPendingProblems([problem]);
     setShowScoreModal(true);
     setShowProblemModal(false);
   };
 
-  const handleAddMultipleProblems = (problems: ProblemData[]) => {
+  const handleAddMultipleProblems = (newProblems: ProblemData[]) => {
     if (isReadOnly) return;
-    const newProblems = problems.filter(
-      (problem) => !contestData.problems.some((p) => p.id === problem.id)
+    const actualNewProblems = newProblems.filter(
+      (problem) => !problems.some((p) => p.id === problem.id)
     );
-    if (newProblems.length === 0) {
+    if (actualNewProblems.length === 0) {
       toastService.error('Tất cả các bài thi đã được thêm vào cuộc thi.');
       return;
     }
-    setContestData((prev) => ({
-      ...prev,
-      problems: [...prev.problems, ...newProblems],
-    }));
-    setPendingProblems(newProblems);
+    setValue('problems', [...problems, ...actualNewProblems], {
+      shouldValidate: true,
+    });
+    setPendingProblems(actualNewProblems);
     setShowScoreModal(true);
     setShowProblemModal(false);
   };
@@ -161,10 +170,9 @@ export default function ContestForm({
       if (result.data.status === HttpStatus.OK) {
         toastService.success('Tạo bài tập thành công!');
         const newProblem: ProblemData = result.data.data;
-        setContestData((prevData) => ({
-          ...prevData,
-          problems: [...prevData.problems, newProblem],
-        }));
+        setValue('problems', [...problems, newProblem], {
+          shouldValidate: true,
+        });
 
         setPendingProblems([newProblem]);
         setShowScoreModal(true);
@@ -186,30 +194,25 @@ export default function ContestForm({
   };
 
   const handleSaveScore = (scores: Record<number, number>) => {
-    if (pendingProblems && pendingProblems.length > 0) {
-      setContestData((prev) => ({
-        ...prev,
-        problems: prev.problems.map((p) => {
-          // Check if this problem is in the pendingProblems array
-          const isTargetProblem = pendingProblems.some(
-            (pendingProblem) => pendingProblem.id === p.id
-          );
+    const updatedProblems = problems.map((p) => {
+      const isTargetProblem = pendingProblems.some(
+        (pendingProblem) => pendingProblem.id === p.id
+      );
 
-          if (
-            isTargetProblem &&
-            typeof p.id !== 'undefined' &&
-            scores[p.id] !== undefined
-          ) {
-            return { ...p, score: scores[p.id] };
-          }
+      if (
+        isTargetProblem &&
+        typeof p.id !== 'undefined' &&
+        scores[p.id] !== undefined
+      ) {
+        return { ...p, score: scores[p.id] };
+      }
 
-          return p;
-        }),
-      }));
+      return p;
+    });
+    setValue('problems', updatedProblems, { shouldValidate: true });
 
-      setShowScoreModal(false);
-      setPendingProblems([]);
-    }
+    setShowScoreModal(false);
+    setPendingProblems([]);
   };
 
   const handleEditProblemScore = (problem: ProblemData) => {
@@ -241,6 +244,18 @@ export default function ContestForm({
         {/* Contest Stats (View mode only) */}
         {mode === ContestFormMode.VIEW && (
           <ContestStats contest={contestData} />
+        )}
+
+        {/* Creator info (View mode only) */}
+        {mode === ContestFormMode.VIEW && contestData.createdBy && (
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Người tạo
+            </label>
+            <p className="text-slate-600 dark:text-slate-400">
+              {contestData.createdBy}
+            </p>
+          </div>
         )}
 
         {/* Basic Information */}
@@ -303,13 +318,51 @@ export default function ContestForm({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Access Range */}
+              {/* IsHasTimeLimit */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Phạm vi truy cập <span className="text-red-500">*</span>
+                  Giới hạn thời gian <span className="text-red-500">*</span>
                 </label>
                 <Controller
-                  name="status"
+                  name="isHasDurationMinutes"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(e) => {
+                        field.onChange(e === 'true');
+                      }}
+                      value={field.value ? 'true' : 'false'}
+                      disabled={field.disabled}
+                    >
+                      <SelectTrigger
+                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                          errors.isHasDurationMinutes
+                            ? 'ring-red-500' // Apply red ring on error
+                            : 'focus:ring-green-500'
+                        }`}
+                      >
+                        <SelectValue placeholder="Chọn phạm vi truy cập" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={'true'}>
+                          Có giới hạn thời gian
+                        </SelectItem>
+                        <SelectItem value={'false'}>
+                          Không giới hạn thời gian
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* deadlineEnforcement */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Quy định nộp muộn <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="deadlineEnforcement"
                   control={control}
                   render={({ field }) => (
                     <Select
@@ -319,7 +372,7 @@ export default function ContestForm({
                     >
                       <SelectTrigger
                         className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                          errors.status
+                          errors.deadlineEnforcement
                             ? 'ring-red-500' // Apply red ring on error
                             : 'focus:ring-green-500'
                         }`}
@@ -327,36 +380,22 @@ export default function ContestForm({
                         <SelectValue placeholder="Chọn phạm vi truy cập" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={ContestStatus.PUBLIC}>
-                          Công khai
-                        </SelectItem>
-                        <SelectItem value={ContestStatus.PRIVATE}>
-                          Riêng tư
-                        </SelectItem>
+                        {CONTEST_DEADLINE_ENFORCEMENT_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                {/* Display validation error message */}
-                {errors.status && (
-                  <p className="text-sm text-red-500">
-                    {errors.status.message}
-                  </p>
-                )}
               </div>
-            </div>
-
-            {/* Creator info (View mode only) */}
-            {mode === ContestFormMode.VIEW && contestData.createdBy && (
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Người tạo
-                </label>
-                <p className="text-slate-600 dark:text-slate-400">
-                  {contestData.createdBy}
+              {errors.deadlineEnforcement && (
+                <p className="text-sm text-red-500">
+                  {errors.deadlineEnforcement.message}
                 </p>
-              </div>
-            )}
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -379,29 +418,19 @@ export default function ContestForm({
                   name="startTime"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="datetime-local"
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().slice(0, 16)
-                          : ''
-                      }
-                      onChange={(e) => {
-                        field.onChange(
-                          e.target.value
-                            ? new Date(e.target.value).toISOString()
-                            : ''
-                        );
-                        trigger('startTime');
-                        trigger('endTime');
-                      }}
-                      className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                        errors.startTime
-                          ? 'ring-red-500'
-                          : 'focus:ring-blue-500'
-                      }`}
-                    />
+                    <AppLocalizationProvider>
+                      <DateTimePicker
+                        className="w-full"
+                        {...field}
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(newValue) => {
+                          field.onChange(
+                            newValue ? newValue.toISOString() : null
+                          );
+                          trigger('startTime');
+                        }}
+                      />
+                    </AppLocalizationProvider>
                   )}
                 />
                 {errors.startTime && (
@@ -420,26 +449,19 @@ export default function ContestForm({
                   name="endTime"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="datetime-local"
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().slice(0, 16)
-                          : ''
-                      }
-                      onChange={(e) => {
-                        field.onChange(
-                          e.target.value
-                            ? new Date(e.target.value).toISOString()
-                            : ''
-                        );
-                        trigger('endTime');
-                      }}
-                      className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                        errors.endTime ? 'ring-red-500' : 'focus:ring-blue-500'
-                      }`}
-                    />
+                    <AppLocalizationProvider>
+                      <DateTimePicker
+                        {...field}
+                        className="w-full"
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(newValue) => {
+                          field.onChange(
+                            newValue ? newValue.toISOString() : null
+                          );
+                          trigger('endTime');
+                        }}
+                      />
+                    </AppLocalizationProvider>
                   )}
                 />
                 {errors.endTime && (
@@ -448,32 +470,71 @@ export default function ContestForm({
                   </p>
                 )}
               </div>
-            </div>
 
-            {/* Duration */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Thời lượng cuộc thi (phút)
-              </label>
-              <Controller
-                name="durationMinutes"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(Number.parseInt(e.target.value, 10) || 0)
-                    }
-                    placeholder="Nhập thời lượng cuộc thi..."
-                    className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
-                  />
+              {/* Late Deadline */}
+              {isHasDurationMinutes !== true &&
+                deadlineEnforcement === ContestDeadlineEnforcement.FLEXIBLE && (
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Deadline nộp muộn<span className="text-red-500">*</span>
+                    </label>
+                    <Controller
+                      name="lateDeadline"
+                      control={control}
+                      render={({ field }) => (
+                        <AppLocalizationProvider>
+                          <DateTimePicker
+                            {...field}
+                            className="w-full"
+                            value={field.value ? dayjs(field.value) : null}
+                            onChange={(newValue) => {
+                              field.onChange(
+                                newValue ? newValue.toISOString() : null
+                              );
+                              trigger('lateDeadline');
+                            }}
+                          />
+                        </AppLocalizationProvider>
+                      )}
+                    />
+                    {errors.lateDeadline && (
+                      <p className="text-sm text-red-500">
+                        {errors.lateDeadline.message}
+                      </p>
+                    )}
+                  </div>
                 )}
-              />
-              {errors.durationMinutes && (
-                <p className="text-sm text-red-500">
-                  {errors.durationMinutes.message}
-                </p>
+
+              {/* Duration */}
+              {isHasDurationMinutes && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Thời lượng cuộc thi (phút)
+                  </label>
+                  <Controller
+                    name="durationMinutes"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type="number"
+                        {...field}
+                        value={field.value == null ? '' : field.value}
+                        onChange={(e) =>
+                          field.onChange(
+                            Number.parseInt(e.target.value, 10) || null
+                          )
+                        }
+                        placeholder="Nhập thời lượng cuộc thi..."
+                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
+                      />
+                    )}
+                  />
+                  {errors.durationMinutes && (
+                    <p className="text-sm text-red-500">
+                      {errors.durationMinutes.message}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </CardContent>
@@ -484,7 +545,7 @@ export default function ContestForm({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                Danh sách bài tập ({contestData.problems.length})
+                Danh sách bài tập ({problems.length})
               </CardTitle>
               {!isReadOnly && (
                 <div>
@@ -509,7 +570,7 @@ export default function ContestForm({
             </div>
           </CardHeader>
           <CardContent>
-            {contestData.problems.length === 0 ? (
+            {problems.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-slate-400" />
@@ -538,7 +599,7 @@ export default function ContestForm({
               </div>
             ) : (
               <div className="space-y-4">
-                {contestData.problems.map((problem, index) => (
+                {problems.map((problem, index) => (
                   <div
                     key={problem.id}
                     className="flex items-center justify-between p-4 bg-slate-50/50 dark:bg-slate-700/30 rounded-xl border border-slate-200/50 dark:border-slate-600/50"
@@ -605,7 +666,6 @@ export default function ContestForm({
           <div className="flex justify-end">
             <Button
               type="submit"
-              // onClick={handleSave}
               disabled={isSaving}
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg"
             >
@@ -672,9 +732,7 @@ export default function ContestForm({
               <ProblemList
                 mode={ProblemListMode.MULTIPLE_SELECT}
                 endpointType={ProblemEndpointType.SELECTABLE_FOR_CONTEST}
-                initialSelectedProblemIds={
-                  new Set(contestData.problems.map((p) => p.id))
-                }
+                initialSelectedProblemIds={new Set(problems.map((p) => p.id))}
                 onProblemSelect={handleAddProblem}
                 onProblemView={handleViewProblemDetail}
                 onMultipleProblemsSelect={handleAddMultipleProblems}

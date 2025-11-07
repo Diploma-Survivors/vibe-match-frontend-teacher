@@ -19,42 +19,35 @@ async function sendDeepLinkingResponse(
   resourceId: number,
   type: ResourceType = ResourceType.PROBLEM
 ): Promise<any> {
-  try {
-    const url = process.env.NEXT_PUBLIC_API_LAUNCH_URL;
-    const deviceId = await LtiService.getDeviceId();
+  const deviceId = await LtiService.getDeviceId();
 
-    const custom =
-      type === ResourceType.PROBLEM
-        ? { problemId: resourceId }
-        : { contestId: resourceId };
+  const custom =
+    type === ResourceType.PROBLEM
+      ? { problemId: resourceId }
+      : { contestId: resourceId };
 
-    const deepLinkResponse = {
-      url,
-      deviceId,
-      custom,
-    };
+  const deepLinkResponse = {
+    deviceId,
+    custom,
+  };
 
-    const response = await clientApi.post(
-      '/lti/dl/response',
-      deepLinkResponse,
-      { withCredentials: true, responseType: 'text' }
-    );
+  const response = await clientApi.post('/lti/dl/response', deepLinkResponse, {
+    withCredentials: true,
+    responseType: 'text',
+  });
 
+  if (response.status === 201) {
     const html = response.data;
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-
-    // Lấy form ra
     const form = doc.querySelector('form');
     if (form) {
       document.body.appendChild(form);
       form.submit();
     }
-  } catch (error) {
-    console.error('Error sending deep linking response:', error);
-    throw error;
   }
+  return response;
 }
 
 export const LtiService = {
