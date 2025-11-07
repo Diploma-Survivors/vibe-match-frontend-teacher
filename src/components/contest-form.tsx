@@ -241,11 +241,6 @@ export default function ContestForm({
           </p>
         </div>
 
-        {/* Contest Stats (View mode only) */}
-        {mode === ContestFormMode.VIEW && (
-          <ContestStats contest={contestData} />
-        )}
-
         {/* Creator info (View mode only) */}
         {mode === ContestFormMode.VIEW && contestData.createdBy && (
           <div className="space-y-2">
