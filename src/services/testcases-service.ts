@@ -12,7 +12,7 @@ export class TestcasesService {
   ): Promise<CreateTestcaseResponse> {
     try {
       const response = await clientApi.post('/testcases', { testcases });
-      return response.data.data;
+      return response?.data?.data;
     } catch (error) {
       console.error('Error creating testcase:', error);
       throw error;
@@ -33,7 +33,7 @@ export class TestcasesService {
         },
         withCredentials: true, // Include cookies if needed
       });
-      return response.data.data;
+      return response?.data?.data;
     } catch (error) {
       console.error('Error uploading testcase file:', error);
       throw error;

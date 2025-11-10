@@ -10,6 +10,11 @@ export enum ProblemDifficulty {
   HARD = 'hard',
 }
 
+export enum ProblemVisibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
+
 export enum SortBy {
   TITLE = 'title',
   DIFFICULTY = 'difficulty',
@@ -23,7 +28,6 @@ export enum SortOrder {
 export enum ProblemType {
   STANDALONE = 'standalone',
   CONTEST = 'contest',
-  HYBRID = 'hybrid',
 }
 
 export enum MatchMode {
@@ -40,10 +44,11 @@ export interface CreateProblemRequest {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
-  type?: ProblemType;
+  type: ProblemType;
+  visibility: ProblemVisibility;
   tagIds: number[];
   topicIds: number[];
-  testcase: File | null;
+  testcaseFile: File | null;
   testcaseSamples: TestcaseSample[];
 }
 
@@ -70,7 +75,8 @@ export interface ProblemData {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
-  type?: ProblemType;
+  type: ProblemType;
+  visibility: ProblemVisibility;
   createdAt?: string;
   updatedAt?: string;
   tags: Tag[];
@@ -92,6 +98,7 @@ export interface ProblemDataResponse {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
+  visibility: ProblemVisibility;
   type: ProblemType;
   createdAt?: string;
   updatedAt?: string;
@@ -113,6 +120,8 @@ export const initialProblemData: ProblemData = {
   timeLimitMs: 1000,
   memoryLimitKb: 256000,
   difficulty: ProblemDifficulty.EASY,
+  visibility: ProblemVisibility.PUBLIC,
+  type: ProblemType.CONTEST,
   tags: [],
   topics: [],
   testcase: null,
@@ -169,10 +178,7 @@ export const TAG_OPTIONS = [
   { value: 'hard', label: 'Khó' },
 ];
 
-// Remove TOPIC_OPTIONS and TAG_OPTIONS as they will be fetched from backend
-// Keep ACCESS_RANGE_OPTIONS for potential future use
-export const ACCESS_RANGE_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
+export const VISIBILITY_OPTIONS = [
   { value: 'public', label: 'Public' },
   { value: 'private', label: 'Private' },
 ];
@@ -251,11 +257,16 @@ export const ProblemSchema = z
     difficulty: z.enum(ProblemDifficulty, {
       error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
     }),
-    type: z.enum(ProblemType).optional(),
+    visibility: z.enum(ProblemVisibility, {
+      error: () => ({ message: 'Vui lòng chọn phạm vi' }),
+    }),
+    type: z.enum(ProblemType, {
+      error: () => ({ message: 'Vui lòng chọn loại cho bài tập' }),
+    }),
     topics: z
       .array(z.any())
       .min(1, 'Vui lòng chọn ít nhất một chủ đề')
-      .max(4, 'Chỉ được chọn tối đa 4 chủ đề'),
+      .max(3, 'Chỉ được chọn tối đa 3 chủ đề'),
     tags: z
       .array(z.any())
       .min(1, 'Vui lòng chọn ít nhất một tag')

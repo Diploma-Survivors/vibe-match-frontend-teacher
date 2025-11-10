@@ -13,11 +13,6 @@ import {
 import { TagsService } from '@/services/tags-service';
 import { TopicsService } from '@/services/topics-service';
 import type { ProblemFilters } from '@/types/problems';
-import {
-  ACCESS_RANGE_OPTIONS,
-  DIFFICULTY_OPTIONS,
-  TAG_OPTIONS,
-} from '@/types/problems';
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import { TOPIC_OPTIONS } from '@/types/topics';
@@ -61,8 +56,8 @@ export default function ProblemFilter({
         TagsService.getAllTags(),
         TopicsService.getAllTopics(),
       ]);
-      setTags(tagsResponse.data.data);
-      setTopics(topicsResponse.data.data);
+      setTags(tagsResponse?.data?.data);
+      setTopics(topicsResponse?.data?.data);
     } catch (error) {
       setTags([]);
       setTopics([]);
