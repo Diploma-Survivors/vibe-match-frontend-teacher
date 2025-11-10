@@ -14,10 +14,11 @@ import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { HttpStatus } from '@/types/api';
 import {
-  CONTEST_DEADLINE_ENFORCEMENT_OPTIONS,
   type Contest,
   ContestDeadlineEnforcement,
   ContestSchema,
+  NON_TIMED_PROBLEM_SUBMISSION_POLICY,
+  TIMED_PROBLEM_SUBMISSION_POLICY,
   initialContestData,
 } from '@/types/contest';
 import {
@@ -34,6 +35,7 @@ import {
   Calendar,
   Edit,
   Plus,
+  Radio,
   Save,
   Search,
   Settings,
@@ -341,34 +343,34 @@ export default function ContestForm({
               {/* deadlineEnforcement */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Quy định nộp muộn <span className="text-red-500">*</span>
+                  Quy định nộp <span className="text-red-500">*</span>
                 </label>
                 <Controller
                   name="deadlineEnforcement"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={field.disabled}
-                    >
-                      <SelectTrigger
-                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                          errors.deadlineEnforcement
-                            ? 'ring-red-500' // Apply red ring on error
-                            : 'focus:ring-green-500'
-                        }`}
-                      >
-                        <SelectValue placeholder="Chọn phạm quy định nộp muộn" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CONTEST_DEADLINE_ENFORCEMENT_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <>
+                      {(isHasDurationMinutes
+                        ? TIMED_PROBLEM_SUBMISSION_POLICY
+                        : NON_TIMED_PROBLEM_SUBMISSION_POLICY
+                      ).map(({ value, label }) => (
+                        <label
+                          key={value}
+                          className="flex items-cente border-none gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"
+                        >
+                          <input
+                            type="radio"
+                            {...field}
+                            value={value}
+                            checked={field.value === value}
+                            className="w-4 h-4 text-green-600 bg-slate-100 border-slate-300 focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-600 dark:border-slate-500"
+                          />
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            {label}
+                          </span>
+                        </label>
+                      ))}
+                    </>
                   )}
                 />
                 {errors.deadlineEnforcement && (

@@ -60,12 +60,26 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'private', label: 'Riêng tư' },
 ];
 
-export const CONTEST_DEADLINE_ENFORCEMENT_OPTIONS = [
+export const TIMED_PROBLEM_SUBMISSION_POLICY = [
+  {
+    value: ContestDeadlineEnforcement.STRICT,
+    label: 'Tự động nộp bài khi cuộc thi kết thúc',
+  },
+  {
+    value: ContestDeadlineEnforcement.FLEXIBLE,
+    label: 'Làm bài cho đến hết Time Limit',
+  },
+];
+
+export const NON_TIMED_PROBLEM_SUBMISSION_POLICY = [
+  {
+    value: ContestDeadlineEnforcement.FLEXIBLE,
+    label: 'Cho phép nộp muộn',
+  },
   {
     value: ContestDeadlineEnforcement.STRICT,
     label: 'Không cho phép nộp muộn',
   },
-  { value: ContestDeadlineEnforcement.FLEXIBLE, label: 'Cho phép nộp muộn' },
 ];
 
 export interface ContestProblemDTO {
