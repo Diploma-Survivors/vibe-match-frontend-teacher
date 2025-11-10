@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
 import { type ProblemData, ProblemEndpointType } from '@/types/problems';
-import { Book, ChevronRight, File, FilePlus, Trophy, X } from 'lucide-react';
+import { Book, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -25,7 +25,7 @@ export default function OptionsPage() {
   const handleViewProblemDetail = async (problem: ProblemData) => {
     try {
       const response = await ProblemsService.getProblemDetail(problem.id);
-      const responseData = response.data.data;
+      const responseData = response?.data?.data;
       const detailedProblem =
         ProblemsService.mapProblemDataResponseToProblemData(responseData);
       setSelectedProblem(detailedProblem);

@@ -56,8 +56,8 @@ export default function ProblemFilter({
         TagsService.getAllTags(),
         TopicsService.getAllTopics(),
       ]);
-      setTags(tagsResponse.data.data);
-      setTopics(topicsResponse.data.data);
+      setTags(tagsResponse?.data?.data);
+      setTopics(topicsResponse?.data?.data);
     } catch (error) {
       setTags([]);
       setTopics([]);

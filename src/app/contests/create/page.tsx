@@ -6,7 +6,7 @@ import { useApp } from '@/contexts/app-context';
 import { ContestsService } from '@/services/contests-service';
 import { LtiService, ResourceType } from '@/services/lti-service';
 import { toastService } from '@/services/toasts-service';
-import { type Contest, ContestStatus } from '@/types/contest';
+import type { Contest } from '@/types/contest';
 import { IssuerType } from '@/types/states';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -23,7 +23,7 @@ export default function CreateContestPage() {
       const contestDTO = ContestsService.mapContestToDTO(data);
 
       const response = await ContestsService.createContest(contestDTO);
-      const newContestId = response.data.data.id;
+      const newContestId = response?.data?.data?.id;
 
       if (issuer === IssuerType.MOODLE) {
         toastService.success('Cuộc thi đã được tạo thành công!');

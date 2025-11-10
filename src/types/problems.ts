@@ -48,7 +48,7 @@ export interface CreateProblemRequest {
   visibility: ProblemVisibility;
   tagIds: number[];
   topicIds: number[];
-  testcase: File | null;
+  testcaseFile: File | null;
   testcaseSamples: TestcaseSample[];
 }
 

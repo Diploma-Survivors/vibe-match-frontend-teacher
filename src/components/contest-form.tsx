@@ -18,15 +18,12 @@ import {
   type Contest,
   ContestDeadlineEnforcement,
   ContestSchema,
-  ContestStatus,
   initialContestData,
 } from '@/types/contest';
 import {
   type CreateProblemRequest,
   type ProblemData,
-  ProblemDataResponse,
   ProblemEndpointType,
-  ProblemType,
   getDifficultyColor,
   getDifficultyLabel,
 } from '@/types/problems';
@@ -34,27 +31,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import {
-  BarChart3,
   Calendar,
-  Clock,
   Edit,
   Plus,
   Save,
   Search,
   Settings,
   Trash2,
-  Trophy,
-  Users,
   X,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import {
-  Controller,
-  FieldErrors,
-  type SubmitHandler,
-  useForm,
-} from 'react-hook-form';
-import ContestStats from './contests/contest-stats';
+import { useState } from 'react';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
@@ -122,7 +109,7 @@ export default function ContestForm({
   const handleViewProblemDetail = async (problem: ProblemData) => {
     try {
       const response = await ProblemsService.getProblemDetail(problem.id);
-      const responseData = response.data.data;
+      const responseData = response?.data?.data;
       const detailedProblem =
         ProblemsService.mapProblemDataResponseToProblemData(responseData);
       setSelectedProblem(detailedProblem);
@@ -169,7 +156,7 @@ export default function ContestForm({
       const result = await ProblemsService.createProblem(problemRequest);
       if (result.data.status === HttpStatus.OK) {
         toastService.success('Tạo bài tập thành công!');
-        const newProblem: ProblemData = result.data.data;
+        const newProblem: ProblemData = result?.data?.data;
         setValue('problems', [...problems, newProblem], {
           shouldValidate: true,
         });
@@ -187,10 +174,10 @@ export default function ContestForm({
 
   const handleRemoveProblem = (problemId: number) => {
     if (isReadOnly) return;
-    setContestData((prev) => ({
-      ...prev,
-      problems: prev.problems.filter((problem) => problem.id !== problemId),
-    }));
+    const newProblems = problems.filter((p) => p.id !== problemId);
+    setValue('problems', newProblems, {
+      shouldValidate: true,
+    });
   };
 
   const handleSaveScore = (scores: Record<number, number>) => {
@@ -336,7 +323,7 @@ export default function ContestForm({
                             : 'focus:ring-green-500'
                         }`}
                       >
-                        <SelectValue placeholder="Chọn phạm vi truy cập" />
+                        <SelectValue placeholder="Chọn giới hạn thời gian" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={'true'}>
@@ -372,7 +359,7 @@ export default function ContestForm({
                             : 'focus:ring-green-500'
                         }`}
                       >
-                        <SelectValue placeholder="Chọn phạm vi truy cập" />
+                        <SelectValue placeholder="Chọn phạm quy định nộp muộn" />
                       </SelectTrigger>
                       <SelectContent>
                         {CONTEST_DEADLINE_ENFORCEMENT_OPTIONS.map((option) => (
@@ -384,12 +371,12 @@ export default function ContestForm({
                     </Select>
                   )}
                 />
+                {errors.deadlineEnforcement && (
+                  <p className="text-sm text-red-500">
+                    {errors.deadlineEnforcement.message}
+                  </p>
+                )}
               </div>
-              {errors.deadlineEnforcement && (
-                <p className="text-sm text-red-500">
-                  {errors.deadlineEnforcement.message}
-                </p>
-              )}
             </div>
           </CardContent>
         </Card>
