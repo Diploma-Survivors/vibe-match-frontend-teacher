@@ -1,5 +1,5 @@
 export interface ApiResponse<T> {
-  status: string;
+  status: HttpStatus;
   apiVersion: string;
   data: T;
 }

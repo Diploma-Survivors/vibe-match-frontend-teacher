@@ -16,6 +16,8 @@ import {
   DIFFICULTY_OPTIONS,
   type ProblemData,
   ProblemSchema,
+  ProblemType,
+  VISIBILITY_OPTIONS,
   initialProblemData,
 } from '@/types/problems';
 import type { Tag } from '@/types/tags';
@@ -94,8 +96,8 @@ export default function ProblemForm({
         TopicsService.getAllTopics(),
       ]);
 
-      setAvailableTags(tagsResponse.data.data);
-      setAvailableTopics(topicsResponse.data.data);
+      setAvailableTags(tagsResponse?.data?.data);
+      setAvailableTopics(topicsResponse?.data?.data);
     } catch (error) {
       setAvailableTags([]);
       setAvailableTopics([]);
@@ -107,6 +109,8 @@ export default function ProblemForm({
 
   const onSubmit: SubmitHandler<ProblemData> = (data) => {
     if (onSave) {
+      // since problemtype in contest is always CONTEST, we set it here before sending to parent
+      data.type = ProblemType.CONTEST;
       onSave(data);
     }
   };
@@ -121,10 +125,7 @@ export default function ProblemForm({
   );
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-4xl mx-auto space-y-8"
-    >
+    <form className="max-w-4xl mx-auto space-y-8">
       {/* Header Info */}
       <div className="text-center">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
@@ -380,6 +381,40 @@ export default function ProblemForm({
               </p>
             )}
           </div>
+
+          {/* Visibility */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Phạm vi <span className="text-red-500">*</span>
+            </label>
+            <Controller
+              name="visibility"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={field.disabled}
+                >
+                  <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
+                    <SelectValue placeholder="Chọn phạm vi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VISIBILITY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.visibility && (
+              <p className="text-sm text-red-500">
+                {errors.visibility.message}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -569,7 +604,8 @@ export default function ProblemForm({
       {!isReadOnly && (
         <div className="flex justify-end">
           <Button
-            type="submit"
+            type="button"
+            onClick={handleSubmit(onSubmit)}
             disabled={isSaving}
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all"
           >
