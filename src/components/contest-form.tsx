@@ -18,6 +18,7 @@ import {
   ContestDeadlineEnforcement,
   ContestSchema,
   NON_TIMED_PROBLEM_SUBMISSION_POLICY,
+  SUBMISSION_STRATEGY_OPTIONS,
   TIMED_PROBLEM_SUBMISSION_POLICY,
   initialContestData,
 } from '@/types/contest';
@@ -124,7 +125,7 @@ export default function ContestForm({
   const handleAddProblem = (problem: ProblemData) => {
     if (isReadOnly) return;
     if (problems.some((obj) => obj.id === problem.id)) {
-      toastService.error('Bài thi đã được thêm vào cuộc thi.');
+      toastService.error('Bài thi đã được thêm vào.');
       return;
     }
     setValue('problems', [...problems, problem], { shouldValidate: true });
@@ -139,7 +140,7 @@ export default function ContestForm({
       (problem) => !problems.some((p) => p.id === problem.id)
     );
     if (actualNewProblems.length === 0) {
-      toastService.error('Tất cả các bài thi đã được thêm vào cuộc thi.');
+      toastService.error('Tất cả các bài thi đã được thêm vào.');
       return;
     }
     setValue('problems', [...problems, ...actualNewProblems], {
@@ -254,7 +255,7 @@ export default function ContestForm({
             {/* Contest Name */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Tên cuộc thi <span className="text-red-500">*</span>
+                Tên <span className="text-red-500">*</span>
               </label>
               <Controller
                 name="name"
@@ -262,7 +263,7 @@ export default function ContestForm({
                 render={({ field }) => (
                   <Input
                     {...field}
-                    placeholder="Nhập tên cuộc thi..."
+                    placeholder="Nhập tên..."
                     className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
                       errors.name ? 'ring-red-500' : 'focus:ring-blue-500'
                     }`}
@@ -277,7 +278,7 @@ export default function ContestForm({
             {/* Contest Description */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Mô tả cuộc thi <span className="text-red-500">*</span>
+                Mô tả <span className="text-red-500">*</span>
               </label>
               <Controller
                 name="description"
@@ -285,7 +286,7 @@ export default function ContestForm({
                 render={({ field }) => (
                   <textarea
                     {...field}
-                    placeholder="Nhập mô tả chi tiết về cuộc thi..."
+                    placeholder="Nhập mô tả chi tiết về..."
                     className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
                       errors.description
                         ? 'ring-red-500'
@@ -302,6 +303,40 @@ export default function ContestForm({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Submission Strategies */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Chiến lược nộp bài <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="submissionStrategy"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={field.disabled}
+                    >
+                      <SelectTrigger
+                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                          errors.submissionStrategy
+                            ? 'ring-red-500' // Apply red ring on error
+                            : 'focus:ring-green-500'
+                        }`}
+                      >
+                        <SelectValue placeholder="Chọn giới hạn thời gian" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SUBMISSION_STRATEGY_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
               {/* IsHasTimeLimit */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -493,7 +528,7 @@ export default function ContestForm({
               {isHasDurationMinutes && (
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                    Thời lượng cuộc thi (phút)
+                    Thời lượng (phút)
                   </label>
                   <Controller
                     name="durationMinutes"
@@ -508,8 +543,12 @@ export default function ContestForm({
                             Number.parseInt(e.target.value, 10) || null
                           )
                         }
-                        placeholder="Nhập thời lượng cuộc thi..."
-                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${errors.durationMinutes ? 'ring-red-500' : 'focus:ring-green-500'}`}
+                        placeholder="Nhập thời lượng..."
+                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                          errors.durationMinutes
+                            ? 'ring-red-500'
+                            : 'focus:ring-green-500'
+                        }`}
                       />
                     )}
                   />
@@ -562,7 +601,7 @@ export default function ContestForm({
                 <p className="text-slate-500 dark:text-slate-400 mb-4">
                   {isReadOnly
                     ? 'Cuộc thi này chưa có bài tập nào'
-                    : 'Chưa có bài tập nào được thêm vào cuộc thi'}
+                    : 'Chưa có bài tập nào được thêm vào'}
                 </p>
                 {errors.problems && (
                   <p className="text-sm text-red-500 mb-2">
@@ -657,8 +696,8 @@ export default function ContestForm({
               {isSaving
                 ? 'Đang lưu...'
                 : mode === ContestFormMode.CREATE
-                  ? 'Tạo cuộc thi'
-                  : 'Cập nhật cuộc thi'}
+                  ? 'Tạo'
+                  : 'Cập nhật'}
             </Button>
           </div>
         )}

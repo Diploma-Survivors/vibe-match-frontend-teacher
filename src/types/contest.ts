@@ -12,6 +12,7 @@ export interface Contest {
   lateDeadline?: string;
   deadlineEnforcement: ContestDeadlineEnforcement;
   problems: ProblemData[];
+  submissionStrategy: ContestSubmissionStrategy;
   createdBy?: string;
   createdAt?: string;
 }
@@ -40,6 +41,13 @@ export enum ContestDeadlineEnforcement {
   FLEXIBLE = 'flexible',
 }
 
+export enum ContestSubmissionStrategy {
+  SINGLE_SUBMISSION = 'SINGLE_SUBMISSION',
+  BEST_SCORE = 'BEST_SCORE',
+  LATEST_SCORE = 'LATEST_SCORE',
+  AVERAGE_SCORE = 'AVERAGE_SCORE',
+}
+
 export interface ContestFilters {
   id?: number;
   name?: string;
@@ -58,6 +66,25 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'public', label: 'Công khai' },
   { value: 'private', label: 'Riêng tư' },
+];
+
+export const SUBMISSION_STRATEGY_OPTIONS = [
+  {
+    value: ContestSubmissionStrategy.SINGLE_SUBMISSION,
+    label: 'Chỉ nộp một lần',
+  },
+  {
+    value: ContestSubmissionStrategy.BEST_SCORE,
+    label: 'Lấy điểm cao nhất',
+  },
+  {
+    value: ContestSubmissionStrategy.LATEST_SCORE,
+    label: 'Lấy điểm lần nộp cuối cùng',
+  },
+  {
+    value: ContestSubmissionStrategy.AVERAGE_SCORE,
+    label: 'Lấy điểm trung bình',
+  },
 ];
 
 export const TIMED_PROBLEM_SUBMISSION_POLICY = [
@@ -101,6 +128,9 @@ export const ContestSchema = z
       .max(500, 'Mô tả cuộc thi không được vượt quá 500 ký tự'),
     deadlineEnforcement: z.enum(ContestDeadlineEnforcement, {
       error: () => ({ message: 'Quy định nộp muộn là bắt buộc' }),
+    }),
+    submissionStrategy: z.enum(ContestSubmissionStrategy, {
+      error: () => ({ message: 'Chiến lược nộp bài là bắt buộc' }),
     }),
     isHasDurationMinutes: z.any().optional(),
     durationMinutes: z.any().optional(),
@@ -166,6 +196,7 @@ export const initialContestData: Contest = {
   startTime: '',
   endTime: '',
   deadlineEnforcement: ContestDeadlineEnforcement.STRICT,
+  submissionStrategy: ContestSubmissionStrategy.SINGLE_SUBMISSION,
   isHasDurationMinutes: false,
   problems: [],
 };
