@@ -25,7 +25,7 @@ export default function CreateContestPage() {
       const response = await ContestsService.createContest(contestDTO);
       const newContestId = response?.data?.data?.id;
 
-      if (issuer === IssuerType.MOODLE) {
+      if (issuer === IssuerType.LOCAL) {
         toastService.success('Cuộc thi đã được tạo thành công!');
         return;
       }
