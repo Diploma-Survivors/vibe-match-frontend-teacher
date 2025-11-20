@@ -61,6 +61,18 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'private', label: 'Riêng tư' },
 ];
 
+export const CONTEST_STATUS_COLORS = {
+  upcoming: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
+  ongoing: 'bg-green-100 text-green-800 hover:bg-green-100',
+  finished: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
+};
+
+export const CONTEST_STATUS_LABELS = {
+  upcoming: 'Sắp diễn ra',
+  ongoing: 'Đang diễn ra',
+  finished: 'Đã kết thúc',
+};
+
 export const SUBMISSION_STRATEGY_OPTIONS = [
   {
     value: ContestSubmissionStrategy.SINGLE_SUBMISSION,
