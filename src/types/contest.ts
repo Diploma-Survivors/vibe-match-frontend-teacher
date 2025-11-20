@@ -1,6 +1,53 @@
 import { z } from 'zod';
 import type { ProblemData } from './problems';
 
+// Leaderboard Types
+export interface LeaderboardUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface ProblemResult {
+  problemId: number;
+  score: number;
+  time: string;
+  isAccepted: boolean;
+  attempts: number;
+}
+
+export interface RankingNode {
+  rank: number;
+  user: LeaderboardUser;
+  totalScore: number;
+  totalTime: string;
+  problemResults: ProblemResult[];
+}
+
+export interface RankingEdge {
+  node: RankingNode;
+  cursor: string;
+}
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
+export interface Rankings {
+  edges: RankingEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
+
+export interface LeaderboardResponse {
+  problems: ProblemData[];
+  rankings: Rankings;
+}
+
 export interface Contest {
   id?: number;
   name: string;

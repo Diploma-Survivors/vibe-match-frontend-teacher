@@ -29,8 +29,6 @@ export default function EditContestPage() {
       setLoading(true);
       const response = await ContestsService.getContestById(contestId);
       setContest(response?.data?.data);
-
-      console.log(response?.data?.data);
     } catch (error) {
       console.error('Error fetching contest:', error);
     } finally {
