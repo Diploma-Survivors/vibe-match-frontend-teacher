@@ -31,7 +31,7 @@ export default function ConditionalLayout({
     <>
       <Header />
       <main className="pt-16">{children}</main>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
