@@ -6,15 +6,15 @@ import { useApp } from '@/contexts/app-context';
 import { ContestsService } from '@/services/contests-service';
 import { LtiService, ResourceType } from '@/services/lti-service';
 import { toastService } from '@/services/toasts-service';
-import { HttpStatus } from '@/types/api';
-import { type Contest, ContestStatus } from '@/types/contest';
+import type { Contest } from '@/types/contest';
+import { IssuerType } from '@/types/states';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
-  const { shouldHideNavigation } = useApp();
+  const { shouldHideNavigation, issuer } = useApp();
 
   const handleSave = async (data: Contest) => {
     setIsSaving(true);
@@ -23,7 +23,12 @@ export default function CreateContestPage() {
       const contestDTO = ContestsService.mapContestToDTO(data);
 
       const response = await ContestsService.createContest(contestDTO);
-      const newContestId = response.data.data.id;
+      const newContestId = response?.data?.data?.id;
+
+      if (issuer === IssuerType.LOCAL) {
+        toastService.success('Cuộc thi đã được tạo thành công!');
+        return;
+      }
 
       if (newContestId) {
         const response = await LtiService.sendDeepLinkingResponse(
@@ -31,8 +36,10 @@ export default function CreateContestPage() {
           ResourceType.CONTEST
         );
 
-        if(response.status === 201) {         
-          toastService.success('Activity đã được tạo thành công và gửi về hệ thống LMS!');
+        if (response.status === 201) {
+          toastService.success(
+            'Activity đã được tạo thành công và gửi về hệ thống LMS!'
+          );
         }
       }
     } catch (error) {
@@ -82,8 +89,16 @@ export default function CreateContestPage() {
           mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
-          title="Tạo cuộc thi mới"
-          subtitle="Thiết lập thông tin và cấu hình cuộc thi lập trình"
+          title={
+            issuer === IssuerType.MOODLE
+              ? 'Tạo assignment mới'
+              : 'Tạo cuộc thi mới'
+          }
+          subtitle={
+            issuer === IssuerType.MOODLE
+              ? 'Thiết lập thông tin và cấu hình bài tập trên Moodle'
+              : 'Thiết lập thông tin và cấu hình cuộc thi lập trình'
+          }
         />
       </div>
     </div>

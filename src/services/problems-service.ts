@@ -9,6 +9,7 @@ import type {
   ProblemListResponse,
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
+import { serialize } from 'object-to-formdata';
 import qs from 'qs';
 
 async function getProblemList(
@@ -24,32 +25,25 @@ async function getProblemList(
   return await clientApi.get(url);
 }
 
-// TODO: We will update this when the api is ready
 async function createProblem(
   problemRequest: CreateProblemRequest
 ): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
-  if (!problemRequest.testcase) {
+  if (!problemRequest.testcaseFile) {
     throw new Error('Testcase file is required for complete problem creation.');
   }
 
-  const formData = new FormData();
-  formData.append('title', problemRequest.title);
-  formData.append('description', problemRequest.description);
-  formData.append('inputDescription', problemRequest.inputDescription);
-  formData.append('outputDescription', problemRequest.outputDescription);
-  formData.append('maxScore', problemRequest.maxScore.toString());
-  formData.append('timeLimitMs', problemRequest.timeLimitMs.toString());
-  formData.append('memoryLimitKb', problemRequest.memoryLimitKb.toString());
-  formData.append('difficulty', problemRequest.difficulty);
-  formData.append('visibility', problemRequest.visibility);
-  formData.append('type', problemRequest.type);
-  formData.append('tagIds', JSON.stringify(problemRequest.tagIds));
-  formData.append('topicIds', JSON.stringify(problemRequest.topicIds));
-  formData.append('testcaseFile', problemRequest.testcase);
-  formData.append(
-    'testcaseSamples',
-    JSON.stringify(problemRequest.testcaseSamples)
-  );
+  const problemForFormData = {
+    ...problemRequest,
+    tagIds: JSON.stringify(problemRequest.tagIds),
+    topicIds: JSON.stringify(problemRequest.topicIds),
+    testcaseSamples: JSON.stringify(problemRequest.testcaseSamples),
+  };
+
+  const formData = serialize(problemForFormData, {
+    indices: true,
+    allowEmptyArrays: true,
+    nullsAsUndefineds: true,
+  });
 
   return await clientApi.post('/problems', formData, {
     headers: {
@@ -65,10 +59,12 @@ async function getProblemDetail(
 }
 
 function mapProblemToDTO(problem: ProblemData): CreateProblemRequest {
+  const { tags, topics, testcase, ...rest } = problem;
   return {
-    ...problem,
-    tagIds: problem.tags.map((tag) => tag.id),
-    topicIds: problem.topics.map((topic) => topic.id),
+    ...rest,
+    tagIds: tags.map((tag) => tag.id),
+    topicIds: topics.map((topic) => topic.id),
+    testcaseFile: testcase,
   };
 }
 

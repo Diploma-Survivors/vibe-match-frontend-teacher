@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LtiService } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
 import { type ProblemData, ProblemEndpointType } from '@/types/problems';
-import { ChevronRight, File, FilePlus, Trophy, X } from 'lucide-react';
+import { Book, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -25,7 +25,7 @@ export default function OptionsPage() {
   const handleViewProblemDetail = async (problem: ProblemData) => {
     try {
       const response = await ProblemsService.getProblemDetail(problem.id);
-      const responseData = response.data.data;
+      const responseData = response?.data?.data;
       const detailedProblem =
         ProblemsService.mapProblemDataResponseToProblemData(responseData);
       setSelectedProblem(detailedProblem);
@@ -48,10 +48,10 @@ export default function OptionsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 flex items-center justify-center">
       {/* Non-dismissible modal */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 dark:border-slate-700/50 backdrop-blur-xl">
+      <div className="min-h-[500px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-white/20 dark:border-slate-700/50 backdrop-blur-xl">
         <div className="p-6 border-b border-slate-200 dark:border-slate-700">
           <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-            Chào mừng đến với SolVibe
+            Chào mừng đến với Vibe Match
           </h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mt-2">
             Hãy chọn một tùy chọn để bắt đầu
@@ -60,7 +60,7 @@ export default function OptionsPage() {
 
         <div className="p-6 space-y-6">
           {/* Option 1: Create Assignment (with links) */}
-          <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-6 border border-slate-200/50 dark:border-slate-600/50 hover:shadow-md transition-all duration-200">
+          {/* <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-6 border border-slate-200/50 dark:border-slate-600/50 hover:shadow-md transition-all duration-200">
             <div className="flex items-start gap-4">
               <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                 <File className="w-6 h-6 text-green-600 dark:text-green-400" />
@@ -96,26 +96,26 @@ export default function OptionsPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Option 2: Create Contest */}
           <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-6 border border-slate-200/50 dark:border-slate-600/50 hover:shadow-md transition-all duration-200">
             <div className="flex items-start gap-4">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Trophy className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <Book className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
 
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
-                  Tạo contest mới
+                  Tạo assignment mới
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                  Tạo một cuộc thi lập trình mới cho học sinh
+                  Tạo một assignment mới cho học sinh
                 </p>
 
                 <Link href="/contests/create" className="w-full block">
                   <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
-                    Tạo contest <ChevronRight className="w-4 h-4 ml-1" />
+                    Tạo assignment <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </div>

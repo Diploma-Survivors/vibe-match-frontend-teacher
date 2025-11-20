@@ -96,8 +96,8 @@ export default function ProblemForm({
         TopicsService.getAllTopics(),
       ]);
 
-      setAvailableTags(tagsResponse.data.data);
-      setAvailableTopics(topicsResponse.data.data);
+      setAvailableTags(tagsResponse?.data?.data);
+      setAvailableTopics(topicsResponse?.data?.data);
     } catch (error) {
       setAvailableTags([]);
       setAvailableTopics([]);
@@ -409,9 +409,9 @@ export default function ProblemForm({
                 </Select>
               )}
             />
-            {errors.difficulty && (
+            {errors.visibility && (
               <p className="text-sm text-red-500">
-                {errors.difficulty.message}
+                {errors.visibility.message}
               </p>
             )}
           </div>

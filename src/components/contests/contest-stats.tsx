@@ -25,92 +25,93 @@ const getStatusColor = (status?: string) => {
 
 // 3. Define the component. It's now clean, self-contained, and focused on one task.
 export default function ContestStats({ contest }: ContestStatsProps) {
-  const durationHours = Math.floor(contest.durationMinutes / 60);
-  const durationRemainingMinutes = contest.durationMinutes % 60;
+  // const durationHours = Math.floor(contest.durationMinutes / 60);
+  // const durationRemainingMinutes = contest.durationMinutes % 60;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {/* Status Card */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600">
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Trạng thái
-              </p>
-              <div
-                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
-                  contest.status
-                )}`}
-              >
-                {contest.status}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div />
+    // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    //   {/* Status Card */}
+    //   <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+    //     <CardContent className="p-6">
+    //       <div className="flex items-center gap-4">
+    //         <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600">
+    //           <Trophy className="w-6 h-6 text-white" />
+    //         </div>
+    //         <div>
+    //           <p className="text-sm text-slate-600 dark:text-slate-400">
+    //             Trạng thái
+    //           </p>
+    //           <div
+    //             className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+    //               contest.status
+    //             )}`}
+    //           >
+    //             {contest.status}
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </CardContent>
+    //   </Card>
 
-      {/* Participants Card (original code was commented out) */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            {/*
-            <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Thí sinh
-              </p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                {contest.participants || 0}
-              </p>
-            </div>
-            */}
-          </div>
-        </CardContent>
-      </Card>
+    //   {/* Participants Card (original code was commented out) */}
+    //   <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+    //     <CardContent className="p-6">
+    //       <div className="flex items-center gap-4">
+    //         <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
+    //           <Users className="w-6 h-6 text-white" />
+    //         </div>
+    //         {/*
+    //         <div>
+    //           <p className="text-sm text-slate-600 dark:text-slate-400">
+    //             Thí sinh
+    //           </p>
+    //           <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+    //             {contest.participants || 0}
+    //           </p>
+    //         </div>
+    //         */}
+    //       </div>
+    //     </CardContent>
+    //   </Card>
 
-      {/* Problems Count Card */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600">
-              <BarChart3 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Số bài
-              </p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                {contest.problems.length}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    //   {/* Problems Count Card */}
+    //   <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+    //     <CardContent className="p-6">
+    //       <div className="flex items-center gap-4">
+    //         <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600">
+    //           <BarChart3 className="w-6 h-6 text-white" />
+    //         </div>
+    //         <div>
+    //           <p className="text-sm text-slate-600 dark:text-slate-400">
+    //             Số bài
+    //           </p>
+    //           <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+    //             {contest.problems.length}
+    //           </p>
+    //         </div>
+    //       </div>
+    //     </CardContent>
+    //   </Card>
 
-      {/* Duration Card */}
-      <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Thời lượng
-              </p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                {durationHours}h {durationRemainingMinutes}m
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    //   {/* Duration Card */}
+    //   <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+    //     <CardContent className="p-6">
+    //       <div className="flex items-center gap-4">
+    //         <div className="p-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-600">
+    //           <Clock className="w-6 h-6 text-white" />
+    //         </div>
+    //         <div>
+    //           <p className="text-sm text-slate-600 dark:text-slate-400">
+    //             Thời lượng
+    //           </p>
+    //           <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+    //             {durationHours}h {durationRemainingMinutes}m
+    //           </p>
+    //         </div>
+    //       </div>
+    //     </CardContent>
+    //   </Card>
+    // </div>
   );
 }

@@ -12,6 +12,7 @@ export interface Contest {
   lateDeadline?: string;
   deadlineEnforcement: ContestDeadlineEnforcement;
   problems: ProblemData[];
+  submissionStrategy: ContestSubmissionStrategy;
   createdBy?: string;
   createdAt?: string;
 }
@@ -40,6 +41,13 @@ export enum ContestDeadlineEnforcement {
   FLEXIBLE = 'flexible',
 }
 
+export enum ContestSubmissionStrategy {
+  SINGLE_SUBMISSION = 'SINGLE_SUBMISSION',
+  BEST_SCORE = 'BEST_SCORE',
+  LATEST_SCORE = 'LATEST_SCORE',
+  AVERAGE_SCORE = 'AVERAGE_SCORE',
+}
+
 export interface ContestFilters {
   id?: number;
   name?: string;
@@ -53,36 +61,45 @@ export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'private', label: 'Riêng tư' },
 ];
 
-export const CONTEST_STATUS_COLORS = {
-  upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  ongoing: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  finished: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-  public:
-    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
-  private:
-    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-} as const;
-
-export const CONTEST_STATUS_LABELS = {
-  upcoming: 'Sắp diễn ra',
-  ongoing: 'Đang diễn ra',
-  finished: 'Đã kết thúc',
-  public: 'Công khai',
-  private: 'Riêng tư',
-} as const;
-
-export const PARTICIPATION_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'yes', label: 'Đã tham gia' },
-  { value: 'no', label: 'Chưa tham gia' },
+export const SUBMISSION_STRATEGY_OPTIONS = [
+  {
+    value: ContestSubmissionStrategy.SINGLE_SUBMISSION,
+    label: 'Chỉ nộp một lần',
+  },
+  {
+    value: ContestSubmissionStrategy.BEST_SCORE,
+    label: 'Lấy điểm cao nhất',
+  },
+  {
+    value: ContestSubmissionStrategy.LATEST_SCORE,
+    label: 'Lấy điểm lần nộp cuối cùng',
+  },
+  {
+    value: ContestSubmissionStrategy.AVERAGE_SCORE,
+    label: 'Lấy điểm trung bình',
+  },
 ];
 
-export const CONTEST_DEADLINE_ENFORCEMENT_OPTIONS = [
+export const TIMED_PROBLEM_SUBMISSION_POLICY = [
+  {
+    value: ContestDeadlineEnforcement.STRICT,
+    label: 'Tự động nộp bài khi cuộc thi kết thúc',
+  },
+  {
+    value: ContestDeadlineEnforcement.FLEXIBLE,
+    label: 'Làm bài cho đến hết Time Limit',
+  },
+];
+
+export const NON_TIMED_PROBLEM_SUBMISSION_POLICY = [
+  {
+    value: ContestDeadlineEnforcement.FLEXIBLE,
+    label: 'Cho phép nộp muộn',
+  },
   {
     value: ContestDeadlineEnforcement.STRICT,
     label: 'Không cho phép nộp muộn',
   },
-  { value: ContestDeadlineEnforcement.FLEXIBLE, label: 'Cho phép nộp muộn' },
 ];
 
 export interface ContestProblemDTO {
@@ -104,6 +121,9 @@ export const ContestSchema = z
       .max(500, 'Mô tả cuộc thi không được vượt quá 500 ký tự'),
     deadlineEnforcement: z.enum(ContestDeadlineEnforcement, {
       error: () => ({ message: 'Quy định nộp muộn là bắt buộc' }),
+    }),
+    submissionStrategy: z.enum(ContestSubmissionStrategy, {
+      error: () => ({ message: 'Chiến lược nộp bài là bắt buộc' }),
     }),
     isHasDurationMinutes: z.any().optional(),
     durationMinutes: z.any().optional(),
@@ -169,6 +189,7 @@ export const initialContestData: Contest = {
   startTime: '',
   endTime: '',
   deadlineEnforcement: ContestDeadlineEnforcement.STRICT,
+  submissionStrategy: ContestSubmissionStrategy.SINGLE_SUBMISSION,
   isHasDurationMinutes: false,
   problems: [],
 };
