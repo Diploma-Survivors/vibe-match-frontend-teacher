@@ -58,6 +58,12 @@ async function getProblemDetail(
   return await clientApi.get(`/problems/${problemId}/detail`);
 }
 
+async function getProblemById(
+  problemId: number
+): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
+  return await clientApi.get(`/problems/${problemId}`);
+}
+
 function mapProblemToDTO(problem: ProblemData): CreateProblemRequest {
   const { tags, topics, testcase, ...rest } = problem;
   return {
@@ -83,5 +89,6 @@ export const ProblemsService = {
   createProblem,
   mapProblemToDTO,
   getProblemDetail,
+  getProblemById,
   mapProblemDataResponseToProblemData,
 };
