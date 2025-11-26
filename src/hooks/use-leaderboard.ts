@@ -25,7 +25,7 @@ export function useLeaderboard(contestId: string) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [request, setRequest] = useState<LeaderboardRequest>({
     contestId,
-    first: 1,
+    first: 100,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

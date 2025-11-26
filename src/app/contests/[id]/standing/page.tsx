@@ -1,6 +1,7 @@
 'use client';
 
 import { StandingFilter } from '@/components/contests/tabs/standing/standing-filter';
+import { StandingSkeleton } from '@/components/contests/tabs/standing/standing-skeleton';
 import { StandingTable } from '@/components/contests/tabs/standing/standing-table';
 import { useLeaderboard } from '@/hooks/use-leaderboard';
 import { useParams } from 'next/navigation';
@@ -23,14 +24,7 @@ export default function ContestStandingPage() {
   } = useLeaderboard(contestId);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4" />
-          <p className="text-gray-600">Đang tải bảng xếp hạng...</p>
-        </div>
-      </div>
-    );
+    return <StandingSkeleton />;
   }
 
   if (error || !data) {
