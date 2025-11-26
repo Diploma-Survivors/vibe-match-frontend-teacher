@@ -98,12 +98,12 @@ export function StandingTable({
                   {/* Total Score */}
                   <TableCell className="text-center border-r border-gray-300 py-3">
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-bold text-gray-900 text-sm">
-                        {node.totalScore % 1 === 0
-                          ? node.totalScore.toFixed(0)
-                          : node.totalScore.toFixed(2)}
+                      <span className="font-bold text-gray-900 text-base">
+                        {node.finalScore % 1 === 0
+                          ? node.finalScore.toFixed(0)
+                          : node.finalScore.toFixed(2)}
                       </span>
-                      <span className="text-xs text-gray-600 font-mono">
+                      <span className="text-sm text-gray-600 font-mono">
                         {node.totalTime}
                       </span>
                     </div>
@@ -115,34 +115,33 @@ export function StandingTable({
                       key={result.problemId}
                       className="text-center p-0 border-r border-gray-300 last:border-r-0"
                     >
-                      {result.status === 'ACCEPTED' ? (
-                        <div
-                          className="flex flex-col items-center justify-center text-gray-800 font-semibold py-2 min-h-[60px]"
-                          style={{ backgroundColor: 'rgb(183, 249, 147)' }}
-                        >
-                          <span className="text-sm leading-tight">
+                      {result.status === 'SOLVED' ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center font-bold min-h-[60px] py-3">
+                          <span className="text-base leading-tight text-green-600">
                             {result.score % 1 === 0
                               ? result.score.toFixed(0)
                               : result.score.toFixed(2)}
                           </span>
-                          <span className="text-[10px] text-gray-700 opacity-90 mt-0.5 font-normal">
+                          <span className="text-xs text-green-600 opacity-80 mt-1 font-semibold">
                             {result.time}
                           </span>
                         </div>
-                      ) : result.status === 'NOT_ACCEPTED' ? (
-                        <div className="flex flex-col items-center justify-center text-gray-800 py-2 min-h-[60px]">
-                          <span className="text-sm leading-tight">
+                      ) : result.status === 'UNSOLVED' ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center min-h-[60px] py-3">
+                          <span className="text-base leading-tight text-gray-600 font-bold">
                             {result.score % 1 === 0
                               ? result.score.toFixed(0)
                               : result.score.toFixed(2)}
                           </span>
-                          <span className="text-[10px] text-gray-700 opacity-90 mt-0.5 font-normal">
+                          <span className="text-xs text-gray-600 opacity-80 mt-1 font-semibold">
                             {result.time}
                           </span>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-center text-gray-300 py-2 min-h-[60px]">
-                          <span className="text-sm">-</span>
+                        <div className="w-full h-full flex items-center justify-center min-h-[60px] py-3">
+                          <span className="text-base text-gray-400 font-bold">
+                            -
+                          </span>
                         </div>
                       )}
                     </TableCell>

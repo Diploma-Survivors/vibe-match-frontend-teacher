@@ -48,8 +48,15 @@ async function getContestLeaderboard(
   const { contestId, filters, ...restParams } = request;
   const url = `/contests/${contestId}/leaderboard`;
 
-  // Build params with nested filters structure
-  const params: Record<string, any> = { ...restParams };
+  // Build params with nested filters structure, excluding undefined values
+  const params: Record<string, any> = {};
+
+  // Only add defined values from restParams
+  for (const [key, value] of Object.entries(restParams)) {
+    if (value !== undefined) {
+      params[key] = value;
+    }
+  }
 
   if (filters?.username) {
     params['filters.username'] = filters.username;

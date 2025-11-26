@@ -6,30 +6,45 @@ import { useState } from 'react';
 
 interface StandingFilterProps {
   onFilterChange: (filters: {
-    keyword: string;
+    username: string;
     sortOrder: 'asc' | 'desc';
   }) => void;
+  initialUsername?: string;
+  initialSortOrder?: 'asc' | 'desc';
 }
 
-export function StandingFilter({ onFilterChange }: StandingFilterProps) {
-  const [keyword, setKeyword] = useState('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+export function StandingFilter({
+  onFilterChange,
+  initialUsername = '',
+  initialSortOrder = 'asc',
+}: StandingFilterProps) {
+  const [username, setUsername] = useState(initialUsername);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialSortOrder);
 
-  const handleKeywordChange = (value: string) => {
-    setKeyword(value);
-    onFilterChange({ keyword: value, sortOrder });
+  const handleSearch = () => {
+    onFilterChange({ username, sortOrder });
+  };
+
+  const handleUsernameChange = (value: string) => {
+    setUsername(value);
   };
 
   const handleSortOrderChange = (value: string) => {
     const order = value as 'asc' | 'desc';
     setSortOrder(order);
-    onFilterChange({ keyword, sortOrder: order });
+    onFilterChange({ username, sortOrder: order });
   };
 
   const handleClearFilters = () => {
-    setKeyword('');
+    setUsername('');
     setSortOrder('asc');
-    onFilterChange({ keyword: '', sortOrder: 'asc' });
+    onFilterChange({ username: '', sortOrder: 'asc' });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -39,24 +54,36 @@ export function StandingFilter({ onFilterChange }: StandingFilterProps) {
         <span className="text-base font-bold text-gray-900">Lọc:</span>
 
         {/* Search by username */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            type="text"
-            placeholder="Tìm kiếm tên truy cập..."
-            value={keyword}
-            onChange={(e) => handleKeywordChange(e.target.value)}
-            className="pl-10 pr-8 h-10 text-sm w-72 rounded-lg border border-gray-300"
-          />
-          {keyword && (
-            <button
-              type="button"
-              onClick={() => handleKeywordChange('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Tìm kiếm tên truy cập..."
+              value={username}
+              onChange={(e) => handleUsernameChange(e.target.value)}
+              onKeyPress={handleKeyPress}
+              className="pl-10 pr-8 h-10 text-sm w-72 rounded-lg border border-gray-300"
+            />
+            {username && (
+              <button
+                type="button"
+                onClick={() => handleUsernameChange('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Search Button */}
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="px-4 py-2 h-10 text-sm bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium whitespace-nowrap"
+          >
+            Tìm kiếm
+          </button>
         </div>
 
         {/* Sort order - Title and Arrow button */}
@@ -75,17 +102,6 @@ export function StandingFilter({ onFilterChange }: StandingFilterProps) {
             <ArrowDown className="w-5 h-5" />
           )}
         </button>
-
-        {/* Clear filters button */}
-        {keyword && (
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors whitespace-nowrap h-10 font-medium"
-          >
-            Xóa
-          </button>
-        )}
       </div>
     </div>
   );

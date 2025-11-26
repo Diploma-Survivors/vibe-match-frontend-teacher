@@ -13,13 +13,13 @@ export interface ProblemResult {
   problemId: number;
   score: number;
   time: string;
-  status: 'NOT_ATTEMPTED' | 'NOT_ACCEPTED' | 'ACCEPTED';
+  status: 'SOLVED' | 'UNSOLVED' | 'UNATTEMPTED';
 }
 
 export interface RankingNode {
   rank: number;
   user: LeaderboardUser;
-  totalScore: number;
+  finalScore: number;
   totalTime: string;
   problemResults: ProblemResult[];
 }

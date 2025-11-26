@@ -15,14 +15,17 @@ interface UseLeaderboardReturn {
     sortOrder?: 'asc' | 'desc';
   }) => void;
   refetch: () => Promise<void>;
+  username: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 export function useLeaderboard(contestId: string) {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
+  const [username, setUsername] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [request, setRequest] = useState<LeaderboardRequest>({
     contestId,
-    first: 10,
-    sortOrder: 'asc',
+    first: 1,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -52,6 +55,14 @@ export function useLeaderboard(contestId: string) {
 
   const updateFilters = useCallback(
     (filters: { username?: string; sortOrder?: 'asc' | 'desc' }) => {
+      // Update local state
+      if (filters.username !== undefined) {
+        setUsername(filters.username);
+      }
+      if (filters.sortOrder !== undefined) {
+        setSortOrder(filters.sortOrder);
+      }
+
       setRequest((prev) => ({
         ...prev,
         filters: filters.username ? { username: filters.username } : undefined,
@@ -94,5 +105,7 @@ export function useLeaderboard(contestId: string) {
     loadNext,
     loadPrevious,
     updateFilters,
+    username,
+    sortOrder,
   };
 }
