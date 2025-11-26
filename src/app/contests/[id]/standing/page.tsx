@@ -1,5 +1,6 @@
 'use client';
 
+import { StandingFilter } from '@/components/contests/tabs/standing/standing-filter';
 import { StandingTable } from '@/components/contests/tabs/standing/standing-table';
 import { useLeaderboard } from '@/hooks/use-leaderboard';
 import { useParams } from 'next/navigation';
@@ -16,11 +17,8 @@ export default function ContestStandingPage() {
     hasPreviousPage,
     loadNext,
     loadPrevious,
-  } = useLeaderboard({
-    contestId,
-    first: 10,
-    sortOrder: 'asc',
-  });
+    updateFilters,
+  } = useLeaderboard(contestId);
 
   if (loading) {
     return (
@@ -49,12 +47,19 @@ export default function ContestStandingPage() {
   }
 
   return (
-    <StandingTable
-      data={data}
-      hasNextPage={hasNextPage}
-      hasPreviousPage={hasPreviousPage}
-      onLoadNext={loadNext}
-      onLoadPrevious={loadPrevious}
-    />
+    <>
+      <StandingFilter
+        onFilterChange={({ keyword, sortOrder }) => {
+          updateFilters({ username: keyword, sortOrder });
+        }}
+      />
+      <StandingTable
+        data={data}
+        hasNextPage={hasNextPage}
+        hasPreviousPage={hasPreviousPage}
+        onLoadNext={loadNext}
+        onLoadPrevious={loadPrevious}
+      />
+    </>
   );
 }

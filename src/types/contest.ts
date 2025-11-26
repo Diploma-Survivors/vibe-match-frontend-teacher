@@ -13,8 +13,7 @@ export interface ProblemResult {
   problemId: number;
   score: number;
   time: string;
-  isAccepted: boolean;
-  attempts: number;
+  status: 'NOT_ATTEMPTED' | 'NOT_ACCEPTED' | 'ACCEPTED';
 }
 
 export interface RankingNode {
@@ -41,6 +40,18 @@ export interface Rankings {
   edges: RankingEdge[];
   pageInfos: PageInfo;
   totalCount: number;
+}
+
+export interface LeaderboardRequest {
+  contestId: string;
+  filters?: {
+    username?: string;
+  };
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface LeaderboardResponse {
