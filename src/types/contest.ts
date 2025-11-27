@@ -253,6 +253,73 @@ export const ContestSchema = z
     }
   );
 
+// Submission Overview Types
+export interface SubmissionUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface SubmissionNode {
+  id: number;
+  user: SubmissionUser;
+  startTime: string;
+  endTime: string | null;
+  finalScore: number;
+}
+
+export interface SubmissionEdge {
+  node: SubmissionNode;
+  cursor: string;
+}
+
+export interface SubmissionsOverviewRequest {
+  contestId: string;
+  filters?: {
+    username?: string;
+  };
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface SubmissionsOverviewResponse {
+  edges: SubmissionEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
+
+// Submission Details Types
+export interface SubmissionLanguage {
+  id: number;
+  name: string;
+}
+
+export interface SubmissionDetailNode {
+  id: number;
+  status: string;
+  score: number;
+  runtime: number;
+  memory: number;
+  language: SubmissionLanguage;
+  note: string | null;
+  user: SubmissionUser;
+}
+
+export interface SubmissionDetailEdge {
+  node: SubmissionDetailNode;
+  cursor: string;
+}
+
+export interface SubmissionDetailsResponse {
+  edges: SubmissionDetailEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
+
 export const initialContestData: Contest = {
   name: '',
   description: '',

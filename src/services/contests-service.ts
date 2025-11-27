@@ -6,6 +6,9 @@ import type {
   ContestProblemDTO,
   LeaderboardRequest,
   LeaderboardResponse,
+  SubmissionDetailsResponse,
+  SubmissionsOverviewRequest,
+  SubmissionsOverviewResponse,
 } from '@/types/contest';
 import type { AxiosResponse } from 'axios';
 
@@ -68,10 +71,68 @@ async function getContestLeaderboard(
   return response.data.data;
 }
 
+async function getContestSubmissionsOverview(
+  request: SubmissionsOverviewRequest
+): Promise<SubmissionsOverviewResponse> {
+  const { contestId, filters, ...restParams } = request;
+  const url = `/contests/${contestId}/submissions/overview`;
+
+  // Build params with nested filters structure, excluding undefined values
+  const params: Record<string, any> = {};
+
+  // Only add defined values from restParams
+  for (const [key, value] of Object.entries(restParams)) {
+    if (value !== undefined) {
+      params[key] = value;
+    }
+  }
+
+  if (filters?.username) {
+    params['filters.username'] = filters.username;
+  }
+
+  const response = await clientApi.get<
+    ApiResponse<SubmissionsOverviewResponse>
+  >(url, {
+    params,
+  });
+  return response.data.data;
+}
+
+async function getSubmissionDetails(
+  contestParticipationId: number,
+  problemId: number,
+  params?: {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+    sortOrder?: 'asc' | 'desc';
+  }
+): Promise<SubmissionDetailsResponse> {
+  const url = `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}`;
+
+  const response = await clientApi.get<ApiResponse<SubmissionDetailsResponse>>(
+    url,
+    {
+      params,
+    }
+  );
+  return response.data.data;
+}
+
+async function getSubmissionById(submissionId: string) {
+  const response = await clientApi.get(`/submissions/${submissionId}`);
+  return response.data.data;
+}
+
 export const ContestsService = {
   createContest,
   mapContestToDTO,
   getContestById,
   updateContest,
   getContestLeaderboard,
+  getContestSubmissionsOverview,
+  getSubmissionDetails,
+  getSubmissionById,
 };
