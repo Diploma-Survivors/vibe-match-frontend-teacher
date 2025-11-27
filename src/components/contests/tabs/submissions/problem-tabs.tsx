@@ -15,7 +15,7 @@ export function ProblemTabs({
   onSelectProblem,
 }: ProblemTabsProps) {
   return (
-    <div className="border-b bg-white sticky top-0 z-10">
+    <div className="border-b border-slate-200 bg-white sticky top-0 z-10">
       <div className="flex items-center justify-center gap-3 px-4 h-12">
         <div className="flex items-center gap-2 max-w-[640px] w-full justify-center mx-auto">
           {problems.map((p) => (

@@ -297,17 +297,17 @@ export default function ContestSubmissionsPage() {
                         ) : selectedSubmissionDetail ? (
                           <>
                             {/* Back button */}
-                            <div className="mb-4">
+                            <div className="mb-2">
                               <button
                                 type="button"
                                 onClick={() => {
                                   setSelectedSubmissionId(null);
                                   setSelectedSubmissionDetail(null);
                                 }}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                className="flex items-center gap-1.5 px-2 py-1.5 text-base font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all duration-200 cursor-pointer"
                               >
                                 <svg
-                                  className="w-4 h-4"
+                                  className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"

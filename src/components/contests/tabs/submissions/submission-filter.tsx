@@ -33,7 +33,7 @@ export function SubmissionFilter({
   };
 
   return (
-    <div className="flex gap-2 p-4 border-b border-slate-200 bg-white">
+    <div className="flex gap-2 p-4 bg-white">
       <div className="flex-1 flex gap-2">
         <div className="relative flex-1">
           <Input

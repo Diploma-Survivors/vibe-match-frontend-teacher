@@ -108,7 +108,7 @@ export function SubmissionDetailForStudent({
       <div className="pr-3 h-full">
         <div
           ref={scrollRef}
-          className={`rounded-xl border border-slate-200 bg-white h-full overflow-y-auto scrollbar-on-scroll ${isScrolling ? 'scrolling' : ''}`}
+          className={`rounded-xl bg-white h-full overflow-y-auto scrollbar-on-scroll ${isScrolling ? 'scrolling' : ''}`}
         >
           <div className="p-8 space-y-7">
             {/* Status */}
