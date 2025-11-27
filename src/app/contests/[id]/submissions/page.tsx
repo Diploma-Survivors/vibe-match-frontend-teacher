@@ -1,11 +1,8 @@
 'use client';
 
-import { CodeViewer } from '@/components/contests/tabs/submissions/code-viewer';
 import { ProblemTabs } from '@/components/contests/tabs/submissions/problem-tabs';
-import { StatsGrid } from '@/components/contests/tabs/submissions/stats-grid';
-import { StatusBadge } from '@/components/contests/tabs/submissions/status-badge';
 import { StudentTable } from '@/components/contests/tabs/submissions/student-table';
-import { SubmissionDetail } from '@/components/contests/tabs/submissions/submission-detail';
+import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail-for-student';
 import { SubmissionFilter } from '@/components/contests/tabs/submissions/submission-filter';
 import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-history-list';
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
@@ -328,43 +325,26 @@ export default function ContestSubmissionsPage() {
                               </button>
                             </div>
 
-                            {/* Submission Detail Content (without ProblemTabs) */}
+                            {/* Submission Detail Content */}
                             <div className="flex-1 overflow-hidden">
-                              <div className="h-full pr-3">
-                                <div className="rounded-xl border border-slate-200 bg-white h-full overflow-y-auto">
-                                  <div className="p-8 space-y-8">
-                                    <StatusBadge
-                                      status={selectedSubmissionDetail.status}
-                                      passedTests={
-                                        selectedSubmissionDetail.status ===
-                                        'ACCEPTED'
-                                          ? 20
-                                          : 10
-                                      }
-                                      totalTests={20}
-                                    />
-
-                                    <StatsGrid
-                                      score={selectedSubmissionDetail.score}
-                                      runtimeMs={
-                                        selectedSubmissionDetail.runtime * 1000
-                                      }
-                                      memoryBytes={
-                                        selectedSubmissionDetail.memory * 1024
-                                      }
-                                    />
-
-                                    <CodeViewer
-                                      sourceCode={
-                                        selectedSubmissionDetail.sourceCode
-                                      }
-                                      languageName={
-                                        selectedSubmissionDetail.language.name
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                              </div>
+                              <SubmissionDetailForStudent
+                                submission={{
+                                  id: selectedSubmissionDetail.id,
+                                  status: selectedSubmissionDetail.status,
+                                  score: selectedSubmissionDetail.score,
+                                  runtime: selectedSubmissionDetail.runtime,
+                                  memory: selectedSubmissionDetail.memory,
+                                  language: selectedSubmissionDetail.language,
+                                  sourceCode:
+                                    selectedSubmissionDetail.sourceCode,
+                                  passedTests:
+                                    selectedSubmissionDetail.status ===
+                                    'ACCEPTED'
+                                      ? 20
+                                      : 10,
+                                  totalTests: 20,
+                                }}
+                              />
                             </div>
                           </>
                         ) : (

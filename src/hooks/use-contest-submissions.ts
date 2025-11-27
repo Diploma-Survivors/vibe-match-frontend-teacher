@@ -3,7 +3,7 @@ import type {
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
 } from '@/types/contest';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseContestSubmissionsReturn {
   data: SubmissionsOverviewResponse | null;
@@ -13,11 +13,11 @@ interface UseContestSubmissionsReturn {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   loadMore: () => Promise<void>;
+  refetch: () => Promise<void>;
   updateFilters: (filters: {
     username?: string;
     sortOrder?: 'asc' | 'desc';
   }) => void;
-  refetch: () => Promise<void>;
   username: string;
   sortOrder: 'asc' | 'desc';
 }
@@ -26,16 +26,21 @@ export function useContestSubmissions(
   contestId: string
 ): UseContestSubmissionsReturn {
   const [data, setData] = useState<SubmissionsOverviewResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
   const [username, setUsername] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
   const [request, setRequest] = useState<SubmissionsOverviewRequest>({
     contestId,
     first: 20,
     sortOrder: 'desc',
   });
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+
+  // Use ref to track previous request to avoid infinite loop
+  const prevRequestRef = useRef<string>('');
 
   const fetchSubmissions = useCallback(
     async (isLoadingMore = false) => {
@@ -72,8 +77,12 @@ export function useContestSubmissions(
   );
 
   useEffect(() => {
-    fetchSubmissions(false);
-  }, [fetchSubmissions]);
+    const requestString = JSON.stringify(request);
+    if (prevRequestRef.current !== requestString) {
+      prevRequestRef.current = requestString;
+      fetchSubmissions(false);
+    }
+  }, [request, fetchSubmissions]);
 
   const updateFilters = useCallback(
     (filters: { username?: string; sortOrder?: 'asc' | 'desc' }) => {
