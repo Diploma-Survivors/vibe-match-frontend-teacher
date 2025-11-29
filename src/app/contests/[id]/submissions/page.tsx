@@ -5,6 +5,8 @@ import { StudentTable } from '@/components/contests/tabs/submissions/student-tab
 import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail-for-student';
 import { SubmissionFilter } from '@/components/contests/tabs/submissions/submission-filter';
 import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-history-list';
+import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-history-list-skeleton';
+import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/submissions-skeleton';
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
 import type { ProblemData } from '@/types/problems';
@@ -140,7 +142,7 @@ export default function ContestSubmissionsPage() {
     }
   }, [selectedStudentId, activeProblemId]);
 
-  const handleSelectSubmission = async (submission: any) => {
+  const handleSelectSubmission = useCallback(async (submission: any) => {
     setSelectedSubmissionId(submission.id);
     setSelectedSubmissionDetail(null);
     setLoadingSubmissionDetail(true);
@@ -155,7 +157,7 @@ export default function ContestSubmissionsPage() {
     } finally {
       setLoadingSubmissionDetail(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchSubmissionDetails();
@@ -167,6 +169,13 @@ export default function ContestSubmissionsPage() {
       setActiveProblemId(problems[0].id);
     }
   }, [problems, activeProblemId]);
+
+  // Auto-select first student when students list loads
+  useEffect(() => {
+    if (students.length > 0 && !selectedStudentId) {
+      setSelectedStudentId(students[0].id);
+    }
+  }, [students, selectedStudentId]);
 
   const selectedStudent = useMemo(
     () => students.find((s) => s.id === selectedStudentId) ?? null,
@@ -182,11 +191,7 @@ export default function ContestSubmissionsPage() {
   };
 
   if (loading || loadingProblems) {
-    return (
-      <div className="h-[calc(100vh-60px)] flex items-center justify-center">
-        <p className="text-slate-500">Đang tải dữ liệu...</p>
-      </div>
-    );
+    return <SubmissionsSkeleton />;
   }
 
   if (error) {
@@ -266,9 +271,7 @@ export default function ContestSubmissionsPage() {
               {/* Content Area */}
               <div className="flex-1 overflow-hidden">
                 {loadingSubmission ? (
-                  <div className="h-full flex items-center justify-center">
-                    <p className="text-slate-500">Đang tải bài nộp...</p>
-                  </div>
+                  <SubmissionHistoryListSkeleton />
                 ) : !submissionDetails || submissionDetails.length === 0 ? (
                   <div className="h-full flex items-center justify-center">
                     <p className="text-slate-500">Chưa có bài nộp.</p>
