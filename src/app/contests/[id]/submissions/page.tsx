@@ -11,6 +11,7 @@ import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
 import type { ProblemData } from '@/types/problems';
 import type { Problem, Student } from '@/types/submissions';
+import { ChevronLeft } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -287,21 +288,7 @@ export default function ContestSubmissionsPage() {
                                 }}
                                 className="flex items-center gap-1.5 px-2 py-1.5 text-base font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all duration-200 cursor-pointer"
                               >
-                                <svg
-                                  className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  aria-hidden="true"
-                                >
-                                  <title>Back arrow</title>
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 19l-7-7 7-7"
-                                  />
-                                </svg>
+                                <ChevronLeft className="w-4 h-4" />
                                 Quay lại danh sách
                               </button>
                             </div>
