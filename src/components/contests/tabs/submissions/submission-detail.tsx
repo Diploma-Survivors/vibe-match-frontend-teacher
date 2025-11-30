@@ -9,8 +9,6 @@ type Problem = {
   title: string;
 };
 
-type SubmissionStatus = 'AC' | 'WA' | 'TLE' | 'CE' | 'RE' | 'Pending';
-
 type SubmissionDetailProps = {
   studentName: string;
   problems: Problem[];
@@ -18,7 +16,7 @@ type SubmissionDetailProps = {
   onSelectProblem: (id: string) => void;
   submission: {
     id: string;
-    status: SubmissionStatus;
+    status: string;
     score: number;
     runtimeSec: number;
     memoryBytes: number;
