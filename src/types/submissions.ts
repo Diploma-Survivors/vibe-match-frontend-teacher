@@ -84,28 +84,6 @@ export interface SubmissionListResponse {
   totalCount: number;
 }
 
-export interface SubmissionDetailData {
-  id: number;
-  status: string;
-  score: number;
-  runtime: number;
-  memory: number;
-  sourceCode: string;
-  createdAt: string;
-  totalTests: number;
-  passedTests: number;
-  language: Language;
-  resultDescription: {
-    message: string;
-  };
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
 // Map language names to Highlight.js language keys
 export const languageMap: Record<string, string> = {
   'C++': 'cpp',
@@ -124,17 +102,6 @@ export interface Problem {
   title: string;
 }
 
-export interface Submission {
-  problemId: string;
-  status: 'AC' | 'WA' | 'TLE' | 'CE' | 'RE' | 'Pending';
-  score: number;
-  language: string;
-  timeMs: number;
-  memoryKb: number;
-  submittedAt: string;
-  code: string;
-}
-
 export interface StudentSubmissionOverview {
   id: number;
   user: {
@@ -146,4 +113,17 @@ export interface StudentSubmissionOverview {
   startTime: string;
   endTime: string | null;
   finalScore: number | null;
+}
+
+export interface SubmissionDetail {
+  id: string;
+  status: string;
+  score: number;
+  runtimeSec: number;
+  memoryBytes: number;
+  languageName: string;
+  sourceCode: string;
+  passedTests: number;
+  totalTests: number;
+  submittedAt: string;
 }

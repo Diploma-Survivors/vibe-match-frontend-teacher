@@ -1,31 +1,19 @@
+import type {
+  Problem,
+  SubmissionDetail as SubmissionDetailType,
+} from '@/types/submissions';
 import { useEffect, useRef, useState } from 'react';
 import { CodeViewer } from './code-viewer';
 import { ProblemTabs } from './problem-tabs';
 import { StatsGrid } from './stats-grid';
 import { StatusBadge } from './status-badge';
 
-type Problem = {
-  id: string;
-  title: string;
-};
-
 type SubmissionDetailProps = {
   studentName: string;
   problems: Problem[];
   activeProblemId: string;
   onSelectProblem: (id: string) => void;
-  submission: {
-    id: string;
-    status: string;
-    score: number;
-    runtimeSec: number;
-    memoryBytes: number;
-    languageName: string;
-    sourceCode: string;
-    passedTests: number;
-    totalTests: number;
-    submittedAt: string;
-  };
+  submission: SubmissionDetailType;
 };
 
 export function SubmissionDetail({

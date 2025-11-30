@@ -1,7 +1,4 @@
-type Problem = {
-  id: string;
-  title: string;
-};
+import type { Problem } from '@/types/submissions';
 
 type ProblemTabsProps = {
   problems: Problem[];
