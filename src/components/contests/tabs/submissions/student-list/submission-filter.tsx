@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, SortAsc, SortDesc } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search } from 'lucide-react';
 import { useState } from 'react';
 
 type SubmissionFilterProps = {
@@ -50,23 +50,21 @@ export function SubmissionFilter({
           Tìm kiếm
         </Button>
       </div>
-      <Button
-        onClick={toggleSort}
-        variant="outline"
-        className="flex items-center gap-2"
-      >
-        {sortOrder === 'asc' ? (
-          <>
-            <SortAsc className="h-4 w-4" />
-            Tăng dần
-          </>
-        ) : (
-          <>
-            <SortDesc className="h-4 w-4" />
-            Giảm dần
-          </>
-        )}
-      </Button>
+      <div className="flex items-center gap-2">
+        <span className="text-base font-bold text-gray-900">Sắp xếp:</span>
+        <button
+          type="button"
+          onClick={toggleSort}
+          className="p-2.5 text-white bg-black hover:bg-gray-800 rounded-lg transition-colors font-semibold shadow-md"
+          title={sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
+        >
+          {sortOrder === 'asc' ? (
+            <ArrowUp className="w-5 h-5" />
+          ) : (
+            <ArrowDown className="w-5 h-5" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

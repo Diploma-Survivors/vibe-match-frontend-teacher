@@ -62,7 +62,11 @@ export function StudentTable({
               </TableCell>
               <TableCell className="text-center border-r border-gray-300 py-3 last:border-r-0">
                 <span className="font-bold text-gray-900 text-sm">
-                  {s.totalScore}
+                  {s.totalScore != null
+                    ? s.totalScore % 1 === 0
+                      ? s.totalScore.toFixed(0)
+                      : s.totalScore.toFixed(2)
+                    : '0'}
                 </span>
               </TableCell>
             </TableRow>

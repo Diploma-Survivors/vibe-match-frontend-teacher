@@ -1,12 +1,12 @@
 'use client';
 
-import { ProblemTabs } from '@/components/contests/tabs/submissions/problem-tabs';
-import { StudentTable } from '@/components/contests/tabs/submissions/student-table';
-import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail-for-student';
-import { SubmissionFilter } from '@/components/contests/tabs/submissions/submission-filter';
-import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-history-list';
-import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-history-list-skeleton';
-import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/submissions-skeleton';
+import { ProblemTabs } from '@/components/contests/tabs/submissions/shared/problem-tabs';
+import { StudentTable } from '@/components/contests/tabs/submissions/student-list/student-table';
+import { SubmissionFilter } from '@/components/contests/tabs/submissions/student-list/submission-filter';
+import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/student-list/submissions-skeleton';
+import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail/submission-detail-for-student';
+import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list';
+import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list-skeleton';
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
 import type { ProblemData } from '@/types/problems';
