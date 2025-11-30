@@ -4,7 +4,7 @@ import { ProblemTabs } from '@/components/contests/tabs/submissions/shared/probl
 import { StudentTable } from '@/components/contests/tabs/submissions/student-list/student-table';
 import { SubmissionFilter } from '@/components/contests/tabs/submissions/student-list/submission-filter';
 import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/student-list/submissions-skeleton';
-import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail/submission-detail-for-student';
+import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail/submission-detail';
 import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list';
 import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list-skeleton';
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
