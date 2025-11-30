@@ -10,7 +10,7 @@ import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submis
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
 import type { ProblemData } from '@/types/problems';
-import type { Problem, Student } from '@/types/submissions';
+import type { Problem, StudentSubmissionOverview } from '@/types/submissions';
 import { ChevronLeft } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -63,19 +63,15 @@ export default function ContestSubmissionsPage() {
     fetchContestProblems();
   }, [fetchContestProblems]);
 
-  // Transform API data to Student format
-  const students: Student[] = useMemo(() => {
+  // Extract nodes from API response
+  const students: StudentSubmissionOverview[] = useMemo(() => {
     if (!data?.edges) return [];
-
-    return data.edges.map((edge) => ({
-      id: edge.node.id.toString(),
-      name: `${edge.node.user.lastName} ${edge.node.user.firstName}`,
-      totalScore: edge.node.finalScore,
-      submissions: [], // TODO: Fetch individual submissions when needed
-    }));
+    return data.edges.map((edge) => edge.node);
   }, [data]);
 
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
+    null
+  );
   const [activeProblemId, setActiveProblemId] = useState<string>('');
 
   // Fetch submission list for selected student and problem
@@ -101,7 +97,7 @@ export default function ContestSubmissionsPage() {
     try {
       setLoadingSubmission(true);
       const response = await ContestsService.getSubmissionDetails(
-        Number(selectedStudentId),
+        selectedStudentId,
         Number(activeProblemId),
         { first: 100, sortOrder: 'desc' }
       );
@@ -306,11 +302,9 @@ export default function ContestSubmissionsPage() {
                                   sourceCode:
                                     selectedSubmissionDetail.sourceCode,
                                   passedTests:
-                                    selectedSubmissionDetail.status ===
-                                    'ACCEPTED'
-                                      ? 20
-                                      : 10,
-                                  totalTests: 20,
+                                    selectedSubmissionDetail.passedTests,
+                                  totalTests:
+                                    selectedSubmissionDetail.totalTests,
                                 }}
                               />
                             </div>

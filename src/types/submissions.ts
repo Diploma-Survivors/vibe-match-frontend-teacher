@@ -135,9 +135,15 @@ export interface Submission {
   code: string;
 }
 
-export interface Student {
-  id: string;
-  name: string;
-  totalScore: number;
-  submissions: Submission[];
+export interface StudentSubmissionOverview {
+  id: number;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  startTime: string;
+  endTime: string | null;
+  finalScore: number | null;
 }

@@ -11,7 +11,7 @@ interface ContestNavbarProps {
 }
 
 const navItems = [
-  { id: 'edit', label: 'Chỉnh sửa', icon: FileText },
+  { id: 'edit', label: 'Thông tin', icon: FileText },
   { id: 'stats', label: 'Thống kê', icon: BarChart2 },
   { id: 'standing', label: 'Bảng xếp hạng', icon: Trophy },
   { id: 'submissions', label: 'Các bài nộp', icon: UserPlus },

@@ -34,8 +34,8 @@ export function SubmissionFilter({
 
   return (
     <div className="flex gap-2 p-4 bg-white">
-      <div className="flex-1 flex gap-2">
-        <div className="relative flex-1">
+      <div className="flex gap-2">
+        <div className="relative w-80">
           <Input
             type="text"
             placeholder="Tìm kiếm theo tên sinh viên..."
