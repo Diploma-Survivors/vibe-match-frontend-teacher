@@ -45,7 +45,7 @@ export interface Rankings {
 export interface LeaderboardRequest {
   contestId: string;
   filters?: {
-    username?: string;
+    name?: string;
   };
   first?: number;
   after?: string;

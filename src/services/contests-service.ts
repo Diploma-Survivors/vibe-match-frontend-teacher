@@ -61,8 +61,8 @@ async function getContestLeaderboard(
     }
   }
 
-  if (filters?.username) {
-    params['filters.username'] = filters.username;
+  if (filters?.name) {
+    params['filters.name'] = filters.name;
   }
 
   const response = await clientApi.get<ApiResponse<LeaderboardResponse>>(url, {

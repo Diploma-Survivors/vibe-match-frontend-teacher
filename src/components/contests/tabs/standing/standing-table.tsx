@@ -37,7 +37,7 @@ export function StandingTable({
                 Hạng
               </TableHead>
               <TableHead className="min-w-[240px] font-bold text-sm py-3 pl-4 border-r border-gray-300 border-b border-gray-300 text-white">
-                Tên truy cập
+                Tên
               </TableHead>
               <TableHead className="w-28 text-center font-bold text-sm py-3 border-r border-gray-300 border-b border-gray-300 text-white">
                 Điểm
@@ -87,10 +87,10 @@ export function StandingTable({
                   <TableCell className="border-r border-gray-300 py-3 pl-4">
                     <div className="flex flex-col gap-0.5">
                       <span className="text-base text-gray-800 font-bold">
-                        {node.user.email}
+                        {node.user.firstName} {node.user.lastName}
                       </span>
                       <span className="text-sm text-gray-600 font-bold">
-                        {node.user.firstName} {node.user.lastName}
+                        {node.user.email}
                       </span>
                     </div>
                   </TableCell>

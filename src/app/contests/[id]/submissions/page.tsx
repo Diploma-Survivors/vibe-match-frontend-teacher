@@ -10,32 +10,10 @@ import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/subm
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
 import type { ProblemData } from '@/types/problems';
+import type { Problem, Student } from '@/types/submissions';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-
-type Problem = {
-  id: string;
-  title: string;
-};
-
-type Submission = {
-  problemId: string;
-  status: 'AC' | 'WA' | 'TLE' | 'CE' | 'RE' | 'Pending';
-  score: number;
-  language: string;
-  timeMs: number;
-  memoryKb: number;
-  submittedAt: string;
-  code: string;
-};
-
-type Student = {
-  id: string;
-  name: string;
-  totalScore: number;
-  submissions: Submission[];
-};
 
 export default function ContestSubmissionsPage() {
   const params = useParams();
@@ -259,7 +237,7 @@ export default function ContestSubmissionsPage() {
             </div>
           ) : (
             <>
-              {/* Problem Tabs - Always visible */}
+              {/* Problem Tabs*/}
               <div className="mb-4">
                 <ProblemTabs
                   problems={problems}

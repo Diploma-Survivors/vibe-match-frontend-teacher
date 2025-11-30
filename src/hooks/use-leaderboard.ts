@@ -11,17 +11,17 @@ interface UseLeaderboardReturn {
   loadNext: () => Promise<void>;
   loadPrevious: () => Promise<void>;
   updateFilters: (filters: {
-    username?: string;
+    name?: string;
     sortOrder?: 'asc' | 'desc';
   }) => void;
   refetch: () => Promise<void>;
-  username: string;
+  name: string;
   sortOrder: 'asc' | 'desc';
 }
 
 export function useLeaderboard(contestId: string) {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [request, setRequest] = useState<LeaderboardRequest>({
     contestId,
@@ -54,10 +54,10 @@ export function useLeaderboard(contestId: string) {
   }, [fetchLeaderboard]);
 
   const updateFilters = useCallback(
-    (filters: { username?: string; sortOrder?: 'asc' | 'desc' }) => {
+    (filters: { name?: string; sortOrder?: 'asc' | 'desc' }) => {
       // Update local state
-      if (filters.username !== undefined) {
-        setUsername(filters.username);
+      if (filters.name !== undefined) {
+        setName(filters.name);
       }
       if (filters.sortOrder !== undefined) {
         setSortOrder(filters.sortOrder);
@@ -65,7 +65,7 @@ export function useLeaderboard(contestId: string) {
 
       setRequest((prev) => ({
         ...prev,
-        filters: filters.username ? { username: filters.username } : undefined,
+        filters: filters.name ? { name: filters.name } : undefined,
         sortOrder: filters.sortOrder || prev.sortOrder,
         // Reset pagination when filters change
         after: undefined,
@@ -105,7 +105,7 @@ export function useLeaderboard(contestId: string) {
     loadNext,
     loadPrevious,
     updateFilters,
-    username,
+    name,
     sortOrder,
   };
 }

@@ -6,39 +6,39 @@ import { useState } from 'react';
 
 interface StandingFilterProps {
   onFilterChange: (filters: {
-    username: string;
+    name: string;
     sortOrder: 'asc' | 'desc';
   }) => void;
-  initialUsername?: string;
+  initialName?: string;
   initialSortOrder?: 'asc' | 'desc';
 }
 
 export function StandingFilter({
   onFilterChange,
-  initialUsername = '',
+  initialName = '',
   initialSortOrder = 'asc',
 }: StandingFilterProps) {
-  const [username, setUsername] = useState(initialUsername);
+  const [name, setName] = useState(initialName);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialSortOrder);
 
   const handleSearch = () => {
-    onFilterChange({ username, sortOrder });
+    onFilterChange({ name, sortOrder });
   };
 
-  const handleUsernameChange = (value: string) => {
-    setUsername(value);
+  const handleNameChange = (value: string) => {
+    setName(value);
   };
 
   const handleSortOrderChange = (value: string) => {
     const order = value as 'asc' | 'desc';
     setSortOrder(order);
-    onFilterChange({ username, sortOrder: order });
+    onFilterChange({ name, sortOrder: order });
   };
 
   const handleClearFilters = () => {
-    setUsername('');
+    setName('');
     setSortOrder('asc');
-    onFilterChange({ username: '', sortOrder: 'asc' });
+    onFilterChange({ name: '', sortOrder: 'asc' });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -59,16 +59,16 @@ export function StandingFilter({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder="Tìm kiếm tên truy cập..."
-              value={username}
-              onChange={(e) => handleUsernameChange(e.target.value)}
+              placeholder="Tìm kiếm tên..."
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
               onKeyPress={handleKeyPress}
               className="pl-10 pr-8 h-10 text-sm w-72 rounded-lg border border-gray-300"
             />
-            {username && (
+            {name && (
               <button
                 type="button"
-                onClick={() => handleUsernameChange('')}
+                onClick={() => handleNameChange('')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="w-4 h-4" />

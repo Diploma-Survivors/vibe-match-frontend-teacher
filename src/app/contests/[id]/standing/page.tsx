@@ -19,7 +19,7 @@ export default function ContestStandingPage() {
     loadNext,
     loadPrevious,
     updateFilters,
-    username,
+    name,
     sortOrder,
   } = useLeaderboard(contestId);
 
@@ -45,13 +45,10 @@ export default function ContestStandingPage() {
   return (
     <>
       <StandingFilter
-        initialUsername={username}
+        initialName={name}
         initialSortOrder={sortOrder}
-        onFilterChange={({
-          username: newUsername,
-          sortOrder: newSortOrder,
-        }) => {
-          updateFilters({ username: newUsername, sortOrder: newSortOrder });
+        onFilterChange={({ name: newName, sortOrder: newSortOrder }) => {
+          updateFilters({ name: newName, sortOrder: newSortOrder });
         }}
       />
       <StandingTable
