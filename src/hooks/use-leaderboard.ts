@@ -36,9 +36,6 @@ export function useLeaderboard(contestId: string) {
       setError(null);
 
       const response = await ContestsService.getContestLeaderboard(request);
-      console.log(request);
-      console.log(response);
-
       setData(response);
     } catch (err) {
       setError(
