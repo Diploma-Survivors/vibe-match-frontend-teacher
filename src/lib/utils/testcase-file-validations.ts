@@ -10,7 +10,7 @@ export function validateTestcaseFileFormat(file: File | null): {
   error?: string;
 } {
   if (!file) {
-    return { isValid: false };
+    return { isValid: false, error: 'Không tìm thấy file.' };
   }
 
   const hasValidType = AllowedTypes.includes(file.type);
@@ -29,63 +29,86 @@ export function validateTestcaseFileFormat(file: File | null): {
     )}`,
   };
 }
+
 export function validateTestcaseFileContent(fileContent: string): {
   isValid: boolean;
   error?: string;
+  testcaseCount?: number;
 } {
-  // Trim whitespace from the start and end of the file
-  const lines = fileContent.trim().split('\n');
-
-  // Check 1: Ensure the file is not empty
-  if (lines.length === 0 || (lines.length === 1 && lines[0].trim() === '')) {
+  if (!fileContent || fileContent.trim() === '') {
     return { isValid: false, error: 'File không được để trống.' };
   }
 
-  // Check 2: Validate the test case count
-  const testcaseCount = Number.parseInt(lines[0], 10);
-  if (Number.isNaN(testcaseCount) || testcaseCount <= 0) {
+  // Parse JSON content
+  let testcases: any;
+  try {
+    testcases = JSON.parse(fileContent);
+  } catch (error) {
     return {
       isValid: false,
-      error: 'Dòng đầu tiên phải là một số hợp lệ thể hiện số lượng test case.',
+      error: `File JSON không hợp lệ: ${error instanceof Error ? error.message : 'Parse error'}`,
     };
   }
 
-  // Check 3: Verify the total number of lines
-  const expectedLineCount = 1 + testcaseCount * 3;
-  if (lines.length !== expectedLineCount) {
+  // Check that the parsed content is an array
+  if (!Array.isArray(testcases)) {
     return {
       isValid: false,
-      error: `Số dòng không chính xác. Mong đợi ${expectedLineCount} dòng cho ${testcaseCount} test case, nhưng tìm thấy ${lines.length} dòng.`,
+      error: 'File JSON phải chứa một mảng (array) các test case.',
     };
   }
 
-  // Check 4: Validate each test case block
-  for (let i = 0; i < testcaseCount; i++) {
-    const baseIndex = 1 + i * 3;
-    const name = lines[baseIndex]?.trim();
-    const input = lines[baseIndex + 1]?.trim();
-    const output = lines[baseIndex + 2]?.trim();
+  // Check that there is at least one test case
+  if (testcases.length === 0) {
+    return {
+      isValid: false,
+      error: 'File phải chứa ít nhất một test case.',
+    };
+  }
 
-    if (!name) {
-      return {
-        isValid: false,
-        error: `Test case #${i + 1} bị thiếu tên.`,
-      };
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  for (let i = 0; i < testcases.length; i++) {
+    const testcase = testcases[i];
+    const index = i + 1;
+
+    // Required fields
+    if (!testcase.input && testcase.input !== '') {
+      errors.push(`Test case #${index}: Thiếu field 'input' (bắt buộc).`);
+    } else if (typeof testcase.input !== 'string') {
+      errors.push(`Test case #${index}: Field 'input' phải là string.`);
     }
-    if (!input) {
-      return {
-        isValid: false,
-        error: `Test case '${name}' (Test #${i + 1}) bị thiếu dòng input.`,
-      };
+
+    if (!testcase.output && testcase.output !== '') {
+      errors.push(`Test case #${index}: Thiếu field 'output' (bắt buộc).`);
+    } else if (typeof testcase.output !== 'string') {
+      errors.push(`Test case #${index}: Field 'output' phải là string.`);
+    } else if (testcase.output.trim() === '') {
+      warnings.push(`Test case #${index}: Field 'output' là chuỗi rỗng.`);
     }
-    if (!output) {
-      return {
-        isValid: false,
-        error: `Test case '${name}' (Test #${i + 1}) bị thiếu dòng output.`,
-      };
+
+    // Stop validation if too many errors
+    if (errors.length >= 20) {
+      errors.push('... và có thể còn nhiều lỗi khác.');
+      break;
     }
   }
 
-  // If all checks pass
-  return { isValid: true };
+  // Return results
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      error: `Tìm thấy ${errors.length} lỗi:\n${errors.join('\n')}`,
+    };
+  }
+
+  if (warnings.length > 0) {
+    console.warn('Testcase validation warnings:', warnings);
+  }
+
+  return {
+    isValid: true,
+    testcaseCount: testcases.length,
+  };
 }

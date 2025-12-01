@@ -6,6 +6,7 @@ export interface TestCase {
 }
 
 export interface TestcaseSample {
+  id?: number;
   input: string;
   output: string;
 }
@@ -24,4 +25,9 @@ export interface CreateTestcaseFileResponse {
 export interface CreateTestcaseResponse {
   id: number;
   // Add other fields as returned by backend
+}
+
+export interface TestcaseInput {
+  input: string;
+  output: string;
 }
