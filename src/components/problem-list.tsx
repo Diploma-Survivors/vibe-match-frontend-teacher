@@ -1,20 +1,9 @@
 'use client';
 
 import useProblems from '@/hooks/use-problems';
-import { ProblemsService } from '@/services/problems-service';
-import {
-  type GetProblemListRequest,
-  type PageInfo,
-  type ProblemData,
-  type ProblemEndpointType,
-  type ProblemListResponse,
-  SortBy,
-  SortOrder,
-} from '@/types/problems';
-import { useEffect, useState } from 'react';
+import type { ProblemData, ProblemEndpointType } from '@/types/problems';
 import ProblemFilter from './problem-filters/problem-filter';
 import ProblemTable, { type ProblemTableMode } from './problem-table';
-import SortControls from './sort-controls';
 
 export enum ProblemListMode {
   VIEW = 'view',
@@ -98,18 +87,6 @@ export default function ProblemList({
         {/* Right Content - Problems List */}
         <div className="xl:col-span-3">
           <div className="space-y-6">
-            {/* Controls */}
-            {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-              <div className="flex items-center gap-4">
-                <SortControls
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  onSortByChange={handleSortByChange}
-                  onSortOrderChange={handleSortOrderChange}
-                />
-              </div>
-            </div> */}
-
             {/* Problems Table */}
             {error ? (
               <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 text-center">

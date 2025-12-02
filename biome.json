@@ -13,7 +13,7 @@
         "useSemanticElements": "warn"
       },
       "complexity": {
-        "noStaticOnlyClass": "warn"
+        "noStaticOnlyClass": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "warn",

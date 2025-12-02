@@ -1,12 +1,12 @@
 'use client';
 
 import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
-import ProblemList, { ProblemListMode } from '@/components/problem-list';
 import { Button } from '@/components/ui/button';
-import { LtiService } from '@/services/lti-service';
+import { LtiService, ResourceType } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
-import { type ProblemData, ProblemEndpointType } from '@/types/problems';
-import { Book, ChevronRight, X } from 'lucide-react';
+import { toastService } from '@/services/toasts-service';
+import type { ProblemData } from '@/types/problems';
+import { Book, ChevronRight, FolderKanban, Plus, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -39,7 +39,21 @@ export default function OptionsPage() {
     problem: ProblemData
   ) => {
     try {
-      const response = await LtiService.sendDeepLinkingResponse(problem.id);
+      const response = await LtiService.sendDeepLinkingResponse(
+        ResourceType.CONTEST,
+        problem.id
+      );
+    } catch (error) {
+      console.error('Error sending deep linking response:', error);
+    }
+  };
+
+  const handleProblemManagementSelectForDeepLinkingResponse = async () => {
+    try {
+      await LtiService.sendDeepLinkingResponse(ResourceType.PROBLEM_MANAGEMENT);
+      toastService.success(
+        'Activity đã được tạo thành công và gửi về hệ thống LMS!'
+      );
     } catch (error) {
       console.error('Error sending deep linking response:', error);
     }
@@ -114,10 +128,36 @@ export default function OptionsPage() {
                 </p>
 
                 <Link href="/contests/create" className="w-full block">
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:cursor-pointer hover:from-blue-700 hover:to-indigo-700 text-white">
                     Tạo assignment <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Option 3: Problem Management */}
+          <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl p-6 border border-slate-200/50 dark:border-slate-600/50 hover:shadow-md transition-all duration-200">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <FolderKanban className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
+                  Quản lý bài tập
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                  Xem và chỉnh sửa các bài tập đã tạo
+                </p>
+
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:cursor-pointer hover:from-blue-700 hover:to-indigo-700 text-white"
+                  onClick={handleProblemManagementSelectForDeepLinkingResponse}
+                >
+                  Chọn nội dung quản lý bài tập{' '}
+                  <Plus className="w-4 h-4 ml-1" />
+                </Button>
               </div>
             </div>
           </div>
@@ -125,7 +165,7 @@ export default function OptionsPage() {
       </div>
 
       {/* Problems Selection Modal */}
-      {showProblemModal && (
+      {/*{showProblemModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-8xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-2 border-b border-slate-200 dark:border-slate-700">
@@ -152,7 +192,7 @@ export default function OptionsPage() {
             </div>
           </div>
         </div>
-      )}
+      )}*/}
 
       {/* Problems Detail Modal */}
       {showProblemDetailModal && (
