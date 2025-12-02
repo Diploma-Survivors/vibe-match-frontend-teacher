@@ -74,7 +74,7 @@ export default function SampleTestcases({
         {currentTestCases.map((testCase, index) => {
           return (
             <div
-              key={index}
+              key={testCase.id}
               className="p-4 bg-gradient-to-r from-slate-50/50 to-blue-50/30 dark:from-slate-700/30 dark:to-blue-900/20 rounded-xl border border-slate-200/50 dark:border-slate-600/50 "
               style={{ marginBlockEnd: '1em' }}
             >

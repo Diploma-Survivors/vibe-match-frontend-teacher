@@ -58,6 +58,16 @@ async function getProblemDetail(
   return await clientApi.get(`/problems/${problemId}/detail`);
 }
 
+async function updateProblem(problem: ProblemData) {
+  const mappedProblem = mapProblemToDTO(problem);
+  return await clientApi.patch(`/problems/${problem.id}`, {
+    ...mappedProblem,
+    tagIds: JSON.stringify(mappedProblem.tagIds),
+    topicIds: JSON.stringify(mappedProblem.topicIds),
+    testcaseSamples: JSON.stringify(mappedProblem.testcaseSamples),
+  });
+}
+
 function mapProblemToDTO(problem: ProblemData): CreateProblemRequest {
   const { tags, topics, testcase, ...rest } = problem;
   return {
@@ -84,4 +94,5 @@ export const ProblemsService = {
   mapProblemToDTO,
   getProblemDetail,
   mapProblemDataResponseToProblemData,
+  updateProblem,
 };
