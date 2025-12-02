@@ -1,132 +1,143 @@
 'use client';
 
 import ContestForm, { ContestFormMode } from '@/components/contest-form';
+import ContestDescription from '@/components/contests/tabs/edit/contest-description';
+import ContestEditSkeleton from '@/components/contests/tabs/edit/contest-edit-skeleton';
+import ContestInfo from '@/components/contests/tabs/edit/contest-info';
+import ContestProblemList from '@/components/contests/tabs/edit/contest-problem-list';
+import ContestQuickStats from '@/components/contests/tabs/edit/contest-quick-stats';
 import { Button } from '@/components/ui/button';
+import { ContestsService } from '@/services/contests-service';
+import { toastService } from '@/services/toasts-service';
+import { HttpStatus } from '@/types/api';
 import type { Contest } from '@/types/contest';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-// interface ContestData {
-//   name: string;
-//   description: string;
-//   startTime: string;
-//   endTime: string;
-//   duration: number;
-//   accessRange: string;
-//   problems: string[];
-//   participants?: number;
-//   maxParticipants?: number;
-//   status?: string;
-//   createdBy?: string;
-//   createdAt?: string;
-// }
+import { X } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function EditContestPage() {
-  //   const router = useRouter();
-  //   const params = useParams();
-  //   const contestId = params.id;
+  const params = useParams();
+  const contestId = params.id as string;
 
-  //   const [contestData, setContestData] = useState<Contest | null>(null);
-  //   const [isSaving, setIsSaving] = useState(false);
-  //   const [isLoading, setIsLoading] = useState(true);
+  const [contest, setContest] = useState<Contest | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  //   // Load existing contest data
-  //   useEffect(() => {
-  //     const loadContestData = () => {
-  //       const existingContest = mockContests.find((c) => c.id === contestId);
-  //       if (existingContest) {
-  //         setContestData({
-  //           name: existingContest.name,
-  //           description: existingContest.description,
-  //           startTime: existingContest.startTime,
-  //           endTime: existingContest.endTime,
-  //           durationMinutes: existingContest.durationMinutes,
-  //           problems: [],
-  //           status: existingContest.status,
-  //           createdBy: existingContest.createdBy,
-  //           createdAt: existingContest.createdAt,
-  //         });
-  //       }
-  //       setIsLoading(false);
-  //     };
+  const fetchContestData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await ContestsService.getContestById(contestId);
+      setContest(response?.data?.data);
+    } catch (error) {
+      console.error('Error fetching contest:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [contestId]);
 
-  //     loadContestData();
-  //   }, [contestId]);
+  useEffect(() => {
+    fetchContestData();
+  }, [fetchContestData]);
 
-  //   const handleSave = async (data: Contest) => {
-  //     setIsSaving(true);
-  //     // Simulate saving
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //     console.log('Updating contest:', data);
-  //     setIsSaving(false);
-  //     // Here you would typically save to your backend
-  //     // router.push(`/contests/${contestId}`);
-  //   };
+  const handleSave = async (data: Contest) => {
+    setIsSaving(true);
 
-  //   if (isLoading) {
-  //     return (
-  //       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
-  //         <div className="text-center">
-  //           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-  //           <p className="text-slate-600 dark:text-slate-400">
-  //             Đang tải dữ liệu cuộc thi...
-  //           </p>
-  //         </div>
-  //       </div>
-  //     );
-  //   }
+    try {
+      const contestDTO = ContestsService.mapContestToDTO(data);
+      const response = await ContestsService.updateContest(
+        contestId,
+        contestDTO
+      );
 
-  //   if (!contestData) {
-  //     return (
-  //       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
-  //         <div className="text-center">
-  //           <h1 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-4">
-  //             Không tìm thấy cuộc thi
-  //           </h1>
-  //           <p className="text-slate-500 dark:text-slate-400">
-  //             Cuộc thi với ID "{contestId}" không tồn tại.
-  //           </p>
-  //         </div>
-  //       </div>
-  //     );
-  //   }
+      if (response.data.status === HttpStatus.OK) {
+        toastService.success('Cập nhật cuộc thi thành công!');
+        setShowEditModal(false);
+        // Refresh contest data
+        await fetchContestData();
+      }
+    } catch (error) {
+      toastService.error('Cập nhật cuộc thi không thành công!');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <ContestEditSkeleton />;
+  }
+
+  if (!contest) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-12">
+        <div className="border border-gray-300 p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Không tìm thấy cuộc thi
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  const totalScore = contest.problems.reduce(
+    (sum, p) => sum + (typeof p.score === 'number' ? p.score : 0),
+    0
+  );
 
   return (
-    <div />
-    // <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
-    //   {/* Header */}
-    //   <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/20 dark:border-slate-700/50">
-    //     <div className="container mx-auto px-6 py-6">
-    //       <div className="flex items-center justify-between">
-    //         <div className="flex items-center gap-4">
-    //           <Link href={`/contests/${contestId}`}>
-    //             <Button
-    //               variant="ghost"
-    //               size="sm"
-    //               className="gap-2 text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
-    //             >
-    //               <ArrowLeft className="w-4 h-4" />
-    //               Quay lại chi tiết
-    //             </Button>
-    //           </Link>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
+    <div className="min-h-screen py-6">
+      <div className="w-full px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+            <ContestDescription
+              name={contest.name}
+              description={contest.description}
+              onEditClick={() => setShowEditModal(true)}
+            />
+            <ContestProblemList problems={contest.problems} />
+          </div>
 
-    //   {/* Main Content */}
-    //   <div className="container mx-auto px-6 py-8">
-    //     <ContestForm
-    //       initialData={contestData}
-    //       mode={ContestFormMode.EDIT}
-    //       onSave={handleSave}
-    //       isSaving={isSaving}
-    //       title="Chỉnh sửa cuộc thi"
-    //       subtitle={`ID: ${contestId} - Cập nhật thông tin và cài đặt cuộc thi`}
-    //     />
-    //   </div>
-    // </div>
+          <div className="lg:col-span-4 xl:col-span-3 space-y-6">
+            <ContestInfo contest={contest} />
+            <ContestQuickStats
+              problemCount={contest.problems.length}
+              totalScore={totalScore}
+              durationMinutes={contest.durationMinutes || 0}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Modal */}
+      {showEditModal && contest && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-300 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800">
+                Chỉnh sửa cuộc thi
+              </h2>
+              <Button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                variant="ghost"
+                size="sm"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              <ContestForm
+                initialData={contest}
+                mode={ContestFormMode.EDIT}
+                onSave={handleSave}
+                isSaving={isSaving}
+                title="Chỉnh sửa cuộc thi"
+                subtitle="Cập nhật thông tin và cấu hình cuộc thi"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -29,7 +29,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 const dedicatedPagesPattern =
   process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
-  '/problems/(?:create|[^/]+(?:/(create|edit))?)';
+  '^(?:/problems/(?:create|[^/]+(?:/(create|edit))?)|/contests/(?:create|[^/]+(?:/(?:edit|stats|standing|submissions)))|/options)$';
 
 export function AppProvider({
   children,
@@ -42,7 +42,7 @@ export function AppProvider({
 
   const pathname = usePathname();
 
-  const DEDICATED_PAGES_REGEX = new RegExp(`^${dedicatedPagesPattern}$`);
+  const DEDICATED_PAGES_REGEX = new RegExp(dedicatedPagesPattern);
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
   const shouldHideNavigation =
     issuer === IssuerType.MOODLE && isInDedicatedPages;

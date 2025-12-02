@@ -414,6 +414,11 @@ export default function ContestForm({
                   </p>
                 )}
               </div>
+              {errors.deadlineEnforcement && (
+                <p className="text-sm text-red-500">
+                  {errors.deadlineEnforcement.message}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

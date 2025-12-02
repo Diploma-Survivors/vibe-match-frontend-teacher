@@ -1,6 +1,64 @@
 import { z } from 'zod';
 import type { ProblemData } from './problems';
 
+// Leaderboard Types
+export interface LeaderboardUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface ProblemResult {
+  problemId: number;
+  score: number;
+  time: string;
+  status: 'SOLVED' | 'UNSOLVED' | 'UNATTEMPTED';
+}
+
+export interface RankingNode {
+  rank: number;
+  user: LeaderboardUser;
+  finalScore: number;
+  totalTime: string;
+  problemResults: ProblemResult[];
+}
+
+export interface RankingEdge {
+  node: RankingNode;
+  cursor: string;
+}
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
+export interface Rankings {
+  edges: RankingEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
+
+export interface LeaderboardRequest {
+  contestId: string;
+  filters?: {
+    name?: string;
+  };
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface LeaderboardResponse {
+  problems: ProblemData[];
+  rankings: Rankings;
+}
+
 export interface Contest {
   id?: number;
   name: string;
@@ -55,18 +113,23 @@ export interface ContestFilters {
   accessRange?: string;
 }
 
-export const CONTEST_STATUS_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'chưa bắt đầu', label: 'Chưa bắt đầu' },
-  { value: 'đang diễn ra', label: 'Đang diễn ra' },
-  { value: 'đã kết thúc', label: 'Đã kết thúc' },
-];
-
 export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'public', label: 'Công khai' },
   { value: 'private', label: 'Riêng tư' },
 ];
+
+export const CONTEST_STATUS_COLORS = {
+  upcoming: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
+  ongoing: 'bg-green-100 text-green-800 hover:bg-green-100',
+  finished: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
+};
+
+export const CONTEST_STATUS_LABELS = {
+  upcoming: 'Sắp diễn ra',
+  ongoing: 'Đang diễn ra',
+  finished: 'Đã kết thúc',
+};
 
 export const SUBMISSION_STRATEGY_OPTIONS = [
   {
@@ -189,6 +252,73 @@ export const ContestSchema = z
       path: ['lateDeadline'],
     }
   );
+
+// Submission Overview Types
+export interface SubmissionUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface SubmissionNode {
+  id: number;
+  user: SubmissionUser;
+  startTime: string;
+  endTime: string | null;
+  finalScore: number;
+}
+
+export interface SubmissionEdge {
+  node: SubmissionNode;
+  cursor: string;
+}
+
+export interface SubmissionsOverviewRequest {
+  contestId: string;
+  filters?: {
+    username?: string;
+  };
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface SubmissionsOverviewResponse {
+  edges: SubmissionEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
+
+// Submission Details Types
+export interface SubmissionLanguage {
+  id: number;
+  name: string;
+}
+
+export interface SubmissionDetailNode {
+  id: number;
+  status: string;
+  score: number;
+  runtime: number;
+  memory: number;
+  language: SubmissionLanguage;
+  note: string | null;
+  user: SubmissionUser;
+}
+
+export interface SubmissionDetailEdge {
+  node: SubmissionDetailNode;
+  cursor: string;
+}
+
+export interface SubmissionDetailsResponse {
+  edges: SubmissionDetailEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
+}
 
 export const initialContestData: Contest = {
   name: '',

@@ -58,6 +58,12 @@ async function getProblemDetail(
   return await clientApi.get(`/problems/${problemId}/detail`);
 }
 
+async function getProblemById(
+  problemId: number
+): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
+  return await clientApi.get(`/problems/${problemId}`);
+}
+    
 async function updateProblem(problem: ProblemData) {
   const mappedProblem = mapProblemToDTO(problem);
   return await clientApi.patch(`/problems/${problem.id}`, {
@@ -93,6 +99,7 @@ export const ProblemsService = {
   createProblem,
   mapProblemToDTO,
   getProblemDetail,
+  getProblemById,
   mapProblemDataResponseToProblemData,
   updateProblem,
 };
