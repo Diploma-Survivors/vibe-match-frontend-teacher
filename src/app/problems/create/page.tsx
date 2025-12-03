@@ -3,7 +3,7 @@
 import ProblemForm, { ProblemFormMode } from '@/components/problem-form';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
-import { LtiService } from '@/services/lti-service';
+import { LtiService, ResourceType } from '@/services/lti-service';
 import { ProblemsService } from '@/services/problems-service';
 import type { CreateProblemRequest, ProblemData } from '@/types/problems';
 import { IssuerType } from '@/types/states';
@@ -31,7 +31,10 @@ export default function CreateProblemPage() {
       // Handle deep linking response
       if (issuer === IssuerType.MOODLE && result.id) {
         try {
-          await LtiService.sendDeepLinkingResponse(result.id);
+          await LtiService.sendDeepLinkingResponse(
+            ResourceType.CONTEST,
+            result.id
+          );
         } catch (dlError) {
           console.error('Failed to send deep linking response:', dlError);
         }

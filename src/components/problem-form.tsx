@@ -24,14 +24,9 @@ import type { Tag } from '@/types/tags';
 import type { TestcaseSample } from '@/types/testcases';
 import type { Topic } from '@/types/topics';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, X } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Controller,
-  FieldValues,
-  type SubmitHandler,
-  useForm,
-} from 'react-hook-form';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import CheckBoxList from './checkbox-list';
 import SampleTestcases from './testcases/sample-testcases';
 import TestCaseUploader from './testcases/testcases-uploader';
@@ -69,7 +64,7 @@ export default function ProblemForm({
   const form = useForm<ProblemData>({
     resolver: zodResolver(ProblemSchema),
     mode: 'onTouched',
-    defaultValues: initialData ? initialData : initialProblemData,
+    defaultValues: initialData ?? initialProblemData,
     disabled: isReadOnly,
   });
 
@@ -383,38 +378,40 @@ export default function ProblemForm({
           </div>
 
           {/* Visibility */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Phạm vi <span className="text-red-500">*</span>
-            </label>
-            <Controller
-              name="visibility"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={field.disabled}
-                >
-                  <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
-                    <SelectValue placeholder="Chọn phạm vi" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VISIBILITY_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {mode !== ProblemFormMode.EDIT && (
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                Phạm vi <span className="text-red-500">*</span>
+              </label>
+              <Controller
+                name="visibility"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={field.disabled}
+                  >
+                    <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500">
+                      <SelectValue placeholder="Chọn phạm vi" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VISIBILITY_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.visibility && (
+                <p className="text-sm text-red-500">
+                  {errors.visibility.message}
+                </p>
               )}
-            />
-            {errors.visibility && (
-              <p className="text-sm text-red-500">
-                {errors.visibility.message}
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

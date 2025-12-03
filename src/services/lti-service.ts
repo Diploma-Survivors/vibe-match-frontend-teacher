@@ -4,8 +4,8 @@ import { AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
 
 export enum ResourceType {
-  PROBLEM = 'PROBLEM',
-  CONTEST = 'CONTEST',
+  PROBLEM_MANAGEMENT = 'problem-management',
+  CONTEST = 'contest',
 }
 
 async function getDeviceId(): Promise<string> {
@@ -18,17 +18,25 @@ async function getDeviceId(): Promise<string> {
 
 // Send deep linking response
 async function sendDeepLinkingResponse(
-  resourceId: number,
-  type: ResourceType = ResourceType.PROBLEM
+  type: ResourceType = ResourceType.CONTEST,
+  resourceId?: number
 ): Promise<any> {
   const deviceId = await LtiService.getDeviceId();
 
-  const custom =
-    type === ResourceType.PROBLEM
-      ? { problemId: resourceId }
-      : { contestId: resourceId };
+  let custom: Record<string, any> = {};
+  switch (type) {
+    case ResourceType.CONTEST:
+      custom = { contestId: resourceId };
+      break;
+    case ResourceType.PROBLEM_MANAGEMENT:
+      custom = {};
+      break;
+    default:
+      break;
+  }
 
   const deepLinkResponse = {
+    contentType: type,
     deviceId,
     custom,
   };

@@ -9,7 +9,6 @@ import {
 import { AllowedExtensions, type TestcaseFileResponse } from '@/types/problems';
 import { Download, FileText, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { set } from 'zod';
 
 interface TestCaseUploaderProps {
   value: File | null;
@@ -177,7 +176,7 @@ export default function TestCaseUploader({
                 <FileText className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
               <p className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-                testcases.txt
+                testcases.json
               </p>
               <a
                 href={testCaseResponse.fileUrl}
@@ -206,7 +205,7 @@ export default function TestCaseUploader({
                   Tải lên file test cases
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                  Kéo thả file .txt vào đây hoặc click để chọn file
+                  Kéo thả file .json vào đây hoặc click để chọn file
                 </p>
                 <Button
                   type="button"

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { UserInfo } from './states';
 import type { Tag } from './tags';
-import type { TestCase, TestcaseSample } from './testcases';
+import type { TestcaseSample } from './testcases';
 import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
@@ -185,7 +185,7 @@ export const VISIBILITY_OPTIONS = [
 
 export enum ProblemEndpointType {
   SELECTABLE_FOR_CONTEST = 'selectable-for-contest',
-  SELECTABLE_FOR_ASSIGNMENT = 'selectable-for-assignment',
+  PROBLEM_MANAGEMENT = 'managable/teacher',
   TRAINING = 'training',
 }
 
@@ -281,6 +281,6 @@ export const ProblemSchema = z
     path: ['testcase'],
   });
 
-export const AllowedTypes = ['text/plain'];
+export const AllowedTypes = ['application/json'];
 
-export const AllowedExtensions = ['.txt'];
+export const AllowedExtensions = ['.json'];

@@ -32,8 +32,8 @@ export default function CreateContestPage() {
 
       if (newContestId) {
         const response = await LtiService.sendDeepLinkingResponse(
-          newContestId,
-          ResourceType.CONTEST
+          ResourceType.CONTEST,
+          newContestId
         );
 
         if (response.status === 201) {
