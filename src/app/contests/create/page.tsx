@@ -91,7 +91,7 @@ export default function CreateContestPage() {
           mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
-          title={`Tạo ${activityType === 'contest' ? 'cuộc thi' : 'assignment'} mới`}
+          title={`Tạo ${activityType === 'assignment' ? 'assignment' : 'cuộc thi'} mới`}
           subtitle={
             activityType === 'assignment'
               ? 'Thiết lập thông tin và cấu hình bài tập trên Moodle'
