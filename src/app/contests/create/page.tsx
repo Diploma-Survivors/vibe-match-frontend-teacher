@@ -14,7 +14,9 @@ import { useState } from 'react';
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
-  const { shouldHideNavigation, issuer, activityType } = useApp();
+  const { shouldHideNavigation, issuer } = useApp();
+
+  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
 
   const handleSave = async (data: Contest) => {
     setIsSaving(true);
