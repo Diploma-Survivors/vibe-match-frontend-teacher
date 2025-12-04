@@ -1,3 +1,4 @@
+import DescriptionEditor from '@/components/lexical-editor/lexical-editor';
 import { Button } from '@/components/ui/button';
 import { Edit } from 'lucide-react';
 
@@ -25,7 +26,9 @@ export default function ContestDescription({
           <Edit className="w-4 h-4" />
         </Button>
       </div>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+      <div className="text-gray-600 leading-relaxed">
+        <DescriptionEditor value={description} readOnly={true} />
+      </div>
     </div>
   );
 }

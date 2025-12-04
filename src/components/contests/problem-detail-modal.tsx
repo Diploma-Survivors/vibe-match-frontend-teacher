@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import DescriptionEditor from '../lexical-editor/lexical-editor';
 
 interface ProblemDetailModalProps {
   problemId: number;
@@ -118,10 +119,12 @@ export default function ProblemDetailModal({
                   <h4 className="text-lg font-bold text-gray-800 mb-3">
                     Mô tả bài tập
                   </h4>
-                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {problem.description}
-                    </div>
+                  {/* Wrapper retains the box look and passes text color to editor */}
+                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-700 leading-relaxed">
+                    <DescriptionEditor
+                      value={problem.description}
+                      readOnly={true}
+                    />
                   </div>
                 </div>
               )}
@@ -132,10 +135,11 @@ export default function ProblemDetailModal({
                   <h4 className="text-lg font-bold text-gray-800 mb-3">
                     Mô tả đầu vào
                   </h4>
-                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {problem.inputDescription}
-                    </div>
+                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-700 leading-relaxed">
+                    <DescriptionEditor
+                      value={problem.inputDescription}
+                      readOnly={true}
+                    />
                   </div>
                 </div>
               )}
@@ -146,14 +150,14 @@ export default function ProblemDetailModal({
                   <h4 className="text-lg font-bold text-gray-800 mb-3">
                     Mô tả đầu ra
                   </h4>
-                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {problem.outputDescription}
-                    </div>
+                  <div className="prose max-w-none bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-700 leading-relaxed">
+                    <DescriptionEditor
+                      value={problem.outputDescription}
+                      readOnly={true}
+                    />
                   </div>
                 </div>
               )}
-
               {/* Sample Testcases */}
               {problem.testcaseSamples &&
                 problem.testcaseSamples.length > 0 && (
