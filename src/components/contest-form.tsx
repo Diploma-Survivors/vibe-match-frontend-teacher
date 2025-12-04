@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import DescriptionEditor from './lexical-editor/lexical-editor';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
@@ -286,18 +287,24 @@ export default function ContestForm({
               <Controller
                 name="description"
                 control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    placeholder="Nhập mô tả chi tiết về..."
-                    className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+                render={({ field: { onChange, value } }) => (
+                  // Wrapper div to handle the Red Error Ring styling
+                  <div
+                    className={`rounded-xl ${
                       errors.description
-                        ? 'ring-red-500'
-                        : 'focus:ring-blue-500'
+                        ? 'ring-2 ring-red-500' // Show red ring on error
+                        : 'focus-within:ring-2 focus-within:ring-blue-500' // Optional: Blue ring on focus
                     }`}
-                  />
+                  >
+                    <DescriptionEditor
+                      value={value} // Ensure value is never undefined
+                      onChange={onChange}
+                      readOnly={false}
+                    />
+                  </div>
                 )}
               />
+
               {errors.description && (
                 <p className="text-sm text-red-500">
                   {errors.description.message}
