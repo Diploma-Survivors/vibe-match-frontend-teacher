@@ -30,6 +30,7 @@ import {
   getDifficultyColor,
   getDifficultyLabel,
 } from '@/types/problems';
+import { IssuerType } from '@/types/states';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
@@ -76,7 +77,6 @@ export default function ContestForm({
   title,
   subtitle,
 }: ContestFormProps) {
-  const { activityType } = useApp();
   const [contestData, setContestData] = useState<Contest>(
     initialData ? initialData : initialContestData
   );
@@ -93,6 +93,8 @@ export default function ContestForm({
   const [pendingProblems, setPendingProblems] = useState<ProblemData[]>([]);
 
   const isReadOnly = mode === ContestFormMode.VIEW;
+  const { issuer } = useApp();
+  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
 
   const form = useForm<Contest>({
     resolver: zodResolver(ContestSchema),

@@ -23,7 +23,6 @@ interface AppContextType {
   isInDedicatedPages: boolean;
   shouldHideNavigation: boolean;
   isLoading: boolean;
-  activityType: 'contest' | 'assignment';
   clearUserData: () => void;
 }
 
@@ -47,7 +46,6 @@ export function AppProvider({
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
   const shouldHideNavigation =
     issuer === IssuerType.MOODLE && isInDedicatedPages;
-  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
 
   const clearUserData = () => {
     setUser(null);
@@ -60,7 +58,6 @@ export function AppProvider({
     isInDedicatedPages,
     shouldHideNavigation,
     isLoading,
-    activityType,
     clearUserData,
   };
 
