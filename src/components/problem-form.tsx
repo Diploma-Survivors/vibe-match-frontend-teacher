@@ -28,6 +28,7 @@ import { Save } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import CheckBoxList from './checkbox-list';
+import DescriptionEditor from './lexical-editor/lexical-editor';
 import SampleTestcases from './testcases/sample-testcases';
 import TestCaseUploader from './testcases/testcases-uploader';
 
@@ -168,15 +169,20 @@ export default function ProblemForm({
             <Controller
               name="description"
               control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  disabled={isReadOnly}
-                  placeholder="Nhập mô tả chi tiết về bài tập..."
-                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
-                    errors.description ? 'ring-red-500' : 'focus:ring-blue-500'
+              render={({ field: { onChange, value } }) => (
+                <div
+                  className={`rounded-xl ${
+                    errors.description
+                      ? 'ring-2 ring-red-500'
+                      : 'focus-within:ring-2 focus-within:ring-blue-500'
                   }`}
-                />
+                >
+                  <DescriptionEditor
+                    value={value || ''}
+                    onChange={onChange}
+                    readOnly={isReadOnly}
+                  />
+                </div>
               )}
             />
             {errors.description && (
@@ -194,16 +200,20 @@ export default function ProblemForm({
             <Controller
               name="inputDescription"
               control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  placeholder="Nhập mô tả đầu vào..."
-                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+              render={({ field: { onChange, value } }) => (
+                <div
+                  className={`rounded-xl ${
                     errors.inputDescription
-                      ? 'ring-red-500'
-                      : 'focus:ring-blue-500'
+                      ? 'ring-2 ring-red-500'
+                      : 'focus-within:ring-2 focus-within:ring-blue-500'
                   }`}
-                />
+                >
+                  <DescriptionEditor
+                    value={value || ''}
+                    onChange={onChange}
+                    readOnly={isReadOnly}
+                  />
+                </div>
               )}
             />
             {errors.inputDescription && (
@@ -221,16 +231,20 @@ export default function ProblemForm({
             <Controller
               name="outputDescription"
               control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  placeholder="Nhập mô tả đầu ra..."
-                  className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+              render={({ field: { onChange, value } }) => (
+                <div
+                  className={`rounded-xl ${
                     errors.outputDescription
-                      ? 'ring-red-500'
-                      : 'focus:ring-blue-500'
+                      ? 'ring-2 ring-red-500'
+                      : 'focus-within:ring-2 focus-within:ring-blue-500'
                   }`}
-                />
+                >
+                  <DescriptionEditor
+                    value={value || ''}
+                    onChange={onChange}
+                    readOnly={isReadOnly}
+                  />
+                </div>
               )}
             />
             {errors.outputDescription && (

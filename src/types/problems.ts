@@ -1,3 +1,4 @@
+import { getLexicalTextLength } from '@/lib/utils';
 import { z } from 'zod';
 import type { UserInfo } from './states';
 import type { Tag } from './tags';
@@ -224,23 +225,53 @@ export const ProblemSchema = z
       .min(3, 'Tên bài tập phải có ít nhất 3 ký tự')
       .max(128, 'Tên bài tập không được vượt quá 128 ký tự'),
 
-    description: z
-      .string()
-      .trim()
-      .min(16, 'Mô tả bài tập phải có ít nhất 16 ký tự')
-      .max(512, 'Mô tả bài tập không được vượt quá 512 ký tự'),
+    description: z.string().superRefine((val, ctx) => {
+      const len = getLexicalTextLength(val);
+      if (len < 16) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả bài tập phải có ít nhất 16 ký tự',
+        });
+      }
+      if (len > 512) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả bài tập không được vượt quá 512 ký tự',
+        });
+      }
+    }),
 
-    inputDescription: z
-      .string()
-      .trim()
-      .min(3, 'Mô tả đầu vào phải có ít nhất 3 ký tự')
-      .max(512, 'Mô tả đầu vào không được vượt quá 512 ký tự'),
+    inputDescription: z.string().superRefine((val, ctx) => {
+      const len = getLexicalTextLength(val);
+      if (len < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả đầu vào phải có ít nhất 6 ký tự',
+        });
+      }
+      if (len > 512) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả đầu vào không được vượt quá 512 ký tự',
+        });
+      }
+    }),
 
-    outputDescription: z
-      .string()
-      .trim()
-      .min(1, 'Mô tả đầu ra phải có ít nhất 1 ký tự')
-      .max(512, 'Mô tả đầu ra không được vượt quá 512 ký tự'),
+    outputDescription: z.string().superRefine((val, ctx) => {
+      const len = getLexicalTextLength(val);
+      if (len < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả đầu ra phải có ít nhất 6 ký tự',
+        });
+      }
+      if (len > 512) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả đầu ra không được vượt quá 512 ký tự',
+        });
+      }
+    }),
 
     maxScore: z
       .number('Điểm tối đa phải là số')

@@ -1,3 +1,4 @@
+import { getLexicalTextLength } from '@/lib/utils';
 import { z } from 'zod';
 import type { ProblemData } from './problems';
 
@@ -184,11 +185,23 @@ export const ContestSchema = z
       .trim()
       .min(3, 'Tên cuộc thi phải có ít nhất 3 ký tự')
       .max(100, 'Tên cuộc thi không được vượt quá 100 ký tự'),
-    description: z
-      .string()
-      .trim()
-      .min(10, 'Mô tả cuộc thi phải có ít nhất 10 ký tự')
-      .max(500, 'Mô tả cuộc thi không được vượt quá 500 ký tự'),
+    description: z.string().superRefine((val, ctx) => {
+      const actualLength = getLexicalTextLength(val);
+
+      if (actualLength < 10) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả cuộc thi phải có ít nhất 10 ký tự',
+        });
+      }
+
+      if (actualLength > 500) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Mô tả cuộc thi không được vượt quá 500 ký tự',
+        });
+      }
+    }),
     deadlineEnforcement: z.enum(ContestDeadlineEnforcement, {
       error: () => ({ message: 'Quy định nộp muộn là bắt buộc' }),
     }),

@@ -16,6 +16,8 @@ export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
   const { shouldHideNavigation, issuer } = useApp();
 
+  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
+
   const handleSave = async (data: Contest) => {
     setIsSaving(true);
 
@@ -84,18 +86,14 @@ export default function CreateContestPage() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 max-w-none">
         <ContestForm
           mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
-          title={
-            issuer === IssuerType.MOODLE
-              ? 'Tạo assignment mới'
-              : 'Tạo cuộc thi mới'
-          }
+          title={`Tạo ${activityType === 'assignment' ? 'assignment' : 'cuộc thi'} mới`}
           subtitle={
-            issuer === IssuerType.MOODLE
+            activityType === 'assignment'
               ? 'Thiết lập thông tin và cấu hình bài tập trên Moodle'
               : 'Thiết lập thông tin và cấu hình cuộc thi lập trình'
           }

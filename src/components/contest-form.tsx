@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useApp } from '@/contexts/app-context';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { HttpStatus } from '@/types/api';
@@ -29,6 +30,7 @@ import {
   getDifficultyColor,
   getDifficultyLabel,
 } from '@/types/problems';
+import { IssuerType } from '@/types/states';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
@@ -45,10 +47,12 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import DescriptionEditor from './lexical-editor/lexical-editor';
 import ProblemForm, { ProblemFormMode } from './problem-form';
 import ProblemList, { ProblemListMode } from './problem-list';
 import ProblemScoreModal from './problem-score-modal';
 import AppLocalizationProvider from './providers/localization-provider';
+import { Tooltip } from './ui/tooltip';
 
 export enum ContestFormMode {
   CREATE = 'create',
@@ -89,6 +93,8 @@ export default function ContestForm({
   const [pendingProblems, setPendingProblems] = useState<ProblemData[]>([]);
 
   const isReadOnly = mode === ContestFormMode.VIEW;
+  const { issuer } = useApp();
+  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
 
   const form = useForm<Contest>({
     resolver: zodResolver(ContestSchema),
@@ -283,18 +289,24 @@ export default function ContestForm({
               <Controller
                 name="description"
                 control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    placeholder="Nhập mô tả chi tiết về..."
-                    className={`w-full h-32 p-4 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 resize-none ${
+                render={({ field: { onChange, value } }) => (
+                  // Wrapper div to handle the Red Error Ring styling
+                  <div
+                    className={`rounded-xl ${
                       errors.description
-                        ? 'ring-red-500'
-                        : 'focus:ring-blue-500'
+                        ? 'ring-2 ring-red-500' // Show red ring on error
+                        : 'focus-within:ring-2 focus-within:ring-blue-500' // Optional: Blue ring on focus
                     }`}
-                  />
+                  >
+                    <DescriptionEditor
+                      value={value} // Ensure value is never undefined
+                      onChange={onChange}
+                      readOnly={false}
+                    />
+                  </div>
                 )}
               />
+
               {errors.description && (
                 <p className="text-sm text-red-500">
                   {errors.description.message}
@@ -304,39 +316,43 @@ export default function ContestForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Submission Strategies */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Chiến lược nộp bài <span className="text-red-500">*</span>
-                </label>
-                <Controller
-                  name="submissionStrategy"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={field.disabled}
-                    >
-                      <SelectTrigger
-                        className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
-                          errors.submissionStrategy
-                            ? 'ring-red-500' // Apply red ring on error
-                            : 'focus:ring-green-500'
-                        }`}
+              <Tooltip
+                content={`Chiến lược nộp bài sẽ được áp dụng cho tất cả các problem trong ${activityType}`}
+              >
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Chiến lược nộp bài <span className="text-red-500">*</span>
+                  </label>
+                  <Controller
+                    name="submissionStrategy"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={field.disabled}
                       >
-                        <SelectValue placeholder="Chọn giới hạn thời gian" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SUBMISSION_STRATEGY_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
+                        <SelectTrigger
+                          className={`h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 ${
+                            errors.submissionStrategy
+                              ? 'ring-red-500' // Apply red ring on error
+                              : 'focus:ring-green-500'
+                          }`}
+                        >
+                          <SelectValue placeholder="Chọn giới hạn thời gian" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SUBMISSION_STRATEGY_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </Tooltip>
               {/* IsHasTimeLimit */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -605,7 +621,7 @@ export default function ContestForm({
                 </div>
                 <p className="text-slate-500 dark:text-slate-400 mb-4">
                   {isReadOnly
-                    ? 'Cuộc thi này chưa có bài tập nào'
+                    ? `${activityType} này chưa có bài tập nào`
                     : 'Chưa có bài tập nào được thêm vào'}
                 </p>
                 {errors.problems && (
