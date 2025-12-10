@@ -3,8 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import { toastService } from '@/services/toasts-service';
-import { Copy } from 'lucide-react';
+import { useAppDispatch } from '@/store/hooks';
+import { toggleVisibility } from '@/store/slides/ai-review-slice';
+import { Copy, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
@@ -54,7 +57,7 @@ const languageMap: Record<string, string> = {
 export function SubmissionDetailForStudent({
   submission,
 }: SubmissionDetailForStudentProps) {
-  console.log(submission);
+  const dispatch = useDispatch();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -114,7 +117,7 @@ export function SubmissionDetailForStudent({
           ref={scrollRef}
           className={`rounded-xl bg-white h-full overflow-y-auto scrollbar-on-scroll ${isScrolling ? 'scrolling' : ''}`}
         >
-          <div className="p-8 space-y-7">
+          <div className="p-8 pt-0 space-y-7">
             {/* Status */}
             {(() => {
               const statusInfo = getStatusMeta(submission.status);
@@ -122,16 +125,29 @@ export function SubmissionDetailForStudent({
               const totalTests = submission.totalTests || 0;
 
               return (
-                <div className={`p-5 rounded-lg border ${statusInfo.color}`}>
-                  <div className="flex items-center gap-3 text-lg font-semibold">
-                    <span className={statusInfo.iconColor}>
-                      {statusInfo.icon}
-                    </span>
-                    <span>{statusInfo.label}</span>
+                <div
+                  className={`flex justify-between p-5 rounded-lg border ${statusInfo.color}`}
+                >
+                  <div>
+                    <div className="flex items-center gap-3 text-lg font-semibold">
+                      <span className={statusInfo.iconColor}>
+                        {statusInfo.icon}
+                      </span>
+                      <span>{statusInfo.label}</span>
+                    </div>
+                    <div className="text-slate-600 mt-2">
+                      {passedTests}/{totalTests} test cases passed
+                    </div>
                   </div>
-                  <div className="text-slate-600 mt-2">
-                    {passedTests}/{totalTests} test cases passed
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => dispatch(toggleVisibility())}
+                    className="gap-2 text-yellow-600 border-yellow-200 hover:bg-yellow-50 dark:text-yellow-400 dark:border-yellow-900 dark:hover:bg-yellow-900/20"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Đánh giá với AI
+                  </Button>
                 </div>
               );
             })()}

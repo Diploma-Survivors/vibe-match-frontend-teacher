@@ -1,5 +1,6 @@
 'use client';
 
+import AIReviewPanel from '@/components/ai-review-panel';
 import { ProblemTabs } from '@/components/contests/tabs/submissions/shared/problem-tabs';
 import { StudentTable } from '@/components/contests/tabs/submissions/student-list/student-table';
 import { SubmissionFilter } from '@/components/contests/tabs/submissions/student-list/submission-filter';
@@ -9,15 +10,19 @@ import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/su
 import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list-skeleton';
 import { useContestSubmissions } from '@/hooks/use-contest-submissions';
 import { ContestsService } from '@/services/contests-service';
+import type { RootState } from '@/store';
+import { toggleVisibility } from '@/store/slides/ai-review-slice';
 import type { ProblemData } from '@/types/problems';
 import type { Problem, StudentSubmissionOverview } from '@/types/submissions';
 import { ChevronLeft } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function ContestSubmissionsPage() {
   const params = useParams();
+  const dispatch = useDispatch();
   const contestId = params.id as string;
 
   // Fetch submissions data from API
@@ -36,6 +41,10 @@ export default function ContestSubmissionsPage() {
   // Fetch contest problems from API
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loadingProblems, setLoadingProblems] = useState(true);
+
+  const { isVisible: isAIReviewVisible } = useSelector(
+    (state: RootState) => state.aiReview
+  );
 
   const fetchContestProblems = useCallback(async () => {
     try {
@@ -178,56 +187,70 @@ export default function ContestSubmissionsPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-60px)] flex">
+    <div className="h-[calc(100vh-60px)] flex gap-1">
       {/* Left: Students list */}
-      <div className="w-1/2 border-r border-slate-200">
-        <div className="h-full flex flex-col">
-          <SubmissionFilter
-            onSearch={handleSearch}
-            onSortChange={handleSortChange}
-            sortOrder={sortOrder}
-            searchKeyword={username}
-          />
-          <div className="flex-1 overflow-hidden">
-            <div id="scrollableDiv" className="h-full overflow-auto p-4">
-              <div className="border border-slate-200 bg-white overflow-hidden">
-                <InfiniteScroll
-                  dataLength={students.length}
-                  next={loadMore}
-                  hasMore={hasNextPage}
-                  loader={
-                    <div className="p-4 text-center text-slate-500">
-                      Đang tải thêm...
-                    </div>
-                  }
-                  endMessage={
-                    students.length > 0 ? (
-                      <div className="p-4 text-center text-slate-400 border-t border-gray-300">
-                        Đã hiển thị tất cả sinh viên
+      {!isAIReviewVisible ? (
+        <div className="w-1/2 border border-slate-200 rounded-xl">
+          <div className="h-full flex flex-col">
+            <SubmissionFilter
+              onSearch={handleSearch}
+              onSortChange={handleSortChange}
+              sortOrder={sortOrder}
+              searchKeyword={username}
+            />
+            <div className="flex-1 overflow-hidden">
+              <div id="scrollableDiv" className="h-full overflow-auto p-4">
+                <div className="border border-slate-200 rounded-xl bg-white overflow-hidden">
+                  <InfiniteScroll
+                    dataLength={students.length}
+                    next={loadMore}
+                    hasMore={hasNextPage}
+                    loader={
+                      <div className="p-4 text-center text-slate-500">
+                        Đang tải thêm...
                       </div>
-                    ) : (
-                      <div className="p-4 text-center text-slate-400 border-t border-gray-300">
-                        Không có sinh viên nào
-                      </div>
-                    )
-                  }
-                  scrollableTarget="scrollableDiv"
-                >
-                  <StudentTable
-                    students={students}
-                    selectedStudentId={selectedStudentId}
-                    onSelectStudent={setSelectedStudentId}
-                  />
-                </InfiniteScroll>
+                    }
+                    endMessage={
+                      students.length > 0 ? (
+                        <div className="p-4 text-center text-slate-400 border-t border-gray-300">
+                          Đã hiển thị tất cả sinh viên
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-slate-400 border-t border-gray-300">
+                          Không có sinh viên nào
+                        </div>
+                      )
+                    }
+                    scrollableTarget="scrollableDiv"
+                  >
+                    <StudentTable
+                      students={students}
+                      selectedStudentId={selectedStudentId}
+                      onSelectStudent={setSelectedStudentId}
+                    />
+                  </InfiniteScroll>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div
+          // style={{ width: `calc(${100 - detailWidth}% - 6px)` }}
+          className="h-full w-1/2 animate-in slide-in-from-right-10 border border-slate-200 rounded-xl fade-in duration-300"
+        >
+          {selectedSubmissionDetail && (
+            <AIReviewPanel
+              submissionId={selectedSubmissionDetail.id.toString()}
+              sourceCode={selectedSubmissionDetail.sourceCode}
+            />
+          )}
+        </div>
+      )}
 
       {/* Right: Submission detail or list */}
-      <div className="w-1/2">
-        <div className="h-full p-4 flex flex-col">
+      <div className="w-1/2 border border-slate-200 rounded-xl">
+        <div className="h-full p-4 pt-3 flex flex-col">
           {!selectedStudent ? (
             <div className="h-full flex items-center justify-center">
               <p className="text-slate-500">Chọn sinh viên để xem chi tiết</p>
@@ -235,11 +258,16 @@ export default function ContestSubmissionsPage() {
           ) : (
             <>
               {/* Problem Tabs*/}
-              <div className="mb-4">
+              <div className="mb-2">
                 <ProblemTabs
                   problems={problems}
                   activeProblemId={activeProblemId}
-                  onSelectProblem={setActiveProblemId}
+                  onSelectProblem={(problemId: string) => {
+                    if (isAIReviewVisible) {
+                      dispatch(toggleVisibility());
+                    }
+                    setActiveProblemId(problemId);
+                  }}
                 />
               </div>
 
@@ -281,6 +309,9 @@ export default function ContestSubmissionsPage() {
                                 onClick={() => {
                                   setSelectedSubmissionId(null);
                                   setSelectedSubmissionDetail(null);
+                                  if (isAIReviewVisible) {
+                                    dispatch(toggleVisibility());
+                                  }
                                 }}
                                 className="flex items-center gap-1.5 px-2 py-1.5 text-base font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-all duration-200 cursor-pointer"
                               >

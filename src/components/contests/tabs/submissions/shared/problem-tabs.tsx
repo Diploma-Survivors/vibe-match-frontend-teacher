@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import type { Problem } from '@/types/submissions';
 
 type ProblemTabsProps = {
@@ -13,21 +14,21 @@ export function ProblemTabs({
 }: ProblemTabsProps) {
   return (
     <div className="bg-white sticky top-0 z-10">
-      <div className="overflow-x-auto px-4 h-12 flex items-center">
+      <div className="overflow-x-auto h-12 flex items-center">
         <div className="flex items-center gap-2 min-w-max">
           {problems.map((p) => (
-            <button
+            <Button
               type="button"
               key={p.id}
               onClick={() => onSelectProblem(p.id)}
-              className={`px-4 py-2 rounded-none text-sm font-medium whitespace-nowrap transition border ${
+              className={`text-sm bg-green-600 text-white ${
                 activeProblemId === p.id
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                  ? 'hover:bg-green-700 text-white border-slate-900 shadow-sm'
                   : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
               }`}
             >
               {p.title}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
