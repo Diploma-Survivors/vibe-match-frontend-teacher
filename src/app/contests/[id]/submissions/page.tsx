@@ -296,6 +296,7 @@ export default function ContestSubmissionsPage() {
                                   id: selectedSubmissionDetail.id,
                                   status: selectedSubmissionDetail.status,
                                   score: selectedSubmissionDetail.score,
+                                  maxScore: selectedSubmissionDetail.maxScore,
                                   runtime: selectedSubmissionDetail.runtime,
                                   memory: selectedSubmissionDetail.memory,
                                   language: selectedSubmissionDetail.language,

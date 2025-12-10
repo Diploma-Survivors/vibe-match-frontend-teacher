@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
+import { toastService } from '@/services/toasts-service';
 import { Copy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
@@ -12,6 +13,7 @@ interface SubmissionDetailForStudentProps {
     id: number;
     status: string;
     score: number;
+    maxScore: number;
     runtime: number;
     memory: number;
     language: {
@@ -52,6 +54,7 @@ const languageMap: Record<string, string> = {
 export function SubmissionDetailForStudent({
   submission,
 }: SubmissionDetailForStudentProps) {
+  console.log(submission);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -81,6 +84,7 @@ export function SubmissionDetailForStudent({
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(submission.sourceCode);
+    toastService.success('Đã sao chép mã nguồn vào clipboard!');
   };
 
   const getSyntaxLanguage = (languageName: string) => {
@@ -137,7 +141,7 @@ export function SubmissionDetailForStudent({
               <div className="rounded-lg border border-slate-200 p-5">
                 <div className="text-xs text-slate-500">SCORE</div>
                 <div className="text-xl font-semibold">
-                  {submission.score} / 100
+                  {submission.score} / {submission.maxScore}
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 p-5">
