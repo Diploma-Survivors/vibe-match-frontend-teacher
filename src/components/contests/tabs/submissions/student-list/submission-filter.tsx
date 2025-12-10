@@ -33,8 +33,8 @@ export function SubmissionFilter({
   };
 
   return (
-    <div className="flex gap-2 p-4 bg-white">
-      <div className="flex gap-2">
+    <div className="flex gap-2 p-4 pb-0 justify-between">
+      <div className="flex  gap-2">
         <div className="relative w-80">
           <Input
             type="text"
@@ -46,16 +46,20 @@ export function SubmissionFilter({
           />
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         </div>
-        <Button onClick={handleSearch} variant="default">
+        <Button
+          onClick={handleSearch}
+          variant="default"
+          className="text-sm bg-green-600 hover:bg-green-700 text-white"
+        >
           Tìm kiếm
         </Button>
       </div>
       <div className="flex items-center gap-2">
         <span className="text-base font-bold text-gray-900">Sắp xếp:</span>
-        <button
+        <Button
           type="button"
           onClick={toggleSort}
-          className="p-2.5 text-white bg-black hover:bg-gray-800 rounded-lg transition-colors font-semibold shadow-md"
+          className="text-sm bg-green-600 hover:bg-green-700 text-white"
           title={sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
         >
           {sortOrder === 'asc' ? (
@@ -63,7 +67,7 @@ export function SubmissionFilter({
           ) : (
             <ArrowDown className="w-5 h-5" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

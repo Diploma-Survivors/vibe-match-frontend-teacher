@@ -22,14 +22,14 @@ export function StudentTable({
   return (
     <Table className="border-collapse w-full">
       <TableHeader>
-        <TableRow className="bg-gray-700 hover:bg-gray-700">
-          <TableHead className="w-16 text-center font-bold text-sm py-3 sticky left-0 bg-gray-700 z-20 border-r border-gray-300 border-b border-gray-300 text-white last:border-r-0">
+        <TableRow className="bg-gray-50 text-gray-700">
+          <TableHead className="w-16 text-gray-700 text-center font-bold text-sm py-3 sticky left-0 bg-gray-50 z-20 border-r border-gray-300 border-b border-gray-300 last:border-r-0">
             Email
           </TableHead>
-          <TableHead className="min-w-[220px] font-bold text-sm py-3 pl-4 border-r border-gray-300 border-b border-gray-300 text-white last:border-r-0">
+          <TableHead className="min-w-[220px] text-gray-700 font-bold text-sm py-3 pl-4 border-r border-gray-300 border-b border-gray-300 last:border-r-0">
             Sinh viên
           </TableHead>
-          <TableHead className="w-24 text-center font-bold text-sm py-3 border-r border-gray-300 border-b border-gray-300 text-white last:border-r-0">
+          <TableHead className="w-24 text-center text-gray-700 font-bold text-sm py-3 border-r border-gray-300 border-b border-gray-300 last:border-r-0">
             Điểm
           </TableHead>
         </TableRow>

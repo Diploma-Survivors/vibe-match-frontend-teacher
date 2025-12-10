@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from '@/components/providers';
 import { AppProvider } from '@/contexts/app-context';
+import { ReduxProvider } from '@/store/providers';
 import type { IssuerType, UserInfo } from '@/types/states';
 import Dialog from '@mui/material/Dialog';
 import { SessionProvider } from 'next-auth/react';
@@ -24,12 +25,14 @@ export function ClientProvider({
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <DialogProvider>
           <ToastProvider>
-            <AppProvider
-              initialUser={initialUser}
-              initialIssuer={initialIssuer}
-            >
-              {children}
-            </AppProvider>
+            <ReduxProvider>
+              <AppProvider
+                initialUser={initialUser}
+                initialIssuer={initialIssuer}
+              >
+                {children}
+              </AppProvider>
+            </ReduxProvider>
           </ToastProvider>
         </DialogProvider>
       </ThemeProvider>
