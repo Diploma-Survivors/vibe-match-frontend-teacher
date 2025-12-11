@@ -1,16 +1,16 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
+import type { Contest, ContestDTO, ContestProblemDTO } from '@/types/contest';
 import type {
-  Contest,
-  ContestDTO,
-  ContestProblemDTO,
   LeaderboardRequest,
   LeaderboardResponse,
   SortOrder,
+} from '@/types/leaderboard';
+import type {
   SubmissionDetailsResponse,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
-} from '@/types/contest';
+} from '@/types/submissions-overview';
 import type { AxiosResponse } from 'axios';
 
 async function createContest(

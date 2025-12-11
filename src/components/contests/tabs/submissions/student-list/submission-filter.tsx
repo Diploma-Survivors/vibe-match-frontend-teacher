@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { SortOrder } from '@/types/contest';
+import type { SortOrder } from '@/types/submissions-overview';
 import { ArrowDown, ArrowUp, Search, X } from 'lucide-react';
 import { useState } from 'react';
 

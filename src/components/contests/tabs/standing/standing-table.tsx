@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { LeaderboardResponse } from '@/types/contest';
+import type { LeaderboardResponse } from '@/types/leaderboard';
 import { Trophy } from 'lucide-react';
 import { StandingPagination } from './standing-pagination';
 

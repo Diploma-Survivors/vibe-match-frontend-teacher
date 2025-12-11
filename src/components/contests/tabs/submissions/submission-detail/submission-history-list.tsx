@@ -1,4 +1,4 @@
-import type { SubmissionDetailEdge } from '@/types/contest';
+import type { SubmissionDetailEdge } from '@/types/submissions-overview';
 import { Search } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { SubmissionHistoryRow } from './submission-history-row';

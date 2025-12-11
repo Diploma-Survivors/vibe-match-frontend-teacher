@@ -1,4 +1,5 @@
 import { ContestsService } from '@/services/contests-service';
+import { toastService } from '@/services/toasts-service';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseSubmissionHistoryParams {
@@ -50,8 +51,13 @@ export function useSubmissionHistory({
       // Don't auto-select, show list view first
       setSelectedSubmissionId(null);
       setSelectedSubmissionDetail(null);
-    } catch (error) {
+    } catch (err) {
+      const error =
+        err instanceof Error
+          ? err
+          : new Error('Không thể tải danh sách bài nộp');
       console.error('Error fetching submission details:', error);
+      toastService.error(error.message);
       setSubmissionDetails([]);
       setSelectedSubmissionId(null);
       setSelectedSubmissionDetail(null);
@@ -70,8 +76,13 @@ export function useSubmissionHistory({
         submission.id.toString()
       );
       setSelectedSubmissionDetail(response);
-    } catch (error) {
+    } catch (err) {
+      const error =
+        err instanceof Error
+          ? err
+          : new Error('Không thể tải chi tiết bài nộp');
       console.error('Error fetching submission detail:', error);
+      toastService.error(error.message);
     } finally {
       setLoadingSubmissionDetail(false);
     }

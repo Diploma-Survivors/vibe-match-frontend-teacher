@@ -4,7 +4,7 @@ import type {
   LeaderboardRequest,
   LeaderboardResponse,
   SortOrder,
-} from '@/types/contest';
+} from '@/types/leaderboard';
 import { useCallback, useEffect, useState } from 'react';
 
 const PAGE_SIZE = 20;

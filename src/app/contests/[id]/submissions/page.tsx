@@ -120,7 +120,9 @@ export default function ContestSubmissionsPage() {
     updateFilters({ name: keyword });
   };
 
-  const handleSortChange = (order: import('@/types/contest').SortOrder) => {
+  const handleSortChange = (
+    order: import('@/types/submissions-overview').SortOrder
+  ) => {
     updateFilters({ sortOrder: order });
   };
 

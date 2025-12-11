@@ -1,10 +1,11 @@
 import { ContestsService } from '@/services/contests-service';
+import { toastService } from '@/services/toasts-service';
 import type {
   SortOrder,
   SubmissionsFilters,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
-} from '@/types/contest';
+} from '@/types/submissions-overview';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseSubmissionsOverviewReturn {
@@ -50,9 +51,10 @@ export function useSubmissionsOverview(
 
       setData(response);
     } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('Failed to fetch submissions')
-      );
+      const error =
+        err instanceof Error ? err : new Error('Failed to fetch submissions');
+      setError(error);
+      toastService.error(error.message);
     } finally {
       setLoading(false);
     }
