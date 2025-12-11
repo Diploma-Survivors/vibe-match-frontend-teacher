@@ -66,24 +66,34 @@ export function useSubmissionsOverview(
     }
   }, [request, fetchSubmissions]);
 
-  const updateFilters = useCallback((filters: SubmissionsFilters) => {
-    // Update local state
-    if (filters.name !== undefined) {
-      setName(filters.name);
-    }
-    if (filters.sortOrder !== undefined) {
-      setSortOrder(filters.sortOrder);
-    }
+  const updateFilters = useCallback(
+    (filters: SubmissionsFilters) => {
+      // Update local state
+      if (filters.name !== undefined) {
+        setName(filters.name);
+      }
+      if (filters.sortOrder !== undefined) {
+        setSortOrder(filters.sortOrder);
+      }
 
-    setRequest((prev) => ({
-      ...prev,
-      filters: filters.name ? { name: filters.name } : undefined,
-      sortOrder: filters.sortOrder || prev.sortOrder,
-      // Reset pagination when filters change
-      after: undefined,
-      before: undefined,
-    }));
-  }, []);
+      setRequest((prev) => {
+        // Merge new filters with existing ones
+        const newName = filters.name !== undefined ? filters.name : name;
+        const newSortOrder =
+          filters.sortOrder !== undefined ? filters.sortOrder : sortOrder;
+
+        return {
+          ...prev,
+          filters: newName ? { name: newName } : undefined,
+          sortOrder: newSortOrder,
+          // Reset pagination when filters change
+          after: undefined,
+          before: undefined,
+        };
+      });
+    },
+    [name, sortOrder]
+  );
 
   const loadNext = useCallback(async () => {
     if (data?.pageInfos.hasNextPage) {
