@@ -2,6 +2,8 @@ import { ContestsService } from '@/services/contests-service';
 import type { LeaderboardRequest, LeaderboardResponse } from '@/types/contest';
 import { useCallback, useEffect, useState } from 'react';
 
+const PAGE_SIZE = 1;
+
 interface UseLeaderboardReturn {
   data: LeaderboardResponse | null;
   loading: boolean;
@@ -19,13 +21,13 @@ interface UseLeaderboardReturn {
   sortOrder: 'asc' | 'desc';
 }
 
-export function useLeaderboard(contestId: string) {
+export function useLeaderboard(contestId: string): UseLeaderboardReturn {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [name, setName] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [request, setRequest] = useState<LeaderboardRequest>({
     contestId,
-    first: 10,
+    first: PAGE_SIZE,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -78,6 +80,8 @@ export function useLeaderboard(contestId: string) {
         ...prev,
         after: data.rankings.pageInfos.endCursor,
         before: undefined,
+        first: PAGE_SIZE,
+        last: undefined,
       }));
     }
   }, [data]);
@@ -88,6 +92,8 @@ export function useLeaderboard(contestId: string) {
         ...prev,
         before: data.rankings.pageInfos.startCursor,
         after: undefined,
+        first: undefined,
+        last: PAGE_SIZE,
       }));
     }
   }, [data]);
