@@ -8,7 +8,8 @@ import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/stud
 import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail/submission-detail';
 import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list';
 import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list-skeleton';
-import { useContestSubmissions } from '@/hooks/use-contest-submissions';
+import { useSubmissionHistory } from '@/hooks/use-submission-history';
+import { useSubmissionsOverview } from '@/hooks/use-submissions-overview';
 import { ContestsService } from '@/services/contests-service';
 import type { RootState } from '@/store';
 import { toggleVisibility } from '@/store/slides/ai-review-slice';
@@ -29,14 +30,13 @@ export default function ContestSubmissionsPage() {
   const {
     data,
     loading,
-    loadingMore,
     error,
     hasNextPage,
-    loadMore,
+    loadNext,
     updateFilters,
-    username,
+    name,
     sortOrder,
-  } = useContestSubmissions(contestId);
+  } = useSubmissionsOverview(contestId);
 
   // Fetch contest problems from API
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -83,69 +83,19 @@ export default function ContestSubmissionsPage() {
   );
   const [activeProblemId, setActiveProblemId] = useState<string>('');
 
-  // Fetch submission list for selected student and problem
-  const [submissionDetails, setSubmissionDetails] = useState<any[]>([]);
-  const [loadingSubmission, setLoadingSubmission] = useState(false);
-
-  // Selected submission and its detail
-  const [selectedSubmissionId, setSelectedSubmissionId] = useState<
-    number | null
-  >(null);
-  const [selectedSubmissionDetail, setSelectedSubmissionDetail] =
-    useState<any>(null);
-  const [loadingSubmissionDetail, setLoadingSubmissionDetail] = useState(false);
-
-  const fetchSubmissionDetails = useCallback(async () => {
-    if (!selectedStudentId || !activeProblemId) {
-      setSubmissionDetails([]);
-      setSelectedSubmissionId(null);
-      setSelectedSubmissionDetail(null);
-      return;
-    }
-
-    try {
-      setLoadingSubmission(true);
-      const response = await ContestsService.getSubmissionDetails(
-        selectedStudentId,
-        Number(activeProblemId),
-        { first: 100, sortOrder: 'desc' }
-      );
-
-      setSubmissionDetails(response.edges);
-
-      // Don't auto-select, show list view first
-      setSelectedSubmissionId(null);
-      setSelectedSubmissionDetail(null);
-    } catch (error) {
-      console.error('Error fetching submission details:', error);
-      setSubmissionDetails([]);
-      setSelectedSubmissionId(null);
-      setSelectedSubmissionDetail(null);
-    } finally {
-      setLoadingSubmission(false);
-    }
-  }, [selectedStudentId, activeProblemId]);
-
-  const handleSelectSubmission = useCallback(async (submission: any) => {
-    setSelectedSubmissionId(submission.id);
-    setSelectedSubmissionDetail(null);
-    setLoadingSubmissionDetail(true);
-
-    try {
-      const response = await ContestsService.getSubmissionById(
-        submission.id.toString()
-      );
-      setSelectedSubmissionDetail(response);
-    } catch (error) {
-      console.error('Error fetching submission detail:', error);
-    } finally {
-      setLoadingSubmissionDetail(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSubmissionDetails();
-  }, [fetchSubmissionDetails]);
+  // Use custom hook for submission history management
+  const {
+    submissionDetails,
+    loadingSubmission,
+    selectedSubmissionId,
+    selectedSubmissionDetail,
+    loadingSubmissionDetail,
+    handleSelectSubmission,
+    handleBackToList,
+  } = useSubmissionHistory({
+    contestParticipationId: selectedStudentId,
+    problemId: activeProblemId,
+  });
 
   // Update active problem when problems load
   useEffect(() => {
@@ -167,7 +117,7 @@ export default function ContestSubmissionsPage() {
   );
 
   const handleSearch = (keyword: string) => {
-    updateFilters({ username: keyword });
+    updateFilters({ name: keyword });
   };
 
   const handleSortChange = (order: import('@/types/contest').SortOrder) => {
@@ -196,14 +146,14 @@ export default function ContestSubmissionsPage() {
               onSearch={handleSearch}
               onSortChange={handleSortChange}
               sortOrder={sortOrder}
-              searchKeyword={username}
+              searchKeyword={name}
             />
             <div className="flex-1 overflow-hidden">
               <div id="scrollableDiv" className="h-full overflow-auto p-4">
                 <div className="border border-slate-200 rounded-xl bg-white overflow-hidden">
                   <InfiniteScroll
                     dataLength={students.length}
-                    next={loadMore}
+                    next={loadNext}
                     hasMore={hasNextPage}
                     loader={
                       <div className="p-4 text-center text-slate-500">
@@ -307,8 +257,7 @@ export default function ContestSubmissionsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setSelectedSubmissionId(null);
-                                  setSelectedSubmissionDetail(null);
+                                  handleBackToList();
                                   if (isAIReviewVisible) {
                                     dispatch(toggleVisibility());
                                   }

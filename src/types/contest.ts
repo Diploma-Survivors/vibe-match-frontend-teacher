@@ -291,10 +291,15 @@ export interface SubmissionEdge {
   cursor: string;
 }
 
+export interface SubmissionsFilters {
+  name?: string;
+  sortOrder?: SortOrder;
+}
+
 export interface SubmissionsOverviewRequest {
   contestId: string;
   filters?: {
-    username?: string;
+    name?: string;
   };
   first?: number;
   after?: string;

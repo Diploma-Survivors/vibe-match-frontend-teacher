@@ -1,12 +1,13 @@
 import { ContestsService } from '@/services/contests-service';
 import type {
   SortOrder,
+  SubmissionsFilters,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
 } from '@/types/contest';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface UseContestSubmissionsReturn {
+interface UseSubmissionsOverviewReturn {
   data: SubmissionsOverviewResponse | null;
   loading: boolean;
   error: Error | null;
@@ -14,28 +15,25 @@ interface UseContestSubmissionsReturn {
   hasPreviousPage: boolean;
   loadNext: () => Promise<void>;
   loadPrevious: () => Promise<void>;
-  updateFilters: (filters: {
-    username?: string;
-    sortOrder?: SortOrder;
-  }) => void;
+  updateFilters: (filters: SubmissionsFilters) => void;
   refetch: () => Promise<void>;
-  username: string;
+  name: string;
   sortOrder: SortOrder;
 }
 
-export function useContestSubmissions(
+export function useSubmissionsOverview(
   contestId: string
-): UseContestSubmissionsReturn {
+): UseSubmissionsOverviewReturn {
   const [data, setData] = useState<SubmissionsOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const [request, setRequest] = useState<SubmissionsOverviewRequest>({
     contestId,
-    first: 20,
+    first: 10,
     sortOrder: 'desc',
   });
 
@@ -68,27 +66,24 @@ export function useContestSubmissions(
     }
   }, [request, fetchSubmissions]);
 
-  const updateFilters = useCallback(
-    (filters: { username?: string; sortOrder?: SortOrder }) => {
-      // Update local state
-      if (filters.username !== undefined) {
-        setUsername(filters.username);
-      }
-      if (filters.sortOrder !== undefined) {
-        setSortOrder(filters.sortOrder);
-      }
+  const updateFilters = useCallback((filters: SubmissionsFilters) => {
+    // Update local state
+    if (filters.name !== undefined) {
+      setName(filters.name);
+    }
+    if (filters.sortOrder !== undefined) {
+      setSortOrder(filters.sortOrder);
+    }
 
-      setRequest((prev) => ({
-        ...prev,
-        filters: filters.username ? { username: filters.username } : undefined,
-        sortOrder: filters.sortOrder || prev.sortOrder,
-        // Reset pagination when filters change
-        after: undefined,
-        before: undefined,
-      }));
-    },
-    []
-  );
+    setRequest((prev) => ({
+      ...prev,
+      filters: filters.name ? { name: filters.name } : undefined,
+      sortOrder: filters.sortOrder || prev.sortOrder,
+      // Reset pagination when filters change
+      after: undefined,
+      before: undefined,
+    }));
+  }, []);
 
   const loadNext = useCallback(async () => {
     if (data?.pageInfos.hasNextPage) {
@@ -124,7 +119,7 @@ export function useContestSubmissions(
     loadNext,
     loadPrevious,
     updateFilters,
-    username,
+    name,
     sortOrder,
   };
 }
