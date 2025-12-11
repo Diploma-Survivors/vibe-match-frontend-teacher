@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowDown, ArrowUp, Search } from 'lucide-react';
+import type { SortOrder } from '@/types/contest';
+import { ArrowDown, ArrowUp, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
-type SubmissionFilterProps = {
+interface SubmissionFilterProps {
   onSearch: (keyword: string) => void;
-  onSortChange: (order: 'asc' | 'desc') => void;
-  sortOrder: 'asc' | 'desc';
+  onSortChange: (order: SortOrder) => void;
+  sortOrder: SortOrder;
   searchKeyword: string;
-};
+}
 
 export function SubmissionFilter({
   onSearch,

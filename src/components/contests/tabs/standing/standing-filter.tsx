@@ -1,16 +1,15 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import type { SortOrder } from '@/types/contest';
 import { ArrowDown, ArrowUp, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface StandingFilterProps {
-  onFilterChange: (filters: {
-    name: string;
-    sortOrder: 'asc' | 'desc';
-  }) => void;
+  onFilterChange: (filters: { name: string; sortOrder: SortOrder }) => void;
   initialName?: string;
-  initialSortOrder?: 'asc' | 'desc';
+  initialSortOrder?: SortOrder;
 }
 
 export function StandingFilter({
@@ -19,7 +18,7 @@ export function StandingFilter({
   initialSortOrder = 'asc',
 }: StandingFilterProps) {
   const [name, setName] = useState(initialName);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialSortOrder);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(initialSortOrder);
 
   const handleSearch = () => {
     onFilterChange({ name, sortOrder });
@@ -29,8 +28,8 @@ export function StandingFilter({
     setName(value);
   };
 
-  const handleSortOrderChange = (value: string) => {
-    const order = value as 'asc' | 'desc';
+  const handleSortChange = (value: string) => {
+    const order = value as SortOrder;
     setSortOrder(order);
     onFilterChange({ name, sortOrder: order });
   };
@@ -90,9 +89,7 @@ export function StandingFilter({
         <span className="text-base font-bold text-gray-900">Sắp xếp:</span>
         <button
           type="button"
-          onClick={() =>
-            handleSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')
-          }
+          onClick={() => handleSortChange(sortOrder === 'asc' ? 'desc' : 'asc')}
           className="p-2.5 text-white bg-black hover:bg-gray-800 rounded-lg transition-colors font-semibold shadow-md"
           title={sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
         >

@@ -170,7 +170,7 @@ export default function ContestSubmissionsPage() {
     updateFilters({ username: keyword });
   };
 
-  const handleSortChange = (order: 'asc' | 'desc') => {
+  const handleSortChange = (order: import('@/types/contest').SortOrder) => {
     updateFilters({ sortOrder: order });
   };
 

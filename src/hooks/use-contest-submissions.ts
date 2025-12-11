@@ -1,5 +1,6 @@
 import { ContestsService } from '@/services/contests-service';
 import type {
+  SortOrder,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
 } from '@/types/contest';
@@ -8,18 +9,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 interface UseContestSubmissionsReturn {
   data: SubmissionsOverviewResponse | null;
   loading: boolean;
-  loadingMore: boolean;
   error: Error | null;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
-  loadMore: () => Promise<void>;
-  refetch: () => Promise<void>;
+  loadNext: () => Promise<void>;
+  loadPrevious: () => Promise<void>;
   updateFilters: (filters: {
     username?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: SortOrder;
   }) => void;
+  refetch: () => Promise<void>;
   username: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 }
 
 export function useContestSubmissions(
@@ -27,11 +28,10 @@ export function useContestSubmissions(
 ): UseContestSubmissionsReturn {
   const [data, setData] = useState<SubmissionsOverviewResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const [username, setUsername] = useState('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const [request, setRequest] = useState<SubmissionsOverviewRequest>({
     contestId,
@@ -42,50 +42,34 @@ export function useContestSubmissions(
   // Use ref to track previous request to avoid infinite loop
   const prevRequestRef = useRef<string>('');
 
-  const fetchSubmissions = useCallback(
-    async (isLoadingMore = false) => {
-      try {
-        if (isLoadingMore) {
-          setLoadingMore(true);
-        } else {
-          setLoading(true);
-        }
-        setError(null);
+  const fetchSubmissions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const response =
-          await ContestsService.getContestSubmissionsOverview(request);
+      const response =
+        await ContestsService.getContestSubmissionsOverview(request);
 
-        if (isLoadingMore && data) {
-          // Append new data for infinite scroll
-          setData({
-            ...response,
-            edges: [...data.edges, ...response.edges],
-          });
-        } else {
-          setData(response);
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error('Failed to fetch submissions')
-        );
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [request, data]
-  );
+      setData(response);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err : new Error('Failed to fetch submissions')
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [request]);
 
   useEffect(() => {
     const requestString = JSON.stringify(request);
     if (prevRequestRef.current !== requestString) {
       prevRequestRef.current = requestString;
-      fetchSubmissions(false);
+      fetchSubmissions();
     }
   }, [request, fetchSubmissions]);
 
   const updateFilters = useCallback(
-    (filters: { username?: string; sortOrder?: 'asc' | 'desc' }) => {
+    (filters: { username?: string; sortOrder?: SortOrder }) => {
       // Update local state
       if (filters.username !== undefined) {
         setUsername(filters.username);
@@ -106,25 +90,39 @@ export function useContestSubmissions(
     []
   );
 
-  const loadMore = useCallback(async () => {
-    if (data?.pageInfos.hasNextPage && !loadingMore) {
+  const loadNext = useCallback(async () => {
+    if (data?.pageInfos.hasNextPage) {
       setRequest((prev) => ({
         ...prev,
         after: data.pageInfos.endCursor,
         before: undefined,
+        first: 20,
+        last: undefined,
       }));
     }
-  }, [data, loadingMore]);
+  }, [data]);
+
+  const loadPrevious = useCallback(async () => {
+    if (data?.pageInfos.hasPreviousPage) {
+      setRequest((prev) => ({
+        ...prev,
+        before: data.pageInfos.startCursor,
+        after: undefined,
+        first: undefined,
+        last: 20,
+      }));
+    }
+  }, [data]);
 
   return {
     data,
     loading,
-    loadingMore,
     error,
-    refetch: () => fetchSubmissions(false),
+    refetch: fetchSubmissions,
     hasNextPage: data?.pageInfos.hasNextPage ?? false,
     hasPreviousPage: data?.pageInfos.hasPreviousPage ?? false,
-    loadMore,
+    loadNext,
+    loadPrevious,
     updateFilters,
     username,
     sortOrder,

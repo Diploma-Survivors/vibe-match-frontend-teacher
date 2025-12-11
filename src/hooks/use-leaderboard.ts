@@ -1,8 +1,13 @@
 import { ContestsService } from '@/services/contests-service';
-import type { LeaderboardRequest, LeaderboardResponse } from '@/types/contest';
+import type {
+  LeaderboardFilters,
+  LeaderboardRequest,
+  LeaderboardResponse,
+  SortOrder,
+} from '@/types/contest';
 import { useCallback, useEffect, useState } from 'react';
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 20;
 
 interface UseLeaderboardReturn {
   data: LeaderboardResponse | null;
@@ -12,19 +17,16 @@ interface UseLeaderboardReturn {
   hasPreviousPage: boolean;
   loadNext: () => Promise<void>;
   loadPrevious: () => Promise<void>;
-  updateFilters: (filters: {
-    name?: string;
-    sortOrder?: 'asc' | 'desc';
-  }) => void;
+  updateFilters: (filters: LeaderboardFilters) => void;
   refetch: () => Promise<void>;
   name: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 }
 
 export function useLeaderboard(contestId: string): UseLeaderboardReturn {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [name, setName] = useState('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [request, setRequest] = useState<LeaderboardRequest>({
     contestId,
     first: PAGE_SIZE,
@@ -52,27 +54,32 @@ export function useLeaderboard(contestId: string): UseLeaderboardReturn {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
 
-  const updateFilters = useCallback(
-    (filters: { name?: string; sortOrder?: 'asc' | 'desc' }) => {
-      // Update local state
-      if (filters.name !== undefined) {
-        setName(filters.name);
-      }
-      if (filters.sortOrder !== undefined) {
-        setSortOrder(filters.sortOrder);
-      }
+  const updateFilters = useCallback((filters: LeaderboardFilters) => {
+    // Update local state
+    if (filters.name !== undefined) {
+      setName(filters.name);
+    }
+    if (filters.sortOrder !== undefined) {
+      setSortOrder(filters.sortOrder);
+    }
 
-      setRequest((prev) => ({
-        ...prev,
-        filters: filters.name ? { name: filters.name } : undefined,
-        sortOrder: filters.sortOrder || prev.sortOrder,
-        // Reset pagination when filters change
-        after: undefined,
-        before: undefined,
-      }));
-    },
-    []
-  );
+    // Build filters object with both name and sortOrder
+    const hasFilters = filters.name || filters.sortOrder;
+    const newFilters: LeaderboardFilters | undefined = hasFilters
+      ? {
+          ...(filters.name && { name: filters.name }),
+          ...(filters.sortOrder && { sortOrder: filters.sortOrder }),
+        }
+      : undefined;
+
+    setRequest((prev) => ({
+      ...prev,
+      filters: newFilters,
+      // Reset pagination when filters change
+      after: undefined,
+      before: undefined,
+    }));
+  }, []);
 
   const loadNext = useCallback(async () => {
     if (data?.rankings.pageInfos.hasNextPage) {
