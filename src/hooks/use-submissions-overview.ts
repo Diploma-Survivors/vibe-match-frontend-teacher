@@ -2,14 +2,15 @@ import { ContestsService } from '@/services/contests-service';
 import { toastService } from '@/services/toasts-service';
 import type {
   SortOrder,
+  SubmissionNode,
   SubmissionsFilters,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
 } from '@/types/submissions-overview';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface UseSubmissionsOverviewReturn {
-  data: SubmissionsOverviewResponse | null;
+  students: SubmissionNode[];
   loading: boolean;
   error: Error | null;
   hasNextPage: boolean;
@@ -41,7 +42,7 @@ export function useSubmissionsOverview(
   // Use ref to track previous request to avoid infinite loop
   const prevRequestRef = useRef<string>('');
 
-  const fetchSubmissions = useCallback(async () => {
+  const fetchSubmissionsOverview = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -64,9 +65,9 @@ export function useSubmissionsOverview(
     const requestString = JSON.stringify(request);
     if (prevRequestRef.current !== requestString) {
       prevRequestRef.current = requestString;
-      fetchSubmissions();
+      fetchSubmissionsOverview();
     }
-  }, [request, fetchSubmissions]);
+  }, [request, fetchSubmissionsOverview]);
 
   const updateFilters = useCallback(
     (filters: SubmissionsFilters) => {
@@ -121,11 +122,17 @@ export function useSubmissionsOverview(
     }
   }, [data]);
 
+  // Extract students from API response
+  const students = useMemo(() => {
+    if (!data?.edges) return [];
+    return data.edges.map((edge) => edge.node);
+  }, [data]);
+
   return {
-    data,
+    students,
     loading,
     error,
-    refetch: fetchSubmissions,
+    refetch: fetchSubmissionsOverview,
     hasNextPage: data?.pageInfos.hasNextPage ?? false,
     hasPreviousPage: data?.pageInfos.hasPreviousPage ?? false,
     loadNext,

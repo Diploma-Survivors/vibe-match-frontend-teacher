@@ -8,6 +8,7 @@ import { SubmissionsSkeleton } from '@/components/contests/tabs/submissions/stud
 import { SubmissionDetailForStudent } from '@/components/contests/tabs/submissions/submission-detail/submission-detail';
 import { SubmissionHistoryList } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list';
 import { SubmissionHistoryListSkeleton } from '@/components/contests/tabs/submissions/submission-detail/submission-history-list-skeleton';
+import { useProblemsForContest } from '@/hooks/use-problems-for-contest';
 import { useSubmissionHistory } from '@/hooks/use-submission-history';
 import { useSubmissionsOverview } from '@/hooks/use-submissions-overview';
 import { ContestsService } from '@/services/contests-service';
@@ -15,6 +16,7 @@ import type { RootState } from '@/store';
 import { toggleVisibility } from '@/store/slides/ai-review-slice';
 import type { ProblemData } from '@/types/problems';
 import type { Problem, StudentSubmissionOverview } from '@/types/submissions';
+import type { SortOrder } from '@/types/submissions-overview';
 import { ChevronLeft } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -26,9 +28,15 @@ export default function ContestSubmissionsPage() {
   const dispatch = useDispatch();
   const contestId = params.id as string;
 
-  // Fetch submissions data from API
+  // state for selected student and problem
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
+    null
+  );
+  const [activeProblemId, setActiveProblemId] = useState<string>('');
+
+  // Fetch submission overview
   const {
-    data,
+    students,
     loading,
     error,
     hasNextPage,
@@ -38,52 +46,14 @@ export default function ContestSubmissionsPage() {
     sortOrder,
   } = useSubmissionsOverview(contestId);
 
-  // Fetch contest problems from API
-  const [problems, setProblems] = useState<Problem[]>([]);
-  const [loadingProblems, setLoadingProblems] = useState(true);
+  // Fetch contest problems for navigating among submission list
+  const {
+    problems,
+    loading: loadingProblems,
+    error: problemsError,
+  } = useProblemsForContest(contestId);
 
-  const { isVisible: isAIReviewVisible } = useSelector(
-    (state: RootState) => state.aiReview
-  );
-
-  const fetchContestProblems = useCallback(async () => {
-    try {
-      setLoadingProblems(true);
-      const response = await ContestsService.getContestById(contestId);
-      const contestData = response?.data?.data;
-
-      if (contestData?.problems) {
-        const formattedProblems = contestData.problems.map(
-          (p: ProblemData, index: number) => ({
-            id: p.id.toString(),
-            title: `${String.fromCharCode(65 + index)}. ${p.title}`,
-          })
-        );
-        setProblems(formattedProblems);
-      }
-    } catch (error) {
-      console.error('Error fetching contest problems:', error);
-    } finally {
-      setLoadingProblems(false);
-    }
-  }, [contestId]);
-
-  useEffect(() => {
-    fetchContestProblems();
-  }, [fetchContestProblems]);
-
-  // Extract nodes from API response
-  const students: StudentSubmissionOverview[] = useMemo(() => {
-    if (!data?.edges) return [];
-    return data.edges.map((edge) => edge.node);
-  }, [data]);
-
-  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
-    null
-  );
-  const [activeProblemId, setActiveProblemId] = useState<string>('');
-
-  // Use custom hook for submission history management
+  // Fetch submission list for selected student and problem
   const {
     submissionDetails,
     loadingSubmission,
@@ -96,6 +66,10 @@ export default function ContestSubmissionsPage() {
     contestParticipationId: selectedStudentId,
     problemId: activeProblemId,
   });
+
+  const { isVisible: isAIReviewVisible } = useSelector(
+    (state: RootState) => state.aiReview
+  );
 
   // Update active problem when problems load
   useEffect(() => {
@@ -120,9 +94,7 @@ export default function ContestSubmissionsPage() {
     updateFilters({ name: keyword });
   };
 
-  const handleSortChange = (
-    order: import('@/types/submissions-overview').SortOrder
-  ) => {
+  const handleSortChange = (order: SortOrder) => {
     updateFilters({ sortOrder: order });
   };
 
