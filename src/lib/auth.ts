@@ -51,10 +51,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     };
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
+    throw error;
   }
 }
 
@@ -84,7 +81,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.userId = user.id;
@@ -92,31 +89,13 @@ export const authOptions: NextAuthOptions = {
         token.redirect = user.redirect;
         token.callbackUrl = user.callbackUrl;
         token.deviceId = user.deviceId;
-
-        try {
-          const decoded: DecodedAccessToken = jwtDecode(
-            user.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+        return token;
       }
-      if (
-        !token.accessToken ||
-        Date.now() > (token.accessTokenExpires as number)
-      ) {
-        try {
-          const data = await refreshAccessToken(token);
-          token.accessToken = data.accessToken;
-          token.refreshToken = data.refreshToken;
-          const decoded: DecodedAccessToken = jwtDecode(
-            data.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+
+      if (trigger === 'update' && session?.action === 'refresh') {
+        const data = await refreshAccessToken(token);
+        token.accessToken = data.accessToken;
+        token.refreshToken = data.refreshToken;
       }
       return token;
     },
@@ -131,7 +110,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/login',
     error: '/',
   },
   session: {
