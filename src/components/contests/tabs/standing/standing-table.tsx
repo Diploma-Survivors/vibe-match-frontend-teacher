@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { LeaderboardResponse } from '@/types/contest';
+import type { LeaderboardResponse } from '@/types/leaderboard';
 import { Trophy } from 'lucide-react';
 import { StandingPagination } from './standing-pagination';
 
@@ -66,7 +66,7 @@ export function StandingTable({
                 >
                   <div className="flex flex-col items-center gap-3">
                     <Trophy className="w-16 h-16 text-gray-300" />
-                    <p className="text-lg">Chưa có dữ liệu xếp hạng</p>
+                    <p className="text-lg">Không có dữ liệu xếp hạng</p>
                   </div>
                 </TableCell>
               </TableRow>

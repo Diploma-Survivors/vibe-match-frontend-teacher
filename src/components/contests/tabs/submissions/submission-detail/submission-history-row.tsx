@@ -1,5 +1,5 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
-import type { SubmissionDetailNode } from '@/types/contest';
+import type { SubmissionDetailNode } from '@/types/submissions-overview';
 import { Clock, Cpu } from 'lucide-react';
 
 interface SubmissionHistoryRowProps {

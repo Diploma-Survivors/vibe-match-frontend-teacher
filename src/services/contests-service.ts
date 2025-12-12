@@ -1,15 +1,16 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
+import type { Contest, ContestDTO, ContestProblemDTO } from '@/types/contest';
 import type {
-  Contest,
-  ContestDTO,
-  ContestProblemDTO,
   LeaderboardRequest,
   LeaderboardResponse,
+  SortOrder,
+} from '@/types/leaderboard';
+import type {
   SubmissionDetailsResponse,
   SubmissionsOverviewRequest,
   SubmissionsOverviewResponse,
-} from '@/types/contest';
+} from '@/types/submissions-overview';
 import type { AxiosResponse } from 'axios';
 
 async function createContest(
@@ -51,10 +52,8 @@ async function getContestLeaderboard(
   const { contestId, filters, ...restParams } = request;
   const url = `/contests/${contestId}/leaderboard`;
 
-  // Build params with nested filters structure, excluding undefined values
   const params: Record<string, any> = {};
 
-  // Only add defined values from restParams
   for (const [key, value] of Object.entries(restParams)) {
     if (value !== undefined) {
       params[key] = value;
@@ -63,6 +62,10 @@ async function getContestLeaderboard(
 
   if (filters?.name) {
     params['filters.name'] = filters.name;
+  }
+
+  if (filters?.sortOrder) {
+    params.sortOrder = filters.sortOrder;
   }
 
   const response = await clientApi.get<ApiResponse<LeaderboardResponse>>(url, {
@@ -87,8 +90,8 @@ async function getContestSubmissionsOverview(
     }
   }
 
-  if (filters?.username) {
-    params['filters.username'] = filters.username;
+  if (filters?.name) {
+    params['filters.name'] = filters.name;
   }
 
   const response = await clientApi.get<
@@ -107,7 +110,7 @@ async function getSubmissionDetails(
     after?: string;
     last?: number;
     before?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: SortOrder;
   }
 ): Promise<SubmissionDetailsResponse> {
   const url = `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}`;
