@@ -56,7 +56,6 @@ export function useSubmissionHistory({
         err instanceof Error
           ? err
           : new Error('Không thể tải danh sách bài nộp');
-      console.error('Error fetching submission details:', error);
       toastService.error(error.message);
       setSubmissionDetails([]);
       setSelectedSubmissionId(null);
@@ -81,7 +80,6 @@ export function useSubmissionHistory({
         err instanceof Error
           ? err
           : new Error('Không thể tải chi tiết bài nộp');
-      console.error('Error fetching submission detail:', error);
       toastService.error(error.message);
     } finally {
       setLoadingSubmissionDetail(false);

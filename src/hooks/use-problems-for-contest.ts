@@ -31,6 +31,7 @@ export function useProblemsForContest(
       const contestData = response?.data?.data;
 
       if (contestData?.problems) {
+        // Format problems with A. Title, B. Title, ...
         const formattedProblems = contestData.problems.map(
           (p: ProblemData, index: number) => ({
             id: p.id.toString(),
@@ -45,7 +46,6 @@ export function useProblemsForContest(
           ? err
           : new Error('Không thể tải danh sách bài tập');
       setError(error);
-      console.error('Error fetching contest problems:', error);
       toastService.error(error.message);
     } finally {
       setLoading(false);
