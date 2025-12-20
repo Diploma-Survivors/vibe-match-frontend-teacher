@@ -10,14 +10,19 @@
       "a11y": {
         "noLabelWithoutControl": "off",
         "useValidAnchor": "off",
-        "useSemanticElements": "warn"
+        "useSemanticElements": "warn",
+        "useKeyWithClickEvents": "off"
       },
       "complexity": {
         "noStaticOnlyClass": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn",
+        "noArrayIndexKey": "off",
         "noExplicitAny": "off"
+      },
+      "style": {
+        "noUnusedTemplateLiteral": "off",
+        "useTemplate": "off"
       }
     }
   },
