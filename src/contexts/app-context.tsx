@@ -1,6 +1,7 @@
 'use client';
 
-import type { UserInfo } from '@/types/states';
+import clientApi from '@/lib/apis/axios-client';
+import type { DecodedAccessToken, UserInfo } from '@/types/states';
 import { IssuerType } from '@/types/states';
 import { usePathname } from 'next/navigation';
 import {
@@ -13,14 +14,11 @@ import {
 
 interface AppProviderProps {
   children: ReactNode;
-  initialUser: UserInfo | null;
-  initialIssuer: IssuerType;
+  decodedAccessToken: DecodedAccessToken | null;
 }
 
 interface AppContextType {
-  user: UserInfo | null;
-  issuer: IssuerType;
-  isInDedicatedPages: boolean;
+  user?: UserProfile;
   shouldHideNavigation: boolean;
   isLoading: boolean;
   clearUserData: () => void;
@@ -33,29 +31,36 @@ const dedicatedPagesPattern =
 
 export function AppProvider({
   children,
-  initialUser,
-  initialIssuer,
+  decodedAccessToken,
 }: AppProviderProps) {
-  const [user, setUser] = useState<UserInfo | null>(initialUser);
-  const [issuer, setIssuer] = useState<IssuerType>(initialIssuer);
+  const [user, setUser] = useState<UserProfile>();
   const [isLoading, setIsLoading] = useState(false);
 
   const pathname = usePathname();
-
-  const DEDICATED_PAGES_REGEX = new RegExp(dedicatedPagesPattern);
-  const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  const shouldHideNavigation =
-    issuer === IssuerType.MOODLE && isInDedicatedPages;
+  const shouldHideNavigation = pathname === '/login';
 
   const clearUserData = () => {
-    setUser(null);
-    setIssuer(IssuerType.LOCAL);
+    setUser(undefined);
   };
+
+  useEffect(() => {
+    if (decodedAccessToken) {
+      setIsLoading(true);
+      clientApi
+        .get('/auth/me')
+        .then((response) => {
+          setUser(response.data.data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch user data:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [decodedAccessToken]);
 
   const value: AppContextType = {
     user,
-    issuer,
-    isInDedicatedPages,
     shouldHideNavigation,
     isLoading,
     clearUserData,

@@ -14,9 +14,7 @@ import { useState } from 'react';
 
 export default function CreateContestPage() {
   const [isSaving, setIsSaving] = useState(false);
-  const { shouldHideNavigation, issuer } = useApp();
-
-  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
+  const { shouldHideNavigation } = useApp();
 
   const handleSave = async (data: Contest) => {
     setIsSaving(true);
@@ -26,11 +24,6 @@ export default function CreateContestPage() {
 
       const response = await ContestsService.createContest(contestDTO);
       const newContestId = response?.data?.data?.id;
-
-      if (issuer === IssuerType.LOCAL) {
-        toastService.success('Cuộc thi đã được tạo thành công!');
-        return;
-      }
 
       if (newContestId) {
         const response = await LtiService.sendDeepLinkingResponse(
@@ -91,12 +84,8 @@ export default function CreateContestPage() {
           mode={ContestFormMode.CREATE}
           onSave={handleSave}
           isSaving={isSaving}
-          title={`Tạo ${activityType === 'assignment' ? 'assignment' : 'cuộc thi'} mới`}
-          subtitle={
-            activityType === 'assignment'
-              ? 'Thiết lập thông tin và cấu hình bài tập trên Moodle'
-              : 'Thiết lập thông tin và cấu hình cuộc thi lập trình'
-          }
+          title={`Tạo cuộc thi mới`}
+          subtitle={'Thiết lập thông tin và cấu hình cuộc thi'}
         />
       </div>
     </div>

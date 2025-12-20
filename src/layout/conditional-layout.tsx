@@ -1,15 +1,48 @@
 'use client';
 
-import Footer from '@/components/footer';
-import Header from '@/components/header';
+import Breadcrumbs from '@/components/breadcrumbs';
+import Sidebar from '@/components/sidebar';
 import { useApp } from '@/contexts/app-context';
+import { SidebarProvider, useSidebar } from '@/contexts/sidebar-context';
+import { cn } from '@/lib/utils';
+import { signOut } from 'next-auth/react';
+
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const { isOpen, isMobile } = useSidebar();
+  const { clearUserData, user } = useApp();
+
+  const handleLogout = async () => {
+    clearUserData();
+    await signOut({
+      callbackUrl: '/login', // Where to go after logout
+      redirect: true,
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <Sidebar onLogout={handleLogout} />
+      <main
+        className={cn(
+          'transition-all duration-300 ease-in-out min-h-screen',
+          !isMobile && (isOpen ? 'pl-[240px]' : 'pl-[80px]')
+        )}
+      >
+        <div className="container mx-auto p-6">
+          <Breadcrumbs />
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}
 
 export default function ConditionalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { shouldHideNavigation, isLoading, isInDedicatedPages } = useApp();
+  const { shouldHideNavigation, isLoading } = useApp();
 
   if (isLoading) {
     return (
@@ -26,12 +59,9 @@ export default function ConditionalLayout({
     return <main className="min-h-screen">{children}</main>;
   }
 
-  // Local mode OR Moodle mode on non-dedicated pages - show full layout
   return (
-    <>
-      <Header />
-      <main className="pt-16">{children}</main>
-      {/* <Footer /> */}
-    </>
+    <SidebarProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </SidebarProvider>
   );
 }

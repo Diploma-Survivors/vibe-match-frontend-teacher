@@ -93,8 +93,6 @@ export default function ContestForm({
   const [pendingProblems, setPendingProblems] = useState<ProblemData[]>([]);
 
   const isReadOnly = mode === ContestFormMode.VIEW;
-  const { issuer } = useApp();
-  const activityType = issuer === IssuerType.MOODLE ? 'assignment' : 'cuộc thi';
 
   const form = useForm<Contest>({
     resolver: zodResolver(ContestSchema),
@@ -317,7 +315,7 @@ export default function ContestForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Submission Strategies */}
               <Tooltip
-                content={`Chiến lược nộp bài sẽ được áp dụng cho tất cả các problem trong ${activityType}`}
+                content={`Chiến lược nộp bài sẽ được áp dụng cho tất cả các problem trong cuộc thi`}
               >
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -621,7 +619,7 @@ export default function ContestForm({
                 </div>
                 <p className="text-slate-500 dark:text-slate-400 mb-4">
                   {isReadOnly
-                    ? `${activityType} này chưa có bài tập nào`
+                    ? 'Cuộc thi này chưa có bài tập nào'
                     : 'Chưa có bài tập nào được thêm vào'}
                 </p>
                 {errors.problems && (

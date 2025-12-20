@@ -32,9 +32,6 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token.refreshToken}`,
         },
-        body: JSON.stringify({
-          deviceId: token.deviceId,
-        }),
       }
     );
 
@@ -63,7 +60,6 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         accessToken: { label: 'Access Token', type: 'text' },
         refreshToken: { label: 'Refresh Token', type: 'text' },
-        deviceId: { label: 'Device ID', type: 'text' },
         redirect: { label: 'Redirect', type: 'text' },
         callbackUrl: { label: 'Callback URL', type: 'text' },
       },
@@ -73,10 +69,58 @@ export const authOptions: NextAuthOptions = {
           id: 'sso-user',
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
-          deviceId: credentials.deviceId,
           redirect: credentials.redirect,
           callbackUrl: credentials.callbackUrl,
         };
+      },
+    }),
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+        // deviceId: { label: "Device ID", type: "text" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error('Missing username or password');
+        }
+
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                emailOrUsername: credentials.username,
+                password: credentials.password,
+              }),
+            }
+          );
+
+          if (!res.ok) {
+            // Throw error to be caught by NextAuth frontend
+            throw new Error(res.statusText || 'Authentication failed');
+          }
+
+          const raw = await res.json();
+          const data = raw.data;
+
+          // Return object MUST match the shape used in 'jwt' callback below
+          return {
+            id: data.user?.id || 'user-id',
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            redirect: data.redirect,
+            callbackUrl: data.callbackUrl,
+          };
+        } catch (error: any) {
+          console.error('Login logic error:', error);
+          // Return null to display a generic error, or throw to display specific error
+          throw new Error(error.message || 'Login failed');
+        }
       },
     }),
   ],

@@ -13,7 +13,7 @@ import { useState } from 'react';
 
 export default function CreateProblemPage() {
   const [isSaving, setIsSaving] = useState(false);
-  const { shouldHideNavigation, issuer } = useApp();
+  const { shouldHideNavigation } = useApp();
 
   const handleSave = async (data: ProblemData) => {
     setIsSaving(true);
@@ -29,7 +29,7 @@ export default function CreateProblemPage() {
       }
 
       // Handle deep linking response
-      if (issuer === IssuerType.MOODLE && result.id) {
+      if (result.id) {
         try {
           await LtiService.sendDeepLinkingResponse(
             ResourceType.CONTEST,
