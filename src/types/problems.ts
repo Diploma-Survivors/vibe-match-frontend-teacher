@@ -1,5 +1,6 @@
 import { getLexicalTextLength } from '@/lib/utils';
 import { z } from 'zod';
+import type { UserProfile } from './user';
 import type { UserInfo } from './states';
 import type { Tag } from './tags';
 import type { TestcaseSample } from './testcases';
@@ -17,8 +18,10 @@ export enum ProblemVisibility {
 }
 
 export enum SortBy {
+  ID = 'id',
   TITLE = 'title',
   DIFFICULTY = 'difficulty',
+  ACCEPTANCE_RATE = 'acceptance_rate',
 }
 
 export enum SortOrder {
@@ -34,6 +37,33 @@ export enum ProblemType {
 export enum MatchMode {
   ANY = 'any',
   ALL = 'all',
+}
+
+export interface Permission {
+  id: number;
+  resource: string;
+  action: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  isSystemRole: boolean;
+  priority: number;
+  permissions: Permission[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+export interface Hint {
+  order: number;
+  content: string;
 }
 
 export interface CreateProblemRequest {
@@ -66,25 +96,48 @@ export interface ProblemQuickStats {
   averageAttempts: number;
 }
 
-export interface ProblemData {
+export interface Problem {
   id: number;
   title: string;
+  slug?: string;
   description: string;
-  inputDescription: string;
-  outputDescription: string;
-  maxScore: number;
+  constraints: string;
+  difficulty: ProblemDifficulty;
+  isPremium?: boolean;
+  isPublished?: boolean;
+  isActive: boolean;
+  totalSubmissions?: number;
+  totalAccepted?: number;
+  acceptanceRate?: number;
+  totalAttempts?: number;
+  totalSolved?: number;
+  averageTimeToSolve?: number;
+  difficultyRating?: number;
+  testcaseFileKey?: any;
+  testcaseCount?: number;
   timeLimitMs: number;
   memoryLimitKb: number;
-  difficulty: ProblemDifficulty;
-  type: ProblemType;
-  visibility: ProblemVisibility;
+  sampleTestcases: TestcaseSample[];
+  hints?: Hint[];
+  hasOfficialSolution?: boolean;
+  officialSolutionContent?: string;
+  createdBy?: UserProfile;
+  updatedBy?: UserProfile;
+  similarProblems?: number[];
+  topics: Topic[];
+  tags: Tag[];
   createdAt?: string;
   updatedAt?: string;
-  tags: Tag[];
-  topics: Topic[];
-  testcase: File | null;
-  testcaseSamples: TestcaseSample[];
-  score?: number; // For use in contests or assignments
+  
+  // Legacy/Form fields (optional to avoid breaking UI immediately)
+  inputDescription?: string;
+  outputDescription?: string;
+  maxScore?: number;
+  type?: ProblemType;
+  visibility?: ProblemVisibility;
+  testcase?: File | null;
+  testcaseSamples?: TestcaseSample[]; // Alias for sampleTestcases?
+  score?: number;
   testcaseResponse?: TestcaseFileResponse;
   quickStats?: ProblemQuickStats;
 }
@@ -111,65 +164,83 @@ export interface ProblemDataResponse {
   quickStats: ProblemQuickStats;
 }
 
-export const initialProblemData: ProblemData = {
+export const initialProblemData: Problem = {
   id: 0,
   title: '',
+  slug: '',
   description: '',
+  constraints: '',
+  difficulty: ProblemDifficulty.EASY,
+  isPremium: false,
+  isPublished: true,
+  isActive: true,
+  totalSubmissions: 0,
+  totalAccepted: 0,
+  acceptanceRate: 0,
+  totalAttempts: 0,
+  totalSolved: 0,
+  averageTimeToSolve: 0,
+  difficultyRating: 0,
+  testcaseFileKey: {},
+  testcaseCount: 0,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  sampleTestcases: [],
+  hints: [],
+  hasOfficialSolution: false,
+  officialSolutionContent: '',
+  createdBy: {} as UserProfile, // Placeholder
+  updatedBy: {} as UserProfile, // Placeholder
+  similarProblems: [],
+  topics: [],
+  tags: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  
+  // Legacy
   inputDescription: '',
   outputDescription: '',
   maxScore: 100,
-  timeLimitMs: 1000,
-  memoryLimitKb: 256000,
-  difficulty: ProblemDifficulty.EASY,
-  visibility: ProblemVisibility.PUBLIC,
   type: ProblemType.CONTEST,
-  tags: [],
-  topics: [],
+  visibility: ProblemVisibility.PUBLIC,
   testcase: null,
   testcaseSamples: [],
 };
 
 export interface ProblemFilters {
-  difficulty?: ProblemDifficulty;
-  type?: ProblemType;
+  difficulty?: ProblemDifficulty[];
+  isActive?: boolean;
   topicIds?: number[];
   tagIds?: number[];
 }
 
 export interface GetProblemListRequest {
-  keyword?: string;
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
+  page?: number;
+  limit?: number;
   sortOrder?: SortOrder;
-  matchMode?: MatchMode;
   sortBy?: SortBy;
   filters?: ProblemFilters;
+  search?: string;
 }
 
-export interface ProblemEdge {
-  node: ProblemData;
-  cursor: string;
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
+export interface ProblemMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
+  hasNextPage: boolean;
 }
 
 export interface ProblemListResponse {
-  edges: ProblemEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+  data: Problem[];
+  meta: ProblemMeta;
 }
 
 export const DIFFICULTY_OPTIONS = [
-  { value: 'easy', label: 'Dễ' },
-  { value: 'medium', label: 'Trung bình' },
-  { value: 'hard', label: 'Khó' },
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
 ];
 
 export const TAG_OPTIONS = [
@@ -191,9 +262,9 @@ export enum ProblemEndpointType {
 }
 
 export const DIFFICULTY_LABELS = new Map([
-  [ProblemDifficulty.EASY, 'Dễ'],
-  [ProblemDifficulty.MEDIUM, 'Trung bình'],
-  [ProblemDifficulty.HARD, 'Khó'],
+  [ProblemDifficulty.EASY, 'Easy'],
+  [ProblemDifficulty.MEDIUM, 'Medium'],
+  [ProblemDifficulty.HARD, 'Hard'],
 ]);
 
 export const DIFFICULTY_COLORS = new Map([
@@ -225,6 +296,30 @@ export const ProblemSchema = z
       .min(3, 'Tên bài tập phải có ít nhất 3 ký tự')
       .max(128, 'Tên bài tập không được vượt quá 128 ký tự'),
 
+    slug: z.string().optional(),
+    constraints: z.string().optional(),
+    isPremium: z.boolean().optional(),
+    isPublished: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    totalSubmissions: z.number().optional(),
+    totalAccepted: z.number().optional(),
+    acceptanceRate: z.number().optional(),
+    totalAttempts: z.number().optional(),
+    totalSolved: z.number().optional(),
+    averageTimeToSolve: z.number().optional(),
+    difficultyRating: z.number().optional(),
+    testcaseFileKey: z.any().optional(),
+    sampleTestcases: z.array(z.any()).optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+    testcaseCount: z.number().optional(),
+    hints: z.array(z.any()).optional(),
+    hasOfficialSolution: z.boolean().optional(),
+    officialSolutionContent: z.string().optional(),
+    createdBy: z.any().optional(), // Should be User schema but any is fine for now
+    updatedBy: z.any().optional(),
+    similarProblems: z.array(z.number()).optional(),
+
     description: z.string().superRefine((val, ctx) => {
       const len = getLexicalTextLength(val);
       if (len < 16) {
@@ -241,41 +336,10 @@ export const ProblemSchema = z
       }
     }),
 
-    inputDescription: z.string().superRefine((val, ctx) => {
-      const len = getLexicalTextLength(val);
-      if (len < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả đầu vào phải có ít nhất 6 ký tự',
-        });
-      }
-      if (len > 512) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả đầu vào không được vượt quá 512 ký tự',
-        });
-      }
-    }),
+    inputDescription: z.string().optional(),
+    outputDescription: z.string().optional(),
 
-    outputDescription: z.string().superRefine((val, ctx) => {
-      const len = getLexicalTextLength(val);
-      if (len < 6) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả đầu ra phải có ít nhất 6 ký tự',
-        });
-      }
-      if (len > 512) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả đầu ra không được vượt quá 512 ký tự',
-        });
-      }
-    }),
-
-    maxScore: z
-      .number('Điểm tối đa phải là số')
-      .positive('Điểm tối đa phải là số dương'),
+    maxScore: z.number().optional(),
 
     timeLimitMs: z
       .number('Giới hạn thời gian phải là số')
@@ -288,12 +352,12 @@ export const ProblemSchema = z
     difficulty: z.enum(ProblemDifficulty, {
       error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
     }),
-    visibility: z.enum(ProblemVisibility, {
-      error: () => ({ message: 'Vui lòng chọn phạm vi' }),
-    }),
-    type: z.enum(ProblemType, {
-      error: () => ({ message: 'Vui lòng chọn loại cho bài tập' }),
-    }),
+    // visibility: z.enum(ProblemVisibility, {
+    //   error: () => ({ message: 'Vui lòng chọn phạm vi' }),
+    // }),
+    // type: z.enum(ProblemType, {
+    //   error: () => ({ message: 'Vui lòng chọn loại cho bài tập' }),
+    // }),
     topics: z
       .array(z.any())
       .min(1, 'Vui lòng chọn ít nhất một chủ đề')
@@ -302,15 +366,15 @@ export const ProblemSchema = z
       .array(z.any())
       .min(1, 'Vui lòng chọn ít nhất một tag')
       .max(4, 'Chỉ được chọn tối đa 4 tag'),
-    testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
-    testcaseSamples: z
-      .array(z.any())
-      .min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
-  })
-  .refine((data) => data.testcase !== undefined && data.testcase !== null, {
-    message: 'File test case là bắt buộc',
-    path: ['testcase'],
+    // testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
+    // testcaseSamples: z
+    //   .array(z.any())
+    //   .min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
   });
+  // .refine((data) => data.testcase !== undefined && data.testcase !== null, {
+  //   message: 'File test case là bắt buộc',
+  //   path: ['testcase'],
+  // });
 
 export const AllowedTypes = ['application/json'];
 

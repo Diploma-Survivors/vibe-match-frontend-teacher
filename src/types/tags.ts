@@ -8,6 +8,10 @@ export interface UpdateTagRequest {
 export interface Tag {
   id: number;
   name: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  slug: string;
+  type: string;
+  description: string;
+  color: string;
+  createdAt: string;
+  updatedAt?: string;
 }

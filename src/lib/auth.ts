@@ -30,12 +30,16 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token.refreshToken}`,
         },
+        body: JSON.stringify({
+          refreshToken: token.refreshToken,
+        }),
       }
     );
 
-    const data = await response.json();
+    const raw = await response.json();
+    const data = raw.data;
+    
 
     if (!response.ok) {
       throw data;

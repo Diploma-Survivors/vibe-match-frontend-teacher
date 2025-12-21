@@ -1,7 +1,7 @@
 'use client';
 
 import useProblems from '@/hooks/use-problems';
-import type { ProblemData, ProblemEndpointType } from '@/types/problems';
+import type { Problem, ProblemEndpointType } from '@/types/problems';
 import ProblemFilter from './problem-filters/problem-filter';
 import ProblemTable, { type ProblemTableMode } from './problem-table';
 
@@ -15,9 +15,9 @@ interface ProblemListProps {
   mode: ProblemListMode;
   endpointType: ProblemEndpointType;
   initialSelectedProblemIds?: Set<number>;
-  onProblemView?: (problem: ProblemData) => void;
-  onProblemSelect?: (problem: ProblemData) => void;
-  onMultipleProblemsSelect?: (problems: ProblemData[]) => void;
+  onProblemView?: (problem: Problem) => void;
+  onProblemSelect?: (problem: Problem) => void;
+  onMultipleProblemsSelect?: (problems: Problem[]) => void;
 }
 
 export default function ProblemList({
@@ -31,7 +31,7 @@ export default function ProblemList({
   const {
     // State
     problems,
-    pageInfo,
+    meta,
     totalCount,
     isLoading,
     error,
@@ -49,16 +49,16 @@ export default function ProblemList({
     handleSortOrderChange,
     handleSearch,
     handleReset,
-    handleLoadMore,
+    handlePageChange,
   } = useProblems(endpointType);
 
-  const handleProblemSelection = (problem: ProblemData) => {
+  const handleProblemSelection = (problem: Problem) => {
     if (onProblemSelect) {
       onProblemSelect(problem);
     }
   };
 
-  const handleMultipleProblemsSelect = (selectedProblems: ProblemData[]) => {
+  const handleMultipleProblemsSelect = (selectedProblems: Problem[]) => {
     if (mode === ProblemListMode.MULTIPLE_SELECT && onMultipleProblemsSelect) {
       onMultipleProblemsSelect(selectedProblems);
     }
@@ -66,74 +66,48 @@ export default function ProblemList({
 
   return (
     <div className="container mx-auto px-6 py-8" style={{ maxWidth: 'none' }}>
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-        {/* Left Sidebar - Filters */}
-        <div className="xl:col-span-1">
-          <div className="xl:sticky xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:custom-scrollbar xl:pr-2">
-            <div className="space-y-6">
-              <ProblemFilter
-                keyWord={keyword}
-                filters={filters}
-                onKeywordChange={handleKeywordChange}
-                onFiltersChange={handleFiltersChange}
-                onSearch={handleSearch}
-                onReset={handleReset}
-                isLoading={isLoading}
-              />
+      <div className="space-y-6">
+        {/* Filter Section */}
+        <ProblemFilter
+          keyWord={keyword}
+          filters={filters}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onKeywordChange={handleKeywordChange}
+          onFiltersChange={handleFiltersChange}
+          onSortByChange={handleSortByChange}
+          onSortOrderChange={handleSortOrderChange}
+          onSearch={handleSearch}
+          onReset={handleReset}
+          isLoading={isLoading}
+        />
+
+        {/* Problems Table */}
+        {error ? (
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 text-center">
+            <div className="text-slate-500 dark:text-slate-400 text-lg">
+              {error}
             </div>
           </div>
-        </div>
-
-        {/* Right Content - Problems List */}
-        <div className="xl:col-span-3">
-          <div className="space-y-6">
-            {/* Problems Table */}
-            {error ? (
-              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 text-center">
-                <div className="text-slate-500 dark:text-slate-400 text-lg">
-                  {error}
-                </div>
-              </div>
-            ) : (
-              <ProblemTable
-                problems={problems}
-                hasMore={pageInfo?.hasNextPage ?? false}
-                totalCount={totalCount}
-                onLoadMore={handleLoadMore}
-                isLoading={isLoading}
-                mode={mode as unknown as ProblemTableMode}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
-                initialSelectedProblemIds={initialSelectedProblemIds}
-                onSortByChange={handleSortByChange}
-                onSortOrderChange={handleSortOrderChange}
-                onProblemSelect={handleProblemSelection}
-                onProblemView={onProblemView}
-                onMultipleProblemsSelect={handleMultipleProblemsSelect}
-              />
-            )}
-          </div>
-        </div>
+        ) : (
+          <ProblemTable
+            problems={problems}
+            meta={meta}
+            totalCount={totalCount}
+            onPageChange={handlePageChange}
+            isLoading={isLoading}
+            mode={mode as unknown as ProblemTableMode}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            initialSelectedProblemIds={initialSelectedProblemIds}
+            onSortByChange={handleSortByChange}
+            onSortOrderChange={handleSortOrderChange}
+            onProblemSelect={handleProblemSelection}
+            onProblemView={onProblemView}
+            onMultipleProblemsSelect={handleMultipleProblemsSelect}
+          />
+        )}
       </div>
-
-      {/* Footer */}
-      {/* <div className="mt-16 pt-8 border-t border-white/20 dark:border-slate-700/50">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-lg">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-slate-600 dark:text-slate-400 font-medium">
-              Dữ liệu được đồng bộ real-time từ Vibe Match
-            </span>
-          </div>
-          <p className="mt-4 text-slate-500 dark:text-slate-500">
-            Tổng cộng{" "}
-            <strong className="text-green-600 dark:text-emerald-400">
-              {totalCount}
-            </strong>{" "}
-            bài tập từ nhiều chủ đề
-          </p>
-        </div>
-      </div> */}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import type { ApiResponse } from '@/types/api';
 import type {
   CreateProblemRequest,
   GetProblemListRequest,
-  ProblemData,
+  Problem,
   ProblemDataResponse,
   ProblemEndpointType,
   ProblemListResponse,
@@ -27,7 +27,7 @@ async function getProblemList(
 
 async function createProblem(
   problemRequest: CreateProblemRequest
-): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
+): Promise<AxiosResponse<ApiResponse<Problem>>> {
   if (!problemRequest.testcaseFile) {
     throw new Error('Testcase file is required for complete problem creation.');
   }
@@ -60,11 +60,11 @@ async function getProblemDetail(
 
 async function getProblemById(
   problemId: number
-): Promise<AxiosResponse<ApiResponse<ProblemData>>> {
+): Promise<AxiosResponse<ApiResponse<Problem>>> {
   return await clientApi.get(`/problems/${problemId}`);
 }
     
-async function updateProblem(problem: ProblemData) {
+async function updateProblem(problem: Problem) {
   const mappedProblem = mapProblemToDTO(problem);
   return await clientApi.patch(`/problems/${problem.id}`, {
     ...mappedProblem,
@@ -74,7 +74,7 @@ async function updateProblem(problem: ProblemData) {
   });
 }
 
-function mapProblemToDTO(problem: ProblemData): CreateProblemRequest {
+function mapProblemToDTO(problem: Problem): CreateProblemRequest {
   const { tags, topics, testcase, ...rest } = problem;
   return {
     ...rest,
@@ -86,7 +86,7 @@ function mapProblemToDTO(problem: ProblemData): CreateProblemRequest {
 
 function mapProblemDataResponseToProblemData(
   problemResponse: ProblemDataResponse
-): ProblemData {
+): Problem {
   return {
     ...problemResponse,
     testcaseResponse: problemResponse.testcase,

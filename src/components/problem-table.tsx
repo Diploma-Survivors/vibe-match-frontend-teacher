@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -10,19 +8,28 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type {
-  PageInfo,
-  ProblemData,
+  Problem,
+  ProblemMeta,
   SortBy,
   SortOrder,
 } from '@/types/problems';
 import { getDifficultyColor, getDifficultyLabel } from '@/types/problems';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  Lock,
+  MoreHorizontal,
+  Trash2,
+  Unlock,
+} from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { FaList } from 'react-icons/fa6';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import ProblemTableHeader from './problem-table-header';
-import SortControls from './sort-controls';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tooltip } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export enum ProblemTableMode {
   VIEW = 'view',
@@ -31,12 +38,10 @@ export enum ProblemTableMode {
 }
 
 interface ProblemTableProps {
-  problems: ProblemData[];
-  hasMore: boolean;
-  // pageInfo?: PageInfo | null;
+  problems: Problem[];
+  meta: ProblemMeta | null;
   totalCount?: number;
-  onLoadMore: () => void;
-  // onLoadPrevious?: () => void;
+  onPageChange: (page: number) => void;
   isLoading?: boolean;
   mode: ProblemTableMode;
   sortBy: SortBy;
@@ -44,17 +49,17 @@ interface ProblemTableProps {
   initialSelectedProblemIds?: Set<number>;
   onSortByChange: (newSortBy: SortBy) => void;
   onSortOrderChange: (newSortOrder: SortOrder) => void;
-  onProblemSelect?: (problem: ProblemData) => void;
-  onMultipleProblemsSelect?: (problems: ProblemData[]) => void;
-  onProblemView?: (problem: ProblemData) => void;
+  onProblemSelect?: (problem: Problem) => void;
+  onMultipleProblemsSelect?: (problems: Problem[]) => void;
+  onProblemView?: (problem: Problem) => void;
 }
 
 export default function ProblemTable({
   problems,
+  meta,
   totalCount = 0,
-  onLoadMore,
+  onPageChange,
   isLoading = false,
-  hasMore,
   mode,
   sortBy,
   sortOrder,
@@ -125,244 +130,399 @@ export default function ProblemTable({
     ? selectedProblemIds.size > 0
     : selectedProblemId !== null;
 
+  // Pagination Logic
+  const currentPage = meta?.page || 1;
+  const totalPages = meta?.totalPages || 1;
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={!meta?.hasPreviousPage}
+          className="h-8 w-8 rounded-lg border-slate-200 dark:border-slate-700"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        {startPage > 1 && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(1)}
+              className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-700"
+            >
+              1
+            </Button>
+            {startPage > 2 && <span className="text-slate-400">...</span>}
+          </>
+        )}
+        {pages.map((page) => (
+          <Button
+            key={page}
+            variant={page === currentPage ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onPageChange(page)}
+            className={`h-8 w-8 p-0 rounded-lg ${page === currentPage
+              ? 'bg-green-600 hover:bg-green-700 text-white border-transparent'
+              : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+              }`}
+          >
+            {page}
+          </Button>
+        ))}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && (
+              <span className="text-slate-400">...</span>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(totalPages)}
+              className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-700"
+            >
+              {totalPages}
+            </Button>
+          </>
+        )}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={!meta?.hasNextPage}
+          className="h-8 w-8 rounded-lg border-slate-200 dark:border-slate-700"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <FaList className="text-slate-700 dark:text-slate-200" />
-            <span className="bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
-              Danh sách bài tập
-            </span>
-          </h3>
-          {selectionMode && (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      {/* Table Header with Selection Actions */}
+      {selectionMode && (
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+              Chọn bài tập
+            </h3>
             <Button
               type="button"
               onClick={handleConfirmSelection}
               disabled={!hasSelection}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-lg"
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-sm"
             >
               {isMultipleSelect
                 ? `Chọn ${selectedProblemIds.size} bài tập`
                 : 'Chọn bài tập'}
             </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-slate-600 dark:text-slate-400">
-              <span className="font-bold text-slate-900 dark:text-slate-100">
-                {problems.length}
-              </span>{' '}
-              / {totalCount} bài tập
-            </div>
-            <SortControls
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onSortByChange={onSortByChange}
-              onSortOrderChange={onSortOrderChange}
-            />
           </div>
         </div>
-      </div>
+      )}
 
-      <InfiniteScroll
-        dataLength={problems.length}
-        next={onLoadMore}
-        hasMore={hasMore}
-        loader={
-          <div className="flex flex-col items-center justify-center py-12 px-4">
-            <div className="dots-loader mb-4" />
-          </div>
-        }
-        endMessage={
-          <div className="text-center py-8 px-4">
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-full border border-green-200 dark:border-green-700">
-              <p className="text-slate-700 dark:text-slate-300 font-medium">
-                Bạn đã xem hết tất cả bài tập!
-              </p>
-            </div>
-          </div>
-        }
-        scrollThreshold={0.9}
-        style={{ overflow: 'visible' }}
-      >
-        <div className="overflow-x-auto max-w-full">
-          <div className="min-w-[1000px]">
-            <Table className="w-full table-fixed">
-              <TableHeader>
-                <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50/50 dark:bg-slate-700/20 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 border-b border-slate-200 dark:border-slate-700">
+              {selectionMode && (
+                <TableHead className="w-12 text-center">Chọn</TableHead>
+              )}
+              <TableHead className="w-20 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                ID
+              </TableHead>
+              <TableHead className="font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                Title
+              </TableHead>
+              <TableHead className="w-32 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                Difficulty
+              </TableHead>
+              <TableHead className="w-32 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                Status
+              </TableHead>
+              <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                ACCEPTANCE
+              </TableHead>
+              <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                TAGS
+              </TableHead>
+              <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                Topics
+              </TableHead>
+              {!selectionMode && (
+                <TableHead className="w-24 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider text-right">
+                  Actions
+                </TableHead>
+              )}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              // Loading skeleton
+              Array.from({ length: 10 }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
                   {selectionMode && (
-                    <TableHead className="w-8 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                      Chọn
-                    </TableHead>
+                    <TableCell className="text-center">
+                      <Skeleton className="h-4 w-4 rounded mx-auto" />
+                    </TableCell>
                   )}
-                  <TableHead className="w-8 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    ID
-                  </TableHead>
-                  <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 w-96 ml-4">
-                    Bài tập
-                  </TableHead>
-                  <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    Topic
-                  </TableHead>
+                  <TableCell>
+                    <Skeleton className="h-4 w-8" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-4 w-48" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-2 w-24" />
+                      <Skeleton className="h-3 w-8" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Skeleton className="h-5 w-12 rounded-full" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                  </TableCell>
+                  {!selectionMode && (
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading && problems.length === 0
-                  ? // Loading skeleton for initial load
-                    Array.from({ length: 3 }, (_, index) => index).map(
-                      (skeletonId) => (
-                        <TableRow
-                          key={`loading-skeleton-${skeletonId}`}
-                          className="border-b border-slate-100/50 dark:border-slate-700/30"
-                        >
-                          {selectionMode && (
-                            <TableCell className="text-center px-4 py-4">
-                              <div className="w-4 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                            </TableCell>
-                          )}
-                          <TableCell className="text-center px-4 py-4">
-                            <div className="inline-flex px-3 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse">
-                              <div className="w-4 h-4 bg-slate-300 dark:bg-slate-600 rounded" />
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-4">
-                            <div className="space-y-3">
-                              <div className="w-3/4 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                              <div className="flex items-center gap-3">
-                                <div className="w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                                <div className="w-12 h-6 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                              </div>
-                            </div>
-                          </TableCell>
-                          {!selectionMode && (
-                            <TableCell className="text-center px-4 py-4">
-                              <div className="w-20 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mx-auto" />
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      )
-                    )
-                  : problems.map((problem, index) => {
-                      const isInitialSelected =
-                        isMultipleSelect &&
-                        initialSelectedProblemIds?.has(problem.id);
-                      return (
-                        <TableRow
-                          key={problem.id}
-                          className={`border-b border-slate-100/50 dark:border-slate-700/30 transition-all duration-200 group ${
-                            isInitialSelected
-                              ? 'opacity-60 bg-slate-50 dark:bg-slate-800 cursor-not-allowed'
-                              : 'hover:bg-slate-50/80 dark:hover:bg-slate-700/30'
-                          }`}
-                        >
-                          {selectionMode && (
-                            <TableCell className="text-center px-4 py-4">
-                              <input
-                                type={isMultipleSelect ? 'checkbox' : 'radio'}
-                                name={
-                                  isMultipleSelect
-                                    ? undefined
-                                    : 'problem-selection'
-                                }
-                                value={problem.id}
-                                checked={
-                                  isMultipleSelect
-                                    ? selectedProblemIds.has(problem.id)
-                                    : selectedProblemId === problem.id
-                                }
-                                onChange={() =>
-                                  handleProblemSelection(problem.id)
-                                }
-                                disabled={isInitialSelected}
-                                className="w-4 h-4 text-green-600 focus:ring-green-500 border-2 border-slate-300"
-                              />
-                            </TableCell>
-                          )}
-                          <TableCell className="text-center px-4 py-4">
-                            <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
-                              <code className="text-green-700 dark:text-green-300 font-bold text-sm">
-                                {problem.id}
-                              </code>
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-4">
-                            <div className="space-y-3">
-                              {isInitialSelected ? (
-                                <span className="text-left font-semibold text-slate-500 dark:text-slate-400 italic block w-full">
-                                  {problem.title} (Đã được chọn trong cuộc thi)
-                                </span>
-                              ) : selectionMode ? (
-                                <button
-                                  type="button"
-                                  className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
-                                  onClick={() => handleProblemClick(problem.id)}
-                                >
-                                  {problem.title}
-                                </button>
+              ))
+            ) : problems.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={selectionMode ? 9 : 8}
+                  className="h-32 text-center text-slate-500"
+                >
+                  Không tìm thấy bài tập nào
+                </TableCell>
+              </TableRow>
+            ) : (
+              problems.map((problem) => {
+                const isInitialSelected =
+                  isMultipleSelect &&
+                  initialSelectedProblemIds?.has(problem.id);
+                return (
+                  <TableRow
+                    key={problem.id}
+                    className={`group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors ${isInitialSelected
+                      ? 'bg-slate-50 dark:bg-slate-800 opacity-60'
+                      : ''
+                      }`}
+                  >
+                    {selectionMode && (
+                      <TableCell className="text-center">
+                        <input
+                          type={isMultipleSelect ? 'checkbox' : 'radio'}
+                          checked={
+                            isMultipleSelect
+                              ? selectedProblemIds.has(problem.id)
+                              : selectedProblemId === problem.id
+                          }
+                          onChange={() => handleProblemSelection(problem.id)}
+                          disabled={isInitialSelected}
+                          className="w-4 h-4 text-green-600 rounded border-slate-300 focus:ring-green-500"
+                        />
+                      </TableCell>
+                    )}
+                    <TableCell className="font-medium text-slate-600 dark:text-slate-400">
+                      {problem.id}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        {selectionMode ? (
+                          <span className="font-bold text-slate-800 dark:text-slate-200">
+                            {problem.title}
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/problems/${problem.id}`}
+                            className="font-bold text-slate-800 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                          >
+                            {problem.title}
+                          </Link>
+                        )}
+                        <span className="text-xs text-slate-500 mt-1">
+                          Last updated: {new Date(problem.updatedAt || '').toLocaleDateString()}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={`${getDifficultyColor(
+                          problem.difficulty
+                        )} border-0`}
+                      >
+                        {getDifficultyLabel(problem.difficulty)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={problem.isActive ? 'default' : 'secondary'}
+                        className={`${problem.isActive
+                          ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                          } border-0`}
+                      >
+                        {problem.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Progress
+                          value={problem.acceptanceRate || 0}
+                          className="h-2 w-24"
+                          indicatorClassName="bg-green-500"
+                        />
+                        <span className="text-xs text-slate-600 dark:text-slate-400">
+                          {problem.acceptanceRate?.toFixed(1)}%
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {problem.tags.slice(0, 3).map((tag) => (
+                          <Badge
+                            key={tag.id}
+                            variant="outline"
+                            className="text-xs font-normal text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                          >
+                            {tag.name}
+                          </Badge>
+                        ))}
+                        {problem.tags.length > 3 && (
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-normal text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+                          >
+                            +{problem.tags.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {problem.topics.slice(0, 2).map((topic) => (
+                          <Badge
+                            key={topic.id}
+                            variant="outline"
+                            className="text-xs font-normal text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                          >
+                            {topic.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    {!selectionMode && (
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Tooltip content="Edit">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                              asChild
+                            >
+                              <Link href={`/problems/${problem.id}/edit`}>
+                                <Edit className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </Tooltip>
+                          <Tooltip content={problem.isActive ? "Deactivate" : "Activate"}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 ${problem.isActive
+                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                                : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                                }`}
+                            >
+                              {problem.isActive ? (
+                                <Lock className="h-4 w-4" />
                               ) : (
-                                <Link href={`/problems/${problem.id}`}>
-                                  <button
-                                    type="button"
-                                    className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
-                                  >
-                                    {problem.title}
-                                  </button>
-                                </Link>
+                                <Unlock className="h-4 w-4" />
                               )}
-                              <div className="flex items-center gap-3 flex-wrap">
-                                <div
-                                  className={`${getDifficultyColor(
-                                    problem.difficulty
-                                  )} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
-                                >
-                                  {getDifficultyLabel(problem.difficulty)}
-                                </div>
-                                <div className="flex flex-wrap gap-1">
-                                  {problem.tags.map((tag) => (
-                                    <span
-                                      key={tag.id}
-                                      className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg"
-                                    >
-                                      {tag.name}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center px-4 py-4">
-                            <div className="space-y-2">
-                              <div className="flex flex-wrap gap-1 justify-center">
-                                {problem.topics && problem.topics.length > 0 ? (
-                                  problem.topics.map((topicItem) => (
-                                    <span
-                                      key={topicItem.id}
-                                      className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg font-medium"
-                                    >
-                                      {topicItem.name}
-                                    </span>
-                                  ))
-                                ) : (
-                                  <span className="text-xs text-slate-500 dark:text-slate-400 italic">
-                                    Chưa phân loại
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-              </TableBody>
-            </Table>
-          </div>
+                            </Button>
+                          </Tooltip>
+                          <Tooltip content="Delete">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </Tooltip>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Footer & Pagination */}
+      <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-sm text-slate-500 dark:text-slate-400">
+          Showing{' '}
+          <span className="font-medium text-slate-900 dark:text-slate-200">
+            {meta ? (meta.page - 1) * meta.limit + 1 : 0}
+          </span>{' '}
+          -{' '}
+          <span className="font-medium text-slate-900 dark:text-slate-200">
+            {meta ? Math.min(meta.page * meta.limit, meta.total) : 0}
+          </span>{' '}
+          of{' '}
+          <span className="font-medium text-slate-900 dark:text-slate-200">
+            {meta?.total || 0}
+          </span>{' '}
+          problems
         </div>
-      </InfiniteScroll>
+        {renderPagination()}
+      </div>
     </div>
   );
 }

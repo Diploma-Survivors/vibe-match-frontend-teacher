@@ -7,8 +7,13 @@ export interface TestCase {
 
 export interface TestcaseSample {
   id?: number;
+  problem?: string;
   input: string;
-  output: string;
+  expectedOutput: string;
+  orderIndex?: number;
+  explanation?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateTestcaseRequest {

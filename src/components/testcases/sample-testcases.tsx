@@ -26,7 +26,7 @@ export default function SampleTestcases({
   }, [currentTestCases, onChange]);
 
   const addTestCase = () => {
-    const newTestCases = [...sampleTestcases, { input: '', output: '' }];
+    const newTestCases = [...sampleTestcases, { input: '', expectedOutput: '' }];
     setCurrentTestCases(newTestCases);
   };
 
@@ -37,7 +37,7 @@ export default function SampleTestcases({
 
   const handleTestCaseChange = (
     index: number,
-    field: 'input' | 'output',
+    field: 'input' | 'expectedOutput',
     value: string
   ) => {
     const newTestCases = [...currentTestCases];
@@ -115,11 +115,11 @@ export default function SampleTestcases({
                   <TestCaseTextArea
                     isReadOnly={isReadOnly}
                     label="Đầu ra"
-                    value={testCase.output}
+                    value={testCase.expectedOutput}
                     placeholder="Nhập dữ liệu đầu ra..."
                     required
                     onChange={(val) =>
-                      handleTestCaseChange(index, 'output', val)
+                      handleTestCaseChange(index, 'expectedOutput', val)
                     }
                   />
                 </div>

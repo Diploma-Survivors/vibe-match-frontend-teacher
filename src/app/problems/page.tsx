@@ -1,45 +1,46 @@
 'use client';
 
-import ProblemList, { ProblemListMode } from '@/components/problem-list';
-import { type ProblemData, ProblemEndpointType } from '@/types/problems';
-import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import ProblemList from '@/components/problem-list';
+import { Button } from '@/components/ui/button';
+import { ProblemEndpointType } from '@/types/problems';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProblemsPage() {
-  const router = useRouter();
-
-  const handleProblemView = useCallback(
-    (problem: ProblemData) => {
-      console.log(problem.id);
-      router.push(`/problems/${problem.id}/edit`);
-    },
-    [router]
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-4">
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
-        <div className="container mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-2">
-                Vibe Match Problems
-              </h1>
-              <p className="text-slate-600 dark:text-slate-400 text-lg">
-                Khám phá và chinh phục hàng ngàn bài tập lập trình
-              </p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {/* Header Section */}
+      <div className="dark:bg-slate-800 dark:border-slate-700">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col gap-6">
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                  Problem list
+                </h1>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">
+                  Manage problem with sFinx.
+                </p>
+              </div>
+
+              <Button
+                asChild
+                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Link href="/problems/create">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create new problem
+                </Link>
+              </Button>
             </div>
-            {/*<ProblemStats problems={problems} />*/}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <ProblemList
-        mode={ProblemListMode.VIEW}
         endpointType={ProblemEndpointType.PROBLEM_MANAGEMENT}
-        onProblemView={handleProblemView}
       />
     </div>
   );

@@ -44,3 +44,5 @@ next-env.d.ts
 # package manager lock files
 pnpm-lock.yaml
 yarn.lock
+
+.vscode

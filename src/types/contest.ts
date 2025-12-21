@@ -1,6 +1,6 @@
 import { getLexicalTextLength } from '@/lib/utils';
 import { z } from 'zod';
-import type { ProblemData } from './problems';
+import type { Problem } from './problems';
 
 // Leaderboard Types
 export interface LeaderboardUser {
@@ -56,7 +56,7 @@ export interface LeaderboardRequest {
 }
 
 export interface LeaderboardResponse {
-  problems: ProblemData[];
+  problems: Problem[];
   rankings: Rankings;
 }
 
@@ -70,7 +70,7 @@ export interface Contest {
   durationMinutes?: number;
   lateDeadline?: string;
   deadlineEnforcement: ContestDeadlineEnforcement;
-  problems: ProblemData[];
+  problems: Problem[];
   submissionStrategy: ContestSubmissionStrategy;
   createdBy?: string;
   createdAt?: string;

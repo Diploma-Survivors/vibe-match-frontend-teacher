@@ -15,6 +15,11 @@ export const TOPIC_OPTIONS = [
 export interface Topic {
   id: number;
   name: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  slug: string;
+  description: string;
+  iconUrl: string;
+  orderIndex: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
 }

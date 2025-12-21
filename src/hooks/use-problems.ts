@@ -1,12 +1,11 @@
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
-  MatchMode,
-  type PageInfo,
-  type ProblemData,
+  type Problem,
   type ProblemEndpointType,
   type ProblemFilters,
   type ProblemListResponse,
+  type ProblemMeta,
   SortBy,
   SortOrder,
 } from '@/types/problems';
@@ -15,9 +14,8 @@ import { useCallback, useEffect, useState } from 'react';
 const ITEMS_PER_PAGE = 20;
 
 interface UseProblemsState {
-  problems: ProblemData[];
-  pageInfo: PageInfo | null;
-  totalCount: number;
+  problems: Problem[];
+  meta: ProblemMeta | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -29,10 +27,11 @@ interface UseProblemsActions {
   handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handleSearch: () => void;
   handleReset: () => void;
-  handleLoadMore: () => void;
+  handlePageChange: (page: number) => void;
 }
 
 interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
+  totalCount: number;
   // Request params (exposed for UI)
   filters: ProblemFilters;
   keyword: string;
@@ -46,8 +45,7 @@ export default function useProblems(
   // Main state to manage problems and loading/error states
   const [state, setState] = useState<UseProblemsState>({
     problems: [],
-    pageInfo: null,
-    totalCount: 0,
+    meta: null,
     isLoading: false,
     error: null,
   });
@@ -58,14 +56,14 @@ export default function useProblems(
 
   // state for sorting
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.DESC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetProblemListRequest>({
-    first: ITEMS_PER_PAGE,
+    page: 1,
+    limit: ITEMS_PER_PAGE,
     sortBy: sortBy || SortBy.TITLE,
-    sortOrder: sortOrder || SortOrder.ASC,
-    matchMode: MatchMode.ANY,
+    sortOrder: sortOrder || SortOrder.DESC,
     filters: {
       ...filters,
     },
@@ -76,24 +74,68 @@ export default function useProblems(
     async (requestParams: GetProblemListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-        const axiosResponse = await ProblemsService.getProblemList(
-          requestParams,
-          endpointType
-        );
-        const response: ProblemListResponse = axiosResponse?.data?.data;
+        
+        // Mock API call since endpoint is not available
+        // In a real scenario, we would call ProblemsService.getProblemList(requestParams, endpointType)
+        
+        // Simulating API delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Extract problems from edges
-        const problemsData = response?.edges.map((edge) => ({
-          ...edge.node,
+        // Mock data generation (replace with actual service call when available)
+        // For now, we'll try to use the service if it exists, otherwise fallback or mock
+        // Since the user asked to mock, we will implement a mock fetch here or in the service.
+        // Let's assume we need to mock it here for now as the service might not be updated.
+        
+        // However, to keep it clean, let's try to call the service and if it fails or we want to force mock:
+        // But the user explicitly said "this endpoint is not available, so please mock them"
+        
+        // Let's generate some mock data based on the request
+        const mockProblems: Problem[] = Array.from({ length: requestParams.limit || 20 }).map((_, i) => ({
+          id: (requestParams.page || 1) * 100 + i,
+          title: `Problem ${((requestParams.page || 1) - 1) * 20 + i + 1} - ${requestParams.search || 'Random'}`,
+          slug: `problem-${((requestParams.page || 1) - 1) * 20 + i + 1}`,
+          description: 'Description',
+          difficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random() * 3)] as any,
+          isPremium: Math.random() > 0.8,
+          isPublished: true,
+          isActive: true,
+          totalSubmissions: Math.floor(Math.random() * 1000),
+          totalAccepted: Math.floor(Math.random() * 500),
+          acceptanceRate: Math.random() * 100,
+          tags: [
+            { id: 1, name: 'Array', slug: 'array', color: 'blue', type: 'default', description: '', createdAt: '', updatedAt: '' },
+            { id: 2, name: 'Easy', slug: 'easy', color: 'green', type: 'default', description: '', createdAt: '', updatedAt: '' }
+          ],
+          topics: [
+             { id: 1, name: 'Algorithms', slug: 'algorithms', description: 'Algorithmic problems', iconUrl: '', orderIndex: 1, isActive: true, createdAt: '', updatedAt: '' }
+          ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          constraints: '',
+          timeLimitMs: 1000,
+          memoryLimitKb: 256,
+          sampleTestcases: [],
+          hints: [],
+          hasOfficialSolution: false,
+          testcaseCount: 0,
         }));
+
+        const mockResponse: ProblemListResponse = {
+          data: mockProblems,
+          meta: {
+            page: requestParams.page || 1,
+            limit: requestParams.limit || 20,
+            total: 100, // Mock total
+            totalPages: 5,
+            hasPreviousPage: (requestParams.page || 1) > 1,
+            hasNextPage: (requestParams.page || 1) < 5,
+          },
+        };
 
         setState((prev) => ({
           ...prev,
-          problems: requestParams.after
-            ? [...prev.problems, ...problemsData]
-            : problemsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
+          problems: mockResponse.data,
+          meta: mockResponse.meta,
           isLoading: false,
         }));
       } catch (err) {
@@ -115,11 +157,7 @@ export default function useProblems(
 
   // Helper function to update request
   const updateRequest = useCallback(
-    (updates: Partial<GetProblemListRequest>, clearProblems = false) => {
-      if (clearProblems) {
-        setState((prev) => ({ ...prev, problems: [] }));
-      }
-
+    (updates: Partial<GetProblemListRequest>) => {
       setRequest((prev) => ({
         ...prev,
         ...updates,
@@ -131,17 +169,31 @@ export default function useProblems(
   // handle filter, keyword changes
   const handleFiltersChange = useCallback((newFilters: ProblemFilters) => {
     setFilters(newFilters);
-  }, []);
+    // When filters change, reset to page 1
+    updateRequest({ filters: newFilters, page: 1 });
+  }, [updateRequest]);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
   }, []);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateRequest({
+        search: keyword.trim() || undefined,
+        page: 1,
+      });
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [keyword, updateRequest]);
+
   // handle sorting changes
   const handleSortByChange = useCallback(
     (newSortBy: SortBy) => {
       setSortBy(newSortBy);
-      updateRequest({ sortBy: newSortBy }, false);
+      updateRequest({ sortBy: newSortBy, page: 1 });
     },
     [updateRequest]
   );
@@ -149,69 +201,47 @@ export default function useProblems(
   const handleSortOrderChange = useCallback(
     (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
-      updateRequest({ sortOrder: newSortOrder }, false);
+      updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
     [updateRequest]
   );
 
-  // handle load more for pagination
-  const handleLoadMore = useCallback(() => {
-    if (state.isLoading || !state.pageInfo?.hasNextPage) {
-      return;
-    }
-    updateRequest(
-      {
-        after: state.pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      false
-    );
-  }, [state.isLoading, state.pageInfo, updateRequest]);
+  // handle page change
+  const handlePageChange = useCallback((page: number) => {
+    updateRequest({ page });
+  }, [updateRequest]);
 
-  // handle search
+  // handle search (now just forces a refresh if needed, but debounce handles typing)
   const handleSearch = useCallback(() => {
     const trimmedKeyword = keyword.trim();
-
-    updateRequest(
-      {
-        keyword: trimmedKeyword || undefined,
-        filters: {
-          ...filters,
-        },
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
+    updateRequest({
+      search: trimmedKeyword || undefined,
+      filters: { ...filters },
+      page: 1,
+    });
   }, [keyword, filters, updateRequest]);
 
   // handle reset
   const handleReset = useCallback(() => {
     setFilters({});
     setKeyword('');
+    setSortBy(SortBy.TITLE);
+    setSortOrder(SortOrder.DESC);
 
-    updateRequest(
-      {
-        keyword: undefined,
-        filters: {},
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
+    updateRequest({
+      search: undefined,
+      filters: {},
+      page: 1,
+      sortBy: SortBy.TITLE,
+      sortOrder: SortOrder.DESC,
+    });
   }, [updateRequest]);
 
   return {
     // State
     problems: state.problems,
-    pageInfo: state.pageInfo,
-    totalCount: state.totalCount,
+    meta: state.meta,
+    totalCount: state.meta?.total || 0,
     isLoading: state.isLoading,
     error: state.error,
 
@@ -228,6 +258,6 @@ export default function useProblems(
     handleSortOrderChange,
     handleSearch,
     handleReset,
-    handleLoadMore,
+    handlePageChange,
   };
 }
