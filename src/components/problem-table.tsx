@@ -7,12 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type {
-  Problem,
-  ProblemMeta,
-  SortBy,
-  SortOrder,
-} from '@/types/problems';
+import type { Problem, ProblemMeta, SortBy, SortOrder } from '@/types/problems';
 import { getDifficultyColor, getDifficultyLabel } from '@/types/problems';
 import {
   ChevronLeft,
@@ -77,9 +72,9 @@ export default function ProblemTable({
   const [selectedProblemId, setSelectedProblemId] = useState<number | null>(
     null
   );
-  const [selectedProblemIds, setSelectedProblemIds] = useState<Set<number>>(
-    new Set()
-  );
+  const [selectedProblemsMap, setSelectedProblemsMap] = useState<
+    Map<number, Problem>
+  >(new Map());
 
   const handleProblemClick = (problemId: number) => {
     if (selectionMode && onProblemView) {
@@ -92,27 +87,26 @@ export default function ProblemTable({
     }
   };
 
-  const handleProblemSelection = (problemId: number) => {
+  const handleProblemSelection = (problem: Problem) => {
     if (isMultipleSelect) {
-      setSelectedProblemIds((prev) => {
-        const newSet = new Set(prev);
-        if (newSet.has(problemId)) {
-          newSet.delete(problemId);
+      setSelectedProblemsMap((prev) => {
+        const newMap = new Map(prev);
+        if (newMap.has(problem.id)) {
+          newMap.delete(problem.id);
         } else {
-          newSet.add(problemId);
+          newMap.set(problem.id, problem);
         }
-        return newSet;
+        return newMap;
       });
     } else {
-      setSelectedProblemId(problemId);
+      setSelectedProblemId(problem.id);
     }
   };
 
   const handleConfirmSelection = () => {
     if (isMultipleSelect && onMultipleProblemsSelect) {
-      const selectedProblems = problems.filter((problem) =>
-        selectedProblemIds.has(problem.id)
-      );
+      // Return all selected problems from the map
+      const selectedProblems = Array.from(selectedProblemsMap.values());
       if (selectedProblems.length > 0) {
         onMultipleProblemsSelect(selectedProblems);
       }
@@ -127,7 +121,7 @@ export default function ProblemTable({
   };
 
   const hasSelection = isMultipleSelect
-    ? selectedProblemIds.size > 0
+    ? selectedProblemsMap.size > 0
     : selectedProblemId !== null;
 
   // Pagination Logic
@@ -140,7 +134,7 @@ export default function ProblemTable({
     const pages = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -180,10 +174,11 @@ export default function ProblemTable({
             variant={page === currentPage ? 'default' : 'outline'}
             size="sm"
             onClick={() => onPageChange(page)}
-            className={`h-8 w-8 p-0 rounded-lg ${page === currentPage
-              ? 'bg-green-600 hover:bg-green-700 text-white border-transparent'
-              : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-              }`}
+            className={`h-8 w-8 p-0 rounded-lg ${
+              page === currentPage
+                ? 'bg-green-600 hover:bg-green-700 text-white border-transparent'
+                : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+            }`}
           >
             {page}
           </Button>
@@ -232,7 +227,7 @@ export default function ProblemTable({
               className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-sm"
             >
               {isMultipleSelect
-                ? `Chọn ${selectedProblemIds.size} bài tập`
+                ? `Chọn ${selectedProblemsMap.size} bài tập`
                 : 'Chọn bài tập'}
             </Button>
           </div>
@@ -344,10 +339,11 @@ export default function ProblemTable({
                 return (
                   <TableRow
                     key={problem.id}
-                    className={`group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors ${isInitialSelected
-                      ? 'bg-slate-50 dark:bg-slate-800 opacity-60'
-                      : ''
-                      }`}
+                    className={`group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors ${
+                      isInitialSelected
+                        ? 'bg-slate-50 dark:bg-slate-800 opacity-60'
+                        : ''
+                    }`}
                   >
                     {selectionMode && (
                       <TableCell className="text-center">
@@ -355,10 +351,10 @@ export default function ProblemTable({
                           type={isMultipleSelect ? 'checkbox' : 'radio'}
                           checked={
                             isMultipleSelect
-                              ? selectedProblemIds.has(problem.id)
+                              ? selectedProblemsMap.has(problem.id)
                               : selectedProblemId === problem.id
                           }
-                          onChange={() => handleProblemSelection(problem.id)}
+                          onChange={() => handleProblemSelection(problem)}
                           disabled={isInitialSelected}
                           className="w-4 h-4 text-green-600 rounded border-slate-300 focus:ring-green-500"
                         />
@@ -382,7 +378,10 @@ export default function ProblemTable({
                           </Link>
                         )}
                         <span className="text-xs text-slate-500 mt-1">
-                          Last updated: {new Date(problem.updatedAt || '').toLocaleDateString()}
+                          Last updated:{' '}
+                          {new Date(
+                            problem.updatedAt || ''
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                     </TableCell>
@@ -399,10 +398,11 @@ export default function ProblemTable({
                     <TableCell>
                       <Badge
                         variant={problem.isActive ? 'default' : 'secondary'}
-                        className={`${problem.isActive
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
-                          } border-0`}
+                        className={`${
+                          problem.isActive
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                        } border-0`}
                       >
                         {problem.isActive ? 'Active' : 'Inactive'}
                       </Badge>
@@ -468,14 +468,19 @@ export default function ProblemTable({
                               </Link>
                             </Button>
                           </Tooltip>
-                          <Tooltip content={problem.isActive ? "Deactivate" : "Activate"}>
+                          <Tooltip
+                            content={
+                              problem.isActive ? 'Deactivate' : 'Activate'
+                            }
+                          >
                             <Button
                               variant="ghost"
                               size="icon"
-                              className={`h-8 w-8 ${problem.isActive
-                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
-                                : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
-                                }`}
+                              className={`h-8 w-8 ${
+                                problem.isActive
+                                  ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                                  : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                              }`}
                             >
                               {problem.isActive ? (
                                 <Lock className="h-4 w-4" />

@@ -60,7 +60,6 @@ export interface Role {
   updatedAt: string;
 }
 
-
 export interface Hint {
   order: number;
   content: string;
@@ -81,6 +80,12 @@ export interface CreateProblemRequest {
   topicIds: number[];
   testcaseFile: File | null;
   testcaseSamples: TestcaseSample[];
+  constraints: string;
+  isPremium?: boolean;
+  isPublished?: boolean;
+  hints?: Hint[];
+  hasOfficialSolution?: boolean;
+  officialSolutionContent?: string;
 }
 
 export interface TestcaseFileResponse {
@@ -128,7 +133,7 @@ export interface Problem {
   tags: Tag[];
   createdAt?: string;
   updatedAt?: string;
-  
+
   // Legacy/Form fields (optional to avoid breaking UI immediately)
   inputDescription?: string;
   outputDescription?: string;
@@ -196,7 +201,7 @@ export const initialProblemData: Problem = {
   tags: [],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  
+
   // Legacy
   inputDescription: '',
   outputDescription: '',
@@ -287,94 +292,86 @@ export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
   return DIFFICULTY_LABELS.get(difficulty) || difficulty;
 };
 
-export const ProblemSchema = z
-  .object({
-    id: z.number(),
-    title: z
-      .string()
-      .trim()
-      .min(3, 'Tên bài tập phải có ít nhất 3 ký tự')
-      .max(128, 'Tên bài tập không được vượt quá 128 ký tự'),
+export const ProblemSchema = z.object({
+  id: z.number(),
+  title: z
+    .string()
+    .trim()
+    .min(3, 'Title must be at least 3 characters long')
+    .max(128, 'Title must be at most 128 characters long'),
 
-    slug: z.string().optional(),
-    constraints: z.string().optional(),
-    isPremium: z.boolean().optional(),
-    isPublished: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    totalSubmissions: z.number().optional(),
-    totalAccepted: z.number().optional(),
-    acceptanceRate: z.number().optional(),
-    totalAttempts: z.number().optional(),
-    totalSolved: z.number().optional(),
-    averageTimeToSolve: z.number().optional(),
-    difficultyRating: z.number().optional(),
-    testcaseFileKey: z.any().optional(),
-    sampleTestcases: z.array(z.any()).optional(),
-    createdAt: z.string().optional(),
-    updatedAt: z.string().optional(),
-    testcaseCount: z.number().optional(),
-    hints: z.array(z.any()).optional(),
-    hasOfficialSolution: z.boolean().optional(),
-    officialSolutionContent: z.string().optional(),
-    createdBy: z.any().optional(), // Should be User schema but any is fine for now
-    updatedBy: z.any().optional(),
-    similarProblems: z.array(z.number()).optional(),
+  slug: z.string().optional(),
+  constraints: z
+    .string()
+    .min(10, 'Constraints must be at least 10 characters long'),
+  isPremium: z.boolean().optional(),
+  isPublished: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  totalSubmissions: z.number().optional(),
+  totalAccepted: z.number().optional(),
+  acceptanceRate: z.number().optional(),
+  totalAttempts: z.number().optional(),
+  totalSolved: z.number().optional(),
+  averageTimeToSolve: z.number().optional(),
+  difficultyRating: z.number().optional(),
+  testcaseFileKey: z.any().optional(),
+  sampleTestcases: z.array(z.any()).optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  testcaseCount: z.number().optional(),
+  hints: z.array(z.any()).optional(),
+  hasOfficialSolution: z.boolean().optional(),
+  officialSolutionContent: z.string().optional(),
+  createdBy: z.any().optional(), // Should be User schema but any is fine for now
+  updatedBy: z.any().optional(),
+  similarProblems: z.array(z.number()).optional(),
 
-    description: z.string().superRefine((val, ctx) => {
-      const len = getLexicalTextLength(val);
-      if (len < 16) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả bài tập phải có ít nhất 16 ký tự',
-        });
-      }
-      if (len > 512) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Mô tả bài tập không được vượt quá 512 ký tự',
-        });
-      }
-    }),
+  description: z.string().superRefine((val, ctx) => {
+    const len = val.trim().length;
+    if (len < 16) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Description must be at least 16 characters long',
+      });
+    }
+    if (len > 5000) {
+      // Increased limit for markdown
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Description must be at most 5000 characters long',
+      });
+    }
+  }),
 
-    inputDescription: z.string().optional(),
-    outputDescription: z.string().optional(),
+  inputDescription: z.string().optional(),
+  outputDescription: z.string().optional(),
 
-    maxScore: z.number().optional(),
+  maxScore: z.number().optional(),
 
-    timeLimitMs: z
-      .number('Giới hạn thời gian phải là số')
-      .positive('Giới hạn thời gian phải là số dương'),
+  timeLimitMs: z
+    .number('Time limit must be a number')
+    .positive('Time limit must be a positive number'),
 
-    memoryLimitKb: z
-      .number('Giới hạn bộ nhớ phải là số')
-      .positive('Giới hạn bộ nhớ phải là số dương'),
+  memoryLimitKb: z
+    .number('Memory limit must be a number')
+    .positive('Memory limit must be a positive number'),
 
-    difficulty: z.enum(ProblemDifficulty, {
-      error: () => ({ message: 'Vui lòng chọn mức độ khó' }),
-    }),
-    // visibility: z.enum(ProblemVisibility, {
-    //   error: () => ({ message: 'Vui lòng chọn phạm vi' }),
-    // }),
-    // type: z.enum(ProblemType, {
-    //   error: () => ({ message: 'Vui lòng chọn loại cho bài tập' }),
-    // }),
-    topics: z
-      .array(z.any())
-      .min(1, 'Vui lòng chọn ít nhất một chủ đề')
-      .max(3, 'Chỉ được chọn tối đa 3 chủ đề'),
-    tags: z
-      .array(z.any())
-      .min(1, 'Vui lòng chọn ít nhất một tag')
-      .max(4, 'Chỉ được chọn tối đa 4 tag'),
-    // testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
-    // testcaseSamples: z
-    //   .array(z.any())
-    //   .min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
-  });
-  // .refine((data) => data.testcase !== undefined && data.testcase !== null, {
-  //   message: 'File test case là bắt buộc',
-  //   path: ['testcase'],
-  // });
+  difficulty: z.enum(ProblemDifficulty, {
+    error: () => ({ message: 'Please select a difficulty' }),
+  }),
+  topics: z
+    .array(z.any())
+    .min(1, 'Please select at least one topic')
+    .max(3, 'Only 3 topics can be selected'),
+  tags: z
+    .array(z.any())
+    .min(1, 'Please select at least one tag')
+    .max(4, 'Only 4 tags can be selected'),
+  // testcase: z.instanceof(File).nullable(), // We'll add custom validation for this
+  // testcaseSamples: z
+  //   .array(z.any())
+  //   .min(1, 'Vui lòng thêm ít nhất một test case mẫu'),
+});
 
 export const AllowedTypes = ['application/json'];
 
