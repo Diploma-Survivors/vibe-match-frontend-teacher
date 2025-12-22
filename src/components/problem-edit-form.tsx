@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { useForm, useWatch, FormProvider } from 'react-hook-form';
+'use client';
+import { useState, useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Stepper } from '@/components/ui/stepper';
 import { Button } from '@/components/ui/button';
 import {
-  ProblemDifficulty,
   ProblemType,
   ProblemVisibility,
   ProblemSchema,
@@ -13,8 +12,6 @@ import {
 
 import { toastService } from '@/services/toasts-service';
 import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setDraft, clearDraft } from '@/store/slices/create-problem-slice';
 import { useDialog } from '@/components/providers/dialog-provider';
 
 import { TagsService } from '@/services/tags-service';
@@ -28,57 +25,11 @@ import { TestCasesStep } from './problems/problem-form-steps/test-cases-step';
 import { SolutionHintsStep } from './problems/problem-form-steps/solution-hints-step';
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
-import type { CreateProblemRequest } from '@/types/problems';
-
-export const CreateProblemSchema = ProblemSchema.omit({
-  id: true,
-  slug: true,
-  createdAt: true,
-  updatedAt: true,
-  createdBy: true,
-  updatedBy: true,
-  hints: true,
-})
-  .extend({
-    hints: z
-      .array(
-        z.object({
-          content: z.string().min(1, 'Hint content cannot be empty'),
-          order: z.number(),
-        })
-      )
-      .optional(),
-    testcaseFile: z
-      .any()
-      .refine((file) => file instanceof File, 'Testcase file is required'),
-    sampleTestcases: z
-      .array(
-        z.object({
-          input: z.string().min(1, 'Input cannot be empty'),
-          output: z.string().min(1, 'Output cannot be empty'),
-          explanation: z.string().optional(),
-        })
-      )
-      .min(1, 'At least one sample test case is required'),
-    officialSolutionContent: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.hasOfficialSolution) {
-      if (
-        !data.officialSolutionContent ||
-        data.officialSolutionContent.length <= 16
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            'Official solution content must be longer than 16 characters',
-          path: ['officialSolutionContent'],
-        });
-      }
-    }
-  });
-
-export type CreateProblemFormValues = z.infer<typeof CreateProblemSchema>;
+import type { CreateProblemRequest, Problem } from '@/types/problems';
+import {
+  CreateProblemSchema,
+  type CreateProblemFormValues,
+} from './problem-create-form';
 
 const STEPS = [
   { title: 'General Information', description: 'General Info' },
@@ -88,84 +39,86 @@ const STEPS = [
   { title: 'Solution & Hints', description: 'Solution & Hints' },
 ];
 
-export default function ProblemCreateForm() {
+interface ProblemEditFormProps {
+  problemId: number;
+}
+
+export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [originalProblem, setOriginalProblem] = useState<Problem | null>(null);
 
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const draft = useAppSelector((state) => state.createProblem);
   const { confirm } = useDialog();
 
   const form = useForm<CreateProblemFormValues>({
     resolver: zodResolver(CreateProblemSchema),
-    defaultValues: draft, // Initialize with saved draft from Redux
     mode: 'onChange',
   });
 
   const [errorSteps, setErrorSteps] = useState<number[]>([]);
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-    formState: { errors },
-  } = form;
+  const { handleSubmit, reset } = form;
 
-  // Save draft on change
-  const watchedValues = useWatch({ control });
-
-  const isCancellingRef = useRef(false);
-
-  // Save draft on change
-  useEffect(() => {
-    if (isCancellingRef.current) return;
-
-    // Exclude testcaseFile from draft persistence to avoid Redux non-serializable error
-    const safeDraft: Record<string, any> = {};
-    for (const key in watchedValues) {
-      if (key !== 'testcaseFile') {
-        safeDraft[key] = (watchedValues as any)[key];
-      }
-    }
-
-    // Exclude testcaseFile from draft for comparison
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { testcaseFile, ...draftWithoutFile } = draft;
-
-    // Prevent infinite loops and unnecessary updates
-    if (JSON.stringify(safeDraft) !== JSON.stringify(draftWithoutFile)) {
-      dispatch(setDraft(safeDraft as Partial<CreateProblemFormValues>));
-    }
-  }, [watchedValues, dispatch, draft]);
-
-  // Fetch topics and tags
+  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const [topicsRes, tagsRes] = await Promise.all([
+        const [topicsRes, tagsRes, problemRes] = await Promise.all([
           TopicsService.getAllTopics(),
           TagsService.getAllTags(),
+          ProblemsService.getProblemById(problemId),
         ]);
+
         setAvailableTopics(topicsRes.data.data);
         setAvailableTags(tagsRes.data.data);
+
+        const problem = problemRes.data.data;
+        setOriginalProblem(problem);
+
+        // Map problem data to form values
+        const formValues = ProblemsService.mapProblemToDTO(problem);
+
+        // We need to map the DTO back to form values format where needed
+        // Specifically for topics and tags which expect objects in the form but IDs in DTO
+        // But wait, mapProblemToDTO returns IDs for tags/topics.
+        // The form expects objects for MultiSelect.
+        // So we need to manually map IDs back to objects from the available lists.
+
+        const selectedTopics = topicsRes.data.data.filter((t) =>
+          formValues.topicIds.includes(t.id)
+        );
+        const selectedTags = tagsRes.data.data.filter((t) =>
+          formValues.tagIds.includes(t.id)
+        );
+
+        reset({
+          ...formValues,
+          topics: selectedTopics,
+          tags: selectedTags,
+          // Ensure arrays are initialized
+          sampleTestcases: formValues.testcaseSamples || [],
+          hints: formValues.hints || [],
+          testcaseFile: null, // File input cannot be pre-populated
+        });
       } catch (err) {
-        console.error('Failed to fetch topics or tags', err);
-        toastService.error('Failed to load topics and tags.');
+        console.error('Failed to fetch problem data', err);
+        toastService.error('Failed to load problem data.');
+        router.push('/problems');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
-
-  // handleNext and handleBack removed as we use Stepper for navigation
+  }, [problemId, reset, router]);
 
   const handleCancel = async () => {
     const confirmed = await confirm({
-      title: 'Cancel creating problem',
+      title: 'Cancel editing problem',
       message:
         'Are you sure you want to cancel? Any unsaved changes will be lost.',
       confirmText: 'Yes',
@@ -174,8 +127,6 @@ export default function ProblemCreateForm() {
     });
 
     if (confirmed) {
-      isCancellingRef.current = true;
-      dispatch(clearDraft());
       router.back();
     }
   };
@@ -213,45 +164,57 @@ export default function ProblemCreateForm() {
   };
 
   const onSubmit = async (data: CreateProblemFormValues) => {
+    if (!originalProblem) return;
+
     setIsSubmitting(true);
     setErrorSteps([]); // Reset errors
 
     try {
-      const problemRequest: CreateProblemRequest = {
-        ...data,
-        inputDescription: data.inputDescription || '',
-        outputDescription: data.outputDescription || '',
-        maxScore: data.maxScore || 100,
-        tagIds: data.tags.map((t: any) => t.id),
-        topicIds: data.topics.map((t: any) => t.id),
-        testcaseFile: data.testcaseFile,
-        testcaseSamples:
+      // Construct the updated problem object
+      // We need to merge the form data with the original problem ID
+      const updatedProblem: Problem = {
+        ...originalProblem,
+        title: data.title,
+        description: data.description,
+        constraints: data.constraints,
+        difficulty: data.difficulty,
+        timeLimitMs: data.timeLimitMs,
+        memoryLimitKb: data.memoryLimitKb,
+        isPremium: data.isPremium,
+        isPublished: data.isPublished,
+        topics: data.topics,
+        tags: data.tags,
+        sampleTestcases:
           data.sampleTestcases?.map((tc) => ({
             input: tc.input,
             expectedOutput: tc.output,
             explanation: tc.explanation,
           })) || [],
-        type: ProblemType.STANDALONE,
-        visibility: ProblemVisibility.PUBLIC,
         hints: data.hints,
+        hasOfficialSolution: data.hasOfficialSolution,
+        officialSolutionContent: data.officialSolutionContent,
+        testcase: data.testcaseFile, // Pass the new file if uploaded
       };
 
-      await ProblemsService.createProblem(problemRequest);
+      await ProblemsService.updateProblem(updatedProblem);
 
-      toastService.success('Problem created successfully!');
-      dispatch(clearDraft());
-
-      // Redirect to problems list
+      toastService.success('Problem updated successfully!');
       router.push('/problems');
     } catch (err) {
-      console.error('Error creating problem:', err);
-      toastService.error('Failed to create problem. Please try again.');
+      console.error('Error updating problem:', err);
+      toastService.error('Failed to update problem. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // topicOptions and tagOptions logic moved to GeneralInformationStep
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        Loading problem data...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-100px)] bg-slate-50 dark:bg-slate-900">
@@ -316,7 +279,7 @@ export default function ProblemCreateForm() {
                   disabled={isSubmitting}
                   className="min-w-[100px] bg-green-600 hover:bg-green-700 text-white cursor-pointer"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Problem'}
+                  {isSubmitting ? 'Updating...' : 'Update Problem'}
                 </Button>
               </div>
             </form>

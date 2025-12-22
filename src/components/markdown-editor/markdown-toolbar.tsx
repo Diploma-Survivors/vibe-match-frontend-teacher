@@ -33,6 +33,7 @@ export default function MarkdownToolbar({ onAction }: MarkdownToolbarProps) {
       {tools.map((tool) => (
         <Tooltip key={tool.action} content={tool.label}>
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 hover:bg-slate-200 dark:hover:bg-slate-800"

@@ -44,6 +44,7 @@ export const createProblemSlice = createSlice({
       return { ...state, ...payloadWithoutFile };
     },
     clearDraft: () => {
+      console.log('Clearing draft');
       return initialState;
     },
   },

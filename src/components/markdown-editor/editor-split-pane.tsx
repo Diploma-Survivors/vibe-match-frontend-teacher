@@ -1,3 +1,4 @@
+'use client';
 import MarkdownRenderer from '@/components/markdown-editor/markdown-renderer';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import { useTheme } from 'next-themes';

@@ -1,6 +1,6 @@
 'use client';
 
-import ProblemList from '@/components/problem-list';
+import ProblemList, { ProblemListMode } from '@/components/problem-list';
 import { Button } from '@/components/ui/button';
 import { ProblemEndpointType } from '@/types/problems';
 import { Plus } from 'lucide-react';
@@ -13,7 +13,6 @@ export default function ProblemsPage() {
       <div className="dark:bg-slate-800 dark:border-slate-700">
         <div className="container mx-auto px-6">
           <div className="flex flex-col gap-6">
-
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
@@ -40,6 +39,7 @@ export default function ProblemsPage() {
 
       {/* Main Content */}
       <ProblemList
+        mode={ProblemListMode.VIEW}
         endpointType={ProblemEndpointType.PROBLEM_MANAGEMENT}
       />
     </div>

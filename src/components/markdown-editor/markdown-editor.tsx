@@ -1,3 +1,4 @@
+'use client';
 import { useRef } from 'react';
 import EditorSplitPane, { type EditorRef } from './editor-split-pane';
 import MarkdownToolbar from './markdown-toolbar';
