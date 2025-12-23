@@ -10,7 +10,7 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import aiReviewReducer from './slides/ai-review-slice';
+import aiReviewReducer from './slices/ai-review-slice';
 import createProblemReducer from './slices/create-problem-slice';
 import metadataReducer from './slices/metadata-slice';
 

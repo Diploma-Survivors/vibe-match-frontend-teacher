@@ -1,3 +1,6 @@
+import type { UserProfile } from './user';
+import type { Problem } from './problems';
+
 export enum SubmissionStatus {
   PENDING = 'Pending',
   RUNNING = 'Running',
@@ -14,116 +17,117 @@ export enum SubmissionStatus {
   UNKNOWN_ERROR = 'Unknown Error',
 }
 
-export interface Language {
+export interface TestCaseResult {
+  testcaseId: number;
+  status: string;
+  actualOutput: string;
+  expectedOutput: string;
+  executionTime: number;
+  memoryUsed: number;
+  error: string;
+}
+
+export interface Submission {
   id: number;
-  name: string;
-}
-
-export interface TestCaseSubmission {
-  input: string;
-  output: string;
-}
-
-export interface SubmissionRequest {
+  status: SubmissionStatus;
+  executionTime: number;
+  memoryUsed: number;
+  testcasesPassed: number;
+  totalTestcases: number;
+  testcaseResults: TestCaseResult[];
+  user: Partial<UserProfile>;
+  problem: Partial<Problem>;
+  compileError: string;
+  runtimeError: string;
+  submittedAt: string;
+  problemId: number;
   languageId: number;
-  sourceCode: string;
-  problemId: string;
-  contestId?: number;
-  contestParticipationId?: number;
-  testCases?: TestCaseSubmission[];
+  sourceCode?: string;
 }
 
 export interface SubmissionFilters {
   status?: SubmissionStatus;
-  languageId?: number;
+  languageIds?: number[];
+  problemIds?: number[];
+  search?: string;
+}
+
+export enum SubmissionSortBy {
+  ID = 'id',
+  SUBMITTED_AT = 'submittedAt',
 }
 
 export interface GetSubmissionListRequest {
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
-  sortBy?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: SubmissionSortBy;
   sortOrder?: string;
-  matchMode?: string;
   filters?: SubmissionFilters;
 }
 
-export interface SubmissionListItem {
-  id: number;
-  language: Language;
-  memory: number;
-  note: string | null;
-  runtime: number;
-  score: number | null;
-  status: SubmissionStatus;
-  createdAt?: string;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
+export interface SubmissionMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
-export interface SubmissionEdge {
-  node: SubmissionListItem;
-  cursor: string;
+  hasNextPage: boolean;
 }
 
 export interface SubmissionListResponse {
-  edges: SubmissionEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+  data: Submission[];
+  meta: SubmissionMeta;
 }
 
 // Map language names to Highlight.js language keys
+// Map language names to Highlight.js language keys
 export const languageMap: Record<string, string> = {
+  // --- Original ---
   'C++': 'cpp',
-  Python: 'python',
+  'Python 2': 'python',
+  'Python 3': 'python',
   Java: 'java',
   JavaScript: 'javascript',
   TypeScript: 'typescript',
   'C#': 'csharp',
   Go: 'go',
   Rust: 'rust',
+
+  // --- Web Fundamentals ---
+  HTML: 'xml', // Highlight.js uses 'xml' for HTML
+  XML: 'xml',
+  CSS: 'css',
+  SCSS: 'scss',
+  LESS: 'less',
+  JSON: 'json',
+
+  // --- Backend / Scripting ---
+  PHP: 'php',
+  Ruby: 'ruby',
+  Perl: 'perl',
+  Bash: 'bash',
+  Shell: 'shell',
+  PowerShell: 'powershell',
+  Lua: 'lua',
+  SQL: 'sql',
+  GraphQL: 'graphql',
+
+  // --- Systems / Data Science ---
+  C: 'c',
+  R: 'r',
+  Matlab: 'matlab',
+  Swift: 'swift',
+  Kotlin: 'kotlin',
+  Dart: 'dart',
+  Scala: 'scala',
+  ObjectiveC: 'objectivec',
+
+  // --- Configuration / Docs ---
+  YAML: 'yaml',
+  Markdown: 'markdown',
+  Dockerfile: 'dockerfile',
+  Makefile: 'makefile',
+  INI: 'ini',
+  Diff: 'diff', // Great for showing git changes
 };
 
-// Contest submission types
-export interface Problem {
-  id: string;
-  title: string;
-}
-
-export interface StudentSubmissionOverview {
-  id: number;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  startTime: string;
-  endTime: string | null;
-  finalScore: number | null;
-}
-
-export interface SubmissionDetail {
-  id: string;
-  status: string;
-  score: number;
-  runtimeSec: number;
-  memoryBytes: number;
-  languageName: string;
-  sourceCode: string;
-  passedTests: number;
-  totalTests: number;
-  submittedAt: string;
-}

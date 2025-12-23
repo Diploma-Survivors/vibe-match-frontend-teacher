@@ -55,7 +55,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
           icon: PlusCircle,
         },
         { name: 'Manage Tags/Topics', href: '/tags', icon: Tag },
-        { name: 'Manage Submissions', href: '/submissions', icon: CheckSquare },
+        { name: 'Manage Submissions', href: '/problems/submissions', icon: CheckSquare },
       ],
     },
     {

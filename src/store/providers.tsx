@@ -6,7 +6,7 @@ import { store, persistor } from './index';
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchTags, fetchTopics } from './slices/metadata-slice';
+import { fetchTags, fetchTopics, fetchLanguages } from './slices/metadata-slice';
 import type { AppDispatch } from './index';
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
@@ -15,6 +15,7 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     dispatch(fetchTags());
     dispatch(fetchTopics());
+    dispatch(fetchLanguages());
   }, [dispatch]);
 
   return <>{children}</>;
