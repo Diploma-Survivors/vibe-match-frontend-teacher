@@ -4,10 +4,11 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Stepper } from '@/components/ui/stepper';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
-  ProblemType,
-  ProblemVisibility,
-  ProblemSchema,
+    ProblemType,
+    ProblemVisibility,
+    ProblemSchema,
 } from '@/types/problems';
 
 import { toastService } from '@/services/toasts-service';
@@ -27,265 +28,320 @@ import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import type { CreateProblemRequest, Problem } from '@/types/problems';
 import {
-  CreateProblemSchema,
-  type CreateProblemFormValues,
+    CreateProblemSchema,
+    type CreateProblemFormValues,
 } from './problem-create-form';
 
 const STEPS = [
-  { title: 'General Information', description: 'General Info' },
-  { title: 'Problem Description', description: 'Description' },
-  { title: 'Constraints', description: 'Constraints' },
-  { title: 'Test Cases', description: 'Test Cases' },
-  { title: 'Solution & Hints', description: 'Solution & Hints' },
+    { title: 'General Information', description: 'General Info' },
+    { title: 'Problem Description', description: 'Description' },
+    { title: 'Constraints', description: 'Constraints' },
+    { title: 'Test Cases', description: 'Test Cases' },
+    { title: 'Solution & Hints', description: 'Solution & Hints' },
 ];
 
 interface ProblemEditFormProps {
-  problemId: number;
+    problemId: number;
 }
 
 export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
-  const [originalProblem, setOriginalProblem] = useState<Problem | null>(null);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
+    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+    const [originalProblem, setOriginalProblem] = useState<Problem | null>(null);
 
-  const router = useRouter();
-  const { confirm } = useDialog();
+    const router = useRouter();
+    const { confirm } = useDialog();
 
-  const form = useForm<CreateProblemFormValues>({
-    resolver: zodResolver(CreateProblemSchema),
-    mode: 'onChange',
-  });
-
-  const [errorSteps, setErrorSteps] = useState<number[]>([]);
-
-  const { handleSubmit, reset } = form;
-
-  // Fetch initial data
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [topicsRes, tagsRes, problemRes] = await Promise.all([
-          TopicsService.getAllTopics(),
-          TagsService.getAllTags(),
-          ProblemsService.getProblemById(problemId),
-        ]);
-
-        setAvailableTopics(topicsRes.data.data);
-        setAvailableTags(tagsRes.data.data);
-
-        const problem = problemRes.data.data;
-        setOriginalProblem(problem);
-
-        // Map problem data to form values
-        const formValues = ProblemsService.mapProblemToDTO(problem);
-
-        // We need to map the DTO back to form values format where needed
-        // Specifically for topics and tags which expect objects in the form but IDs in DTO
-        // But wait, mapProblemToDTO returns IDs for tags/topics.
-        // The form expects objects for MultiSelect.
-        // So we need to manually map IDs back to objects from the available lists.
-
-        const selectedTopics = topicsRes.data.data.filter((t) =>
-          formValues.topicIds.includes(t.id)
-        );
-        const selectedTags = tagsRes.data.data.filter((t) =>
-          formValues.tagIds.includes(t.id)
-        );
-
-        reset({
-          ...formValues,
-          topics: selectedTopics,
-          tags: selectedTags,
-          // Ensure arrays are initialized
-          sampleTestcases: formValues.testcaseSamples || [],
-          hints: formValues.hints || [],
-          testcaseFile: null, // File input cannot be pre-populated
-        });
-      } catch (err) {
-        console.error('Failed to fetch problem data', err);
-        toastService.error('Failed to load problem data.');
-        router.push('/problems');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [problemId, reset, router]);
-
-  const handleCancel = async () => {
-    const confirmed = await confirm({
-      title: 'Cancel editing problem',
-      message:
-        'Are you sure you want to cancel? Any unsaved changes will be lost.',
-      confirmText: 'Yes',
-      cancelText: 'No',
-      color: 'red',
+    const form = useForm<CreateProblemFormValues>({
+        resolver: zodResolver(CreateProblemSchema),
+        mode: 'onChange',
     });
 
-    if (confirmed) {
-      router.back();
+    const [errorSteps, setErrorSteps] = useState<number[]>([]);
+
+    const { handleSubmit, reset } = form;
+
+    // Fetch initial data
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const [topicsRes, tagsRes, problemRes] = await Promise.all([
+                    TopicsService.getAllTopics(),
+                    TagsService.getAllTags(),
+                    ProblemsService.getProblemById(problemId),
+                ]);
+
+                setAvailableTopics(topicsRes.data.data);
+                setAvailableTags(tagsRes.data.data);
+
+                const problem = problemRes.data.data;
+                setOriginalProblem(problem);
+
+                // Map problem data to form values
+                const formValues = ProblemsService.mapProblemToDTO(problem);
+
+                // We need to map the DTO back to form values format where needed
+                // Specifically for topics and tags which expect objects in the form but IDs in DTO
+                // But wait, mapProblemToDTO returns IDs for tags/topics.
+                // The form expects objects for MultiSelect.
+                // So we need to manually map IDs back to objects from the available lists.
+
+                const selectedTopics = topicsRes.data.data.filter((t) =>
+                    formValues.topicIds.includes(t.id)
+                );
+                const selectedTags = tagsRes.data.data.filter((t) =>
+                    formValues.tagIds.includes(t.id)
+                );
+
+                reset({
+                    ...formValues,
+                    topics: selectedTopics,
+                    tags: selectedTags,
+                    // Ensure arrays are initialized
+                    sampleTestcases: formValues.testcaseSamples || [],
+                    hints: formValues.hints || [],
+                    testcaseFile: null, // File input cannot be pre-populated
+                });
+            } catch (err) {
+                console.error('Failed to fetch problem data', err);
+                toastService.error('Failed to load problem data.');
+                router.push('/problems');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [problemId, reset, router]);
+
+    const handleCancel = async () => {
+        const confirmed = await confirm({
+            title: 'Cancel editing problem',
+            message:
+                'Are you sure you want to cancel? Any unsaved changes will be lost.',
+            confirmText: 'Yes',
+            cancelText: 'No',
+            color: 'red',
+        });
+
+        if (confirmed) {
+            router.back();
+        }
+    };
+
+    const onError = (errors: any) => {
+        const newErrorSteps: number[] = [];
+
+        // Step 1: General Info
+        if (errors.title || errors.difficulty || errors.topics || errors.tags) {
+            newErrorSteps.push(0);
+        }
+
+        // Step 2: Description
+        if (errors.description) {
+            newErrorSteps.push(1);
+        }
+
+        // Step 3: Constraints
+        if (errors.constraints) {
+            newErrorSteps.push(2);
+        }
+
+        // Step 4: Test Cases
+        if (errors.testcaseFile || errors.sampleTestcases) {
+            newErrorSteps.push(3);
+        }
+
+        // Step 5: Solution & Hints
+        if (errors.officialSolutionContent || errors.hints) {
+            newErrorSteps.push(4);
+        }
+
+        setErrorSteps(newErrorSteps);
+        toastService.error('Please fix the errors in the highlighted steps.');
+    };
+
+    const onSubmit = async (data: CreateProblemFormValues) => {
+        if (!originalProblem) return;
+
+        setIsSubmitting(true);
+        setErrorSteps([]); // Reset errors
+
+        try {
+            // Construct the updated problem object
+            // We need to merge the form data with the original problem ID
+            const updatedProblem: Problem = {
+                ...originalProblem,
+                title: data.title,
+                description: data.description,
+                constraints: data.constraints,
+                difficulty: data.difficulty,
+                timeLimitMs: data.timeLimitMs,
+                memoryLimitKb: data.memoryLimitKb,
+                isPremium: data.isPremium,
+                isPublished: data.isPublished,
+                topics: data.topics,
+                tags: data.tags,
+                sampleTestcases:
+                    data.sampleTestcases?.map((tc) => ({
+                        input: tc.input,
+                        expectedOutput: tc.output,
+                        explanation: tc.explanation,
+                    })) || [],
+                hints: data.hints,
+                hasOfficialSolution: data.hasOfficialSolution,
+                officialSolutionContent: data.officialSolutionContent,
+                testcase: data.testcaseFile, // Pass the new file if uploaded
+            };
+
+            await ProblemsService.updateProblem(updatedProblem);
+
+            toastService.success('Problem updated successfully!');
+            router.push('/problems');
+        } catch (err) {
+            console.error('Error updating problem:', err);
+            toastService.error('Failed to update problem. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col min-h-[calc(100vh-100px)] bg-slate-50 dark:bg-slate-900">
+                {/* Stepper Skeleton */}
+                <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div className="container py-4">
+                        <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="flex items-center gap-3 flex-1 min-w-[120px] justify-center">
+                                    <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                                    <Skeleton className="h-4 w-24 hidden sm:block" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Skeleton */}
+                <div className="container py-8 flex-1">
+                    <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                        <div className="mb-6">
+                            <Skeleton className="h-8 w-48" />
+                        </div>
+
+                        <div className="space-y-8">
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-32" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-5 w-24" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-5 w-24" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-40" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-32" />
+                                <Skeleton className="h-32 w-full" />
+                            </div>
+
+                            {/* Footer Buttons Skeleton */}
+                            <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <Skeleton className="h-10 w-24" />
+                                <Skeleton className="h-10 w-32" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
-  };
 
-  const onError = (errors: any) => {
-    const newErrorSteps: number[] = [];
-
-    // Step 1: General Info
-    if (errors.title || errors.difficulty || errors.topics || errors.tags) {
-      newErrorSteps.push(0);
-    }
-
-    // Step 2: Description
-    if (errors.description) {
-      newErrorSteps.push(1);
-    }
-
-    // Step 3: Constraints
-    if (errors.constraints) {
-      newErrorSteps.push(2);
-    }
-
-    // Step 4: Test Cases
-    if (errors.testcaseFile || errors.sampleTestcases) {
-      newErrorSteps.push(3);
-    }
-
-    // Step 5: Solution & Hints
-    if (errors.officialSolutionContent || errors.hints) {
-      newErrorSteps.push(4);
-    }
-
-    setErrorSteps(newErrorSteps);
-    toastService.error('Please fix the errors in the highlighted steps.');
-  };
-
-  const onSubmit = async (data: CreateProblemFormValues) => {
-    if (!originalProblem) return;
-
-    setIsSubmitting(true);
-    setErrorSteps([]); // Reset errors
-
-    try {
-      // Construct the updated problem object
-      // We need to merge the form data with the original problem ID
-      const updatedProblem: Problem = {
-        ...originalProblem,
-        title: data.title,
-        description: data.description,
-        constraints: data.constraints,
-        difficulty: data.difficulty,
-        timeLimitMs: data.timeLimitMs,
-        memoryLimitKb: data.memoryLimitKb,
-        isPremium: data.isPremium,
-        isPublished: data.isPublished,
-        topics: data.topics,
-        tags: data.tags,
-        sampleTestcases:
-          data.sampleTestcases?.map((tc) => ({
-            input: tc.input,
-            expectedOutput: tc.output,
-            explanation: tc.explanation,
-          })) || [],
-        hints: data.hints,
-        hasOfficialSolution: data.hasOfficialSolution,
-        officialSolutionContent: data.officialSolutionContent,
-        testcase: data.testcaseFile, // Pass the new file if uploaded
-      };
-
-      await ProblemsService.updateProblem(updatedProblem);
-
-      toastService.success('Problem updated successfully!');
-      router.push('/problems');
-    } catch (err) {
-      console.error('Error updating problem:', err);
-      toastService.error('Failed to update problem. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        Loading problem data...
-      </div>
+        <div className="flex flex-col min-h-[calc(100vh-100px)] bg-slate-50 dark:bg-slate-900">
+            {/* Stepper Header */}
+            <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="container">
+                    <Stepper
+                        steps={STEPS}
+                        currentStep={currentStep}
+                        onStepClick={setCurrentStep}
+                        errorSteps={errorSteps}
+                    />
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="container py-8 flex-1">
+                <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                            {STEPS[currentStep].title}
+                        </h2>
+                    </div>
+
+                    <FormProvider {...form}>
+                        <form
+                            onSubmit={handleSubmit(onSubmit, onError)}
+                            className="space-y-6"
+                        >
+                            {/* Step 1: General Information */}
+                            {currentStep === 0 && (
+                                <GeneralInformationStep
+                                    availableTopics={availableTopics}
+                                    availableTags={availableTags}
+                                />
+                            )}
+
+                            {/* Step 2: Problem Description */}
+                            {currentStep === 1 && <ProblemDescriptionStep />}
+
+                            {/* Step 3: Constraints */}
+                            {currentStep === 2 && <ConstraintsStep />}
+
+                            {/* Step 4: Test Cases */}
+                            {currentStep === 3 && <TestCasesStep />}
+
+                            {/* Step 5: Solution & Hints */}
+                            {currentStep === 4 && <SolutionHintsStep />}
+
+                            {/* Footer Buttons */}
+                            <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCancel}
+                                    className="min-w-[100px] cursor-pointer"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="min-w-[100px] bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                                >
+                                    {isSubmitting ? 'Updating...' : 'Update Problem'}
+                                </Button>
+                            </div>
+                        </form>
+                    </FormProvider>
+                </div>
+            </div>
+        </div>
     );
-  }
-
-  return (
-    <div className="flex flex-col min-h-[calc(100vh-100px)] bg-slate-50 dark:bg-slate-900">
-      {/* Stepper Header */}
-      <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="container">
-          <Stepper
-            steps={STEPS}
-            currentStep={currentStep}
-            onStepClick={setCurrentStep}
-            errorSteps={errorSteps}
-          />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="container py-8 flex-1">
-        <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              {STEPS[currentStep].title}
-            </h2>
-          </div>
-
-          <FormProvider {...form}>
-            <form
-              onSubmit={handleSubmit(onSubmit, onError)}
-              className="space-y-6"
-            >
-              {/* Step 1: General Information */}
-              {currentStep === 0 && (
-                <GeneralInformationStep
-                  availableTopics={availableTopics}
-                  availableTags={availableTags}
-                />
-              )}
-
-              {/* Step 2: Problem Description */}
-              {currentStep === 1 && <ProblemDescriptionStep />}
-
-              {/* Step 3: Constraints */}
-              {currentStep === 2 && <ConstraintsStep />}
-
-              {/* Step 4: Test Cases */}
-              {currentStep === 3 && <TestCasesStep />}
-
-              {/* Step 5: Solution & Hints */}
-              {currentStep === 4 && <SolutionHintsStep />}
-
-              {/* Footer Buttons */}
-              <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="min-w-[100px] cursor-pointer"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="min-w-[100px] bg-green-600 hover:bg-green-700 text-white cursor-pointer"
-                >
-                  {isSubmitting ? 'Updating...' : 'Update Problem'}
-                </Button>
-              </div>
-            </form>
-          </FormProvider>
-        </div>
-      </div>
-    </div>
-  );
 }

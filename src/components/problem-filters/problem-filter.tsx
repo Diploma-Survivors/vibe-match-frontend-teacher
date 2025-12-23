@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,8 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TagsService } from '@/services/tags-service';
-import { TopicsService } from '@/services/topics-service';
 import {
   type ProblemFilters,
   SortBy,
@@ -49,6 +48,8 @@ interface ProblemFilterProps {
   onSearch: () => void;
   onReset: () => void;
   isLoading: boolean;
+  tags: Tag[];
+  topics: Topic[];
 }
 
 export default function ProblemFilter({
@@ -62,55 +63,12 @@ export default function ProblemFilter({
   onSortOrderChange,
   onSearch,
   onReset,
+  tags,
+  topics,
 }: ProblemFilterProps) {
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [isLoadingTags, setIsLoadingTags] = useState(true);
-  const [isLoadingTopics, setIsLoadingTopics] = useState(true);
-
   // Search states for dropdowns
   const [topicSearch, setTopicSearch] = useState('');
   const [tagSearch, setTagSearch] = useState('');
-
-  // Fetch tags and topics from backend
-  const fetchTagsAndTopics = useCallback(async () => {
-    setIsLoadingTags(true);
-    setIsLoadingTopics(true);
-
-    try {
-      // Mocking API calls
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const mockTags: Tag[] = [
-        { id: 1, name: 'Array', slug: 'array', color: 'blue', type: 'default', description: '', createdAt: '', updatedAt: '' },
-        { id: 2, name: 'String', slug: 'string', color: 'green', type: 'default', description: '', createdAt: '', updatedAt: '' },
-        { id: 3, name: 'Dynamic Programming', slug: 'dp', color: 'red', type: 'default', description: '', createdAt: '', updatedAt: '' },
-        { id: 4, name: 'Graph', slug: 'graph', color: 'purple', type: 'default', description: '', createdAt: '', updatedAt: '' },
-        { id: 5, name: 'Tree', slug: 'tree', color: 'yellow', type: 'default', description: '', createdAt: '', updatedAt: '' },
-        { id: 6, name: 'Sorting', slug: 'sorting', color: 'orange', type: 'default', description: '', createdAt: '', updatedAt: '' },
-      ];
-
-      const mockTopics: Topic[] = [
-        { id: 1, name: 'Algorithms', slug: 'algorithms', description: 'Algorithmic problems', iconUrl: '', orderIndex: 1, isActive: true, createdAt: '', updatedAt: '' },
-        { id: 2, name: 'Data Structures', slug: 'data-structures', description: 'Data structure problems', iconUrl: '', orderIndex: 2, isActive: true, createdAt: '', updatedAt: '' },
-        { id: 3, name: 'Database', slug: 'database', description: 'SQL and NoSQL problems', iconUrl: '', orderIndex: 3, isActive: true, createdAt: '', updatedAt: '' },
-        { id: 4, name: 'Artificial Intelligence', slug: 'ai', description: 'AI related problems', iconUrl: '', orderIndex: 4, isActive: true, createdAt: '', updatedAt: '' },
-      ];
-
-      setTags(mockTags);
-      setTopics(mockTopics);
-    } catch (error) {
-      setTags([]);
-      setTopics([]);
-    } finally {
-      setIsLoadingTags(false);
-      setIsLoadingTopics(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTagsAndTopics();
-  }, [fetchTagsAndTopics]);
 
   // Helper to handle multi-select changes
   const handleMultiSelectChange = (
@@ -275,9 +233,7 @@ export default function ProblemFilter({
               />
             </div>
             <DropdownMenuSeparator />
-            {isLoadingTopics ? (
-              <div className="p-2 text-sm text-slate-500">Loading...</div>
-            ) : filteredTopics.length === 0 ? (
+            {filteredTopics.length === 0 ? (
               <div className="p-2 text-sm text-slate-500">No topics found</div>
             ) : (
               filteredTopics.map((topic) => {
@@ -328,9 +284,7 @@ export default function ProblemFilter({
               />
             </div>
             <DropdownMenuSeparator />
-            {isLoadingTags ? (
-              <div className="p-2 text-sm text-slate-500">Loading...</div>
-            ) : filteredTags.length === 0 ? (
+            {filteredTags.length === 0 ? (
               <div className="p-2 text-sm text-slate-500">No tags found</div>
             ) : (
               filteredTags.map((tag) => {

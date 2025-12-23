@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -25,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 
 export enum ProblemTableMode {
   VIEW = 'view',
@@ -47,6 +49,7 @@ interface ProblemTableProps {
   onProblemSelect?: (problem: Problem) => void;
   onMultipleProblemsSelect?: (problems: Problem[]) => void;
   onProblemView?: (problem: Problem) => void;
+  onStatusChange?: (problem: Problem) => void;
 }
 
 export default function ProblemTable({
@@ -64,6 +67,7 @@ export default function ProblemTable({
   onProblemSelect,
   onMultipleProblemsSelect,
   onProblemView,
+  onStatusChange,
 }: ProblemTableProps) {
   const selectionMode =
     mode === ProblemTableMode.SELECT ||
@@ -128,88 +132,6 @@ export default function ProblemTable({
   const currentPage = meta?.page || 1;
   const totalPages = meta?.totalPages || 1;
 
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return (
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!meta?.hasPreviousPage}
-          className="h-8 w-8 rounded-lg border-slate-200 dark:border-slate-700"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        {startPage > 1 && (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(1)}
-              className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-700"
-            >
-              1
-            </Button>
-            {startPage > 2 && <span className="text-slate-400">...</span>}
-          </>
-        )}
-        {pages.map((page) => (
-          <Button
-            key={page}
-            variant={page === currentPage ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onPageChange(page)}
-            className={`h-8 w-8 p-0 rounded-lg ${
-              page === currentPage
-                ? 'bg-green-600 hover:bg-green-700 text-white border-transparent'
-                : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
-            }`}
-          >
-            {page}
-          </Button>
-        ))}
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && (
-              <span className="text-slate-400">...</span>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(totalPages)}
-              className="h-8 w-8 p-0 rounded-lg border-slate-200 dark:border-slate-700"
-            >
-              {totalPages}
-            </Button>
-          </>
-        )}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!meta?.hasNextPage}
-          className="h-8 w-8 rounded-lg border-slate-200 dark:border-slate-700"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  };
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
@@ -339,11 +261,10 @@ export default function ProblemTable({
                 return (
                   <TableRow
                     key={problem.id}
-                    className={`group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors ${
-                      isInitialSelected
-                        ? 'bg-slate-50 dark:bg-slate-800 opacity-60'
-                        : ''
-                    }`}
+                    className={`group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors ${isInitialSelected
+                      ? 'bg-slate-50 dark:bg-slate-800 opacity-60'
+                      : ''
+                      }`}
                   >
                     {selectionMode && (
                       <TableCell className="text-center">
@@ -398,11 +319,10 @@ export default function ProblemTable({
                     <TableCell>
                       <Badge
                         variant={problem.isActive ? 'default' : 'secondary'}
-                        className={`${
-                          problem.isActive
-                            ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
-                        } border-0`}
+                        className={`${problem.isActive
+                          ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
+                          } border-0`}
                       >
                         {problem.isActive ? 'Active' : 'Inactive'}
                       </Badge>
@@ -476,11 +396,11 @@ export default function ProblemTable({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className={`h-8 w-8 ${
-                                problem.isActive
-                                  ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
-                                  : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
-                              }`}
+                              onClick={() => onStatusChange?.(problem)}
+                              className={`h-8 w-8 ${problem.isActive
+                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                                : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                                }`}
                             >
                               {problem.isActive ? (
                                 <Lock className="h-4 w-4" />
@@ -510,24 +430,13 @@ export default function ProblemTable({
       </div>
 
       {/* Footer & Pagination */}
-      <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-slate-500 dark:text-slate-400">
-          Showing{' '}
-          <span className="font-medium text-slate-900 dark:text-slate-200">
-            {meta ? (meta.page - 1) * meta.limit + 1 : 0}
-          </span>{' '}
-          -{' '}
-          <span className="font-medium text-slate-900 dark:text-slate-200">
-            {meta ? Math.min(meta.page * meta.limit, meta.total) : 0}
-          </span>{' '}
-          of{' '}
-          <span className="font-medium text-slate-900 dark:text-slate-200">
-            {meta?.total || 0}
-          </span>{' '}
-          problems
-        </div>
-        {renderPagination()}
-      </div>
+      <DataTablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        meta={meta || undefined}
+        entityName="problems"
+      />
     </div>
   );
 }

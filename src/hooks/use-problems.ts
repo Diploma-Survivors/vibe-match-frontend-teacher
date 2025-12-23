@@ -1,3 +1,4 @@
+'use client';
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
@@ -28,6 +29,7 @@ interface UseProblemsActions {
   handleSearch: () => void;
   handleReset: () => void;
   handlePageChange: (page: number) => void;
+  refresh: () => void;
 }
 
 interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
@@ -55,15 +57,15 @@ export default function useProblems(
   const [keyword, setKeyword] = useState<string>('');
 
   // state for sorting
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.DESC);
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.ID);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetProblemListRequest>({
     page: 1,
     limit: ITEMS_PER_PAGE,
-    sortBy: sortBy || SortBy.TITLE,
-    sortOrder: sortOrder || SortOrder.DESC,
+    sortBy: sortBy || SortBy.ID,
+    sortOrder: sortOrder || SortOrder.ASC,
     filters: {
       ...filters,
     },
@@ -221,21 +223,24 @@ export default function useProblems(
     });
   }, [keyword, filters, updateRequest]);
 
-  // handle reset
   const handleReset = useCallback(() => {
     setFilters({});
     setKeyword('');
-    setSortBy(SortBy.TITLE);
-    setSortOrder(SortOrder.DESC);
+    setSortBy(SortBy.ID);
+    setSortOrder(SortOrder.ASC);
 
     updateRequest({
       search: undefined,
       filters: {},
       page: 1,
-      sortBy: SortBy.TITLE,
-      sortOrder: SortOrder.DESC,
+      sortBy: SortBy.ID,
+      sortOrder: SortOrder.ASC,
     });
   }, [updateRequest]);
+
+  const refresh = useCallback(() => {
+    fetchProblems(request);
+  }, [fetchProblems, request]);
 
   return {
     // State
@@ -259,5 +264,6 @@ export default function useProblems(
     handleSearch,
     handleReset,
     handlePageChange,
+    refresh,
   };
 }
