@@ -66,6 +66,7 @@ export interface Hint {
 }
 
 export interface CreateProblemRequest {
+  id?: number;
   title: string;
   description: string;
   inputDescription: string;
@@ -74,8 +75,6 @@ export interface CreateProblemRequest {
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
-  type: ProblemType;
-  visibility: ProblemVisibility;
   tagIds: number[];
   topicIds: number[];
   testcaseFile: File | null;

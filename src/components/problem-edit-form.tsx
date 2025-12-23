@@ -75,8 +75,8 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                     ProblemsService.getProblemById(problemId),
                 ]);
 
-                setAvailableTopics(topicsRes.data.data);
-                setAvailableTags(tagsRes.data.data);
+                setAvailableTopics(topicsRes.data.data.data);
+                setAvailableTags(tagsRes.data.data.data);
 
                 const problem = problemRes.data.data;
                 setOriginalProblem(problem);
@@ -90,10 +90,10 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                 // The form expects objects for MultiSelect.
                 // So we need to manually map IDs back to objects from the available lists.
 
-                const selectedTopics = topicsRes.data.data.filter((t) =>
+                const selectedTopics = topicsRes.data.data.data.filter((t) =>
                     formValues.topicIds.includes(t.id)
                 );
-                const selectedTags = tagsRes.data.data.filter((t) =>
+                const selectedTags = tagsRes.data.data.data.filter((t) =>
                     formValues.tagIds.includes(t.id)
                 );
 
@@ -173,29 +173,24 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
         try {
             // Construct the updated problem object
             // We need to merge the form data with the original problem ID
-            const updatedProblem: Problem = {
-                ...originalProblem,
-                title: data.title,
-                description: data.description,
-                constraints: data.constraints,
-                difficulty: data.difficulty,
-                timeLimitMs: data.timeLimitMs,
-                memoryLimitKb: data.memoryLimitKb,
-                isPremium: data.isPremium,
-                isPublished: data.isPublished,
-                topics: data.topics,
-                tags: data.tags,
-                sampleTestcases:
+            const updatedProblem: CreateProblemRequest = {
+                ...data,
+                id: originalProblem.id,
+                inputDescription: data.inputDescription || '',
+                outputDescription: data.outputDescription || '',
+                maxScore: data.maxScore || 100,
+                tagIds: data.tags.map((t: any) => t.id),
+                topicIds: data.topics.map((t: any) => t.id),
+                testcaseFile: data.testcaseFile,
+                testcaseSamples:
                     data.sampleTestcases?.map((tc) => ({
                         input: tc.input,
                         expectedOutput: tc.output,
                         explanation: tc.explanation,
                     })) || [],
                 hints: data.hints,
-                hasOfficialSolution: data.hasOfficialSolution,
-                officialSolutionContent: data.officialSolutionContent,
-                testcase: data.testcaseFile, // Pass the new file if uploaded
             };
+
 
             await ProblemsService.updateProblem(updatedProblem);
 

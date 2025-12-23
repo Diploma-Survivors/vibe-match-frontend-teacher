@@ -219,14 +219,13 @@ Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
   };
 }
 
-async function updateProblem(problem: Problem) {
-  const mappedProblem = mapProblemToDTO(problem);
-  const formData = serialize(mappedProblem, {
+async function updateProblem(problemRequest: CreateProblemRequest) {
+  const formData = serialize(problemRequest, {
     indices: true,
     nullsAsUndefineds: true,
   });
 
-  return await clientApi.put(`/problems/${problem.id}`, formData, {
+  return await clientApi.put(`/problems/${problemRequest.id}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -244,8 +243,6 @@ function mapProblemToDTO(problem: Problem): CreateProblemRequest {
     timeLimitMs: problem.timeLimitMs,
     memoryLimitKb: problem.memoryLimitKb,
     difficulty: problem.difficulty,
-    type: problem.type || ProblemType.STANDALONE, // Default or handle optional
-    visibility: problem.visibility || ProblemVisibility.PUBLIC, // Default
     tagIds: tags.map((tag) => tag.id),
     topicIds: topics.map((topic) => topic.id),
     testcaseFile: testcase || null,

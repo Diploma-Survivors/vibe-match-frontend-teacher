@@ -237,8 +237,6 @@ export default function ProblemCreateForm() {
                         expectedOutput: tc.output,
                         explanation: tc.explanation,
                     })) || [],
-                type: ProblemType.STANDALONE,
-                visibility: ProblemVisibility.PUBLIC,
                 hints: data.hints,
             };
 
