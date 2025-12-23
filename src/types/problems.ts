@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { UserProfile } from './user';
 import type { UserInfo } from './states';
 import type { Tag } from './tags';
-import type { TestcaseSample } from './testcases';
+import type { SampleTestCase } from './testcases';
 import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
@@ -69,8 +69,6 @@ export interface CreateProblemRequest {
   id?: number;
   title: string;
   description: string;
-  inputDescription: string;
-  outputDescription: string;
   maxScore: number;
   timeLimitMs: number;
   memoryLimitKb: number;
@@ -78,13 +76,13 @@ export interface CreateProblemRequest {
   tagIds: number[];
   topicIds: number[];
   testcaseFile: File | null;
-  testcaseSamples: TestcaseSample[];
+  sampleTestcases: SampleTestCase[];
   constraints: string;
-  isPremium?: boolean;
+  isPremium: boolean;
   isPublished?: boolean;
   hints?: Hint[];
-  hasOfficialSolution?: boolean;
   officialSolutionContent?: string;
+  similarProblems?: number[];
 }
 
 export interface TestcaseFileResponse {
@@ -107,7 +105,7 @@ export interface Problem {
   description: string;
   constraints: string;
   difficulty: ProblemDifficulty;
-  isPremium?: boolean;
+  isPremium: boolean;
   isPublished?: boolean;
   isActive: boolean;
   totalSubmissions?: number;
@@ -121,7 +119,7 @@ export interface Problem {
   testcaseCount?: number;
   timeLimitMs: number;
   memoryLimitKb: number;
-  sampleTestcases: TestcaseSample[];
+  sampleTestcases: SampleTestCase[];
   hints?: Hint[];
   hasOfficialSolution?: boolean;
   officialSolutionContent?: string;
@@ -140,7 +138,7 @@ export interface Problem {
   type?: ProblemType;
   visibility?: ProblemVisibility;
   testcase?: File | null;
-  testcaseSamples?: TestcaseSample[]; // Alias for sampleTestcases?
+  testcaseSamples?: SampleTestCase[]; // Alias for sampleTestcases?
   score?: number;
   testcaseResponse?: TestcaseFileResponse;
   quickStats?: ProblemQuickStats;
@@ -164,7 +162,7 @@ export interface ProblemDataResponse {
   tags: Tag[];
   topics: Topic[];
   testcase: TestcaseFileResponse;
-  testcaseSamples: TestcaseSample[];
+  testcaseSamples: SampleTestCase[];
   quickStats: ProblemQuickStats;
 }
 
@@ -303,12 +301,12 @@ export const ProblemSchema = z.object({
   constraints: z
     .string()
     .min(10, 'Constraints must be at least 10 characters long'),
-  isPremium: z.boolean().optional(),
+  isPremium: z.boolean({ message: 'Premium status is required' }),
   isPublished: z.boolean().optional(),
   isActive: z.boolean().optional(),
   totalSubmissions: z.number().optional(),
   totalAccepted: z.number().optional(),
-  acceptanceRate: z.number().optional(),
+acceptanceRate: z.number().optional(),
   totalAttempts: z.number().optional(),
   totalSolved: z.number().optional(),
   averageTimeToSolve: z.number().optional(),
@@ -345,7 +343,9 @@ export const ProblemSchema = z.object({
   inputDescription: z.string().optional(),
   outputDescription: z.string().optional(),
 
-  maxScore: z.number().optional(),
+  maxScore: z
+    .number('Max score must be a number')
+    .positive('Max score must be a positive number'),
 
   timeLimitMs: z
     .number('Time limit must be a number')

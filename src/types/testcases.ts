@@ -5,7 +5,7 @@ export interface TestCase {
   isSample: boolean;
 }
 
-export interface TestcaseSample {
+export interface SampleTestCase {
   id?: number;
   problem?: string;
   input: string;
@@ -17,7 +17,7 @@ export interface TestcaseSample {
 }
 
 export interface CreateTestcaseRequest {
-  testcases: TestcaseSample[];
+  testcases: SampleTestCase[];
 }
 
 export interface CreateTestcaseFileResponse {

@@ -126,7 +126,24 @@ export function GeneralInformationStep({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="maxScore">Max Score</Label>
+          <Controller
+            name="maxScore"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="number"
+                onChange={(e) =>
+                  field.onChange(Number.parseInt(e.target.value))
+                }
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            )}
+          />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="timeLimitMs">Time Limit (ms)</Label>
           <Controller

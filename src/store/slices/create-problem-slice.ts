@@ -11,6 +11,7 @@ const initialState: CreateProblemFormValues = {
   isPublished: true,
   timeLimitMs: 1000,
   memoryLimitKb: 256000,
+  maxScore: 100,
   topics: [],
   tags: [],
   similarProblems: [],
@@ -44,7 +45,6 @@ export const createProblemSlice = createSlice({
       return { ...state, ...payloadWithoutFile };
     },
     clearDraft: () => {
-      console.log('Clearing draft');
       return initialState;
     },
   },

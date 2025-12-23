@@ -19,6 +19,7 @@ import {
   SortOrder,
 } from '@/types/problems';
 import { Plus } from 'lucide-react';
+import { useAppSelector } from '@/store/hooks';
 
 interface RelatedProblemsModalProps {
   selectedProblemIds: number[];
@@ -33,6 +34,7 @@ export function RelatedProblemsModal({
   const [localSelectedIds, setLocalSelectedIds] = useState<Set<number>>(
     new Set(selectedProblemIds)
   );
+  const { tags, topics } = useAppSelector((state) => state.metadata);
 
   // Sync with props when modal opens
   useEffect(() => {
@@ -92,9 +94,11 @@ export function RelatedProblemsModal({
             onSortByChange={handleSortByChange}
             sortOrder={sortOrder}
             onSortOrderChange={handleSortOrderChange}
-            onSearch={handleSearch}
             onReset={handleReset}
+            onSearch={handleSearch}
             isLoading={isLoading}
+            tags={tags}
+            topics={topics}
           />
 
           <ProblemTable

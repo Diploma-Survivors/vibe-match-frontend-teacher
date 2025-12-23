@@ -10,11 +10,8 @@ import ProblemTable, { ProblemTableMode } from '@/components/problem-table';
 import { useDialog } from '@/components/providers/dialog-provider';
 import { toastService } from '@/services/toasts-service';
 
-import { TagsService } from '@/services/tags-service';
-import { TopicsService } from '@/services/topics-service';
-import type { Tag } from '@/types/tags';
-import type { Topic } from '@/types/topics';
-import { useEffect, useState } from 'react';
+import { ProblemsService } from '@/services/problems-service';
+import { useAppSelector } from '@/store/hooks';
 
 export default function ProblemsPage() {
   const {
@@ -43,25 +40,7 @@ export default function ProblemsPage() {
   } = useProblems(ProblemEndpointType.PROBLEM_MANAGEMENT);
 
   const { confirm } = useDialog();
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-
-  useEffect(() => {
-    const fetchTagsAndTopics = async () => {
-      try {
-        const [tagsResponse, topicsResponse] = await Promise.all([
-          TagsService.getAllTags(),
-          TopicsService.getAllTopics(),
-        ]);
-        setTags(tagsResponse.data.data.data);
-        setTopics(topicsResponse.data.data.data);
-      } catch (error) {
-        console.error('Failed to fetch tags or topics:', error);
-      }
-    };
-
-    fetchTagsAndTopics();
-  }, []);
+  const { tags, topics } = useAppSelector((state) => state.metadata);
 
   const handleStatusChange = async (problem: Problem) => {
     const newStatus = !problem.isActive;
@@ -83,8 +62,7 @@ export default function ProblemsPage() {
     if (confirmed) {
       try {
         // Mock API call
-        // await ProblemsService.updateProblem(problem.id, { isActive: newStatus });
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await ProblemsService.updateProblemStatus(problem.id, newStatus);
 
         toastService.success(`Problem ${action}d successfully`);
         refresh();

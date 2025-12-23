@@ -58,7 +58,7 @@ async function createProblem(
     tags: [], // In a real mock, we'd map these from IDs
     description: problemRequest.description,
     constraints: problemRequest.constraints,
-    sampleTestcases: problemRequest.testcaseSamples,
+    sampleTestcases: problemRequest.sampleTestcases,
     hints: [],
     isPremium: problemRequest.isPremium,
     isPublished: problemRequest.isPublished,
@@ -136,6 +136,8 @@ Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
     difficulty: ProblemDifficulty.EASY,
     timeLimitMs: 1000,
     memoryLimitKb: 256000,
+    maxScore: 100,
+    isPremium:true,
     topics: [
       {
         id: 1,
@@ -188,7 +190,6 @@ Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
           'So, if we fix one of the numbers, say x, we have to scan the entire array to find the next number y which is value - x where value is the input parameter.',
       },
     ],
-    isPremium: false,
     isPublished: true,
     isActive: true,
     hasOfficialSolution: true,
@@ -203,7 +204,7 @@ Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
     averageTimeToSolve: 300,
     difficultyRating: 1000,
     testcaseCount: 10,
-    similarProblems: [],
+    similarProblems: [1, 2],
   };
 
   return {
@@ -225,11 +226,74 @@ async function updateProblem(problemRequest: CreateProblemRequest) {
     nullsAsUndefineds: true,
   });
 
-  return await clientApi.put(`/problems/${problemRequest.id}`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
+  // Mock API call
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Mock response data
+  const mockProblem: Problem = {
+    id: Math.floor(Math.random() * 1000),
+    title: problemRequest.title,
+    difficulty: problemRequest.difficulty,
+    timeLimitMs: problemRequest.timeLimitMs,
+    memoryLimitKb: problemRequest.memoryLimitKb,
+    topics: [], // In a real mock, we'd map these from IDs
+    tags: [], // In a real mock, we'd map these from IDs
+    description: problemRequest.description,
+    constraints: problemRequest.constraints,
+    sampleTestcases: problemRequest.sampleTestcases,
+    hints: [],
+    isPremium: problemRequest.isPremium,
+    isPublished: problemRequest.isPublished,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // authorId: 'mock-author-id', // Removed as it's not in Problem interface
+    slug: problemRequest.title.toLowerCase().replace(/\s+/g, '-'),
+    // averageRating: 0,
+    // ratingCount: 0,
+    acceptanceRate: 0,
+    // submissionCount: 0,
+    // acceptedCount: 0,
+    testcase: null,
+    testcaseResponse: undefined,
+    isActive: true,
+    totalSubmissions: 0,
+    totalAccepted: 0,
+    totalAttempts: 0,
+    totalSolved: 0,
+    averageTimeToSolve: 0,
+    difficultyRating: 0,
+    testcaseCount: 0,
+    similarProblems: [],
+  };
+
+  return {
+    data: {
+      data: mockProblem,
+      status: HttpStatus.OK,
+      apiVersion: '1.0',
     },
-  });
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config: {} as any,
+  };
+}
+
+async function updateProblemStatus(id: number, status: boolean) {
+    // Mock API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    return {
+      data: {
+        data: id,
+        status: HttpStatus.OK,
+        apiVersion: '1.0',
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
 }
 
 function mapProblemToDTO(problem: Problem): CreateProblemRequest {
@@ -237,8 +301,6 @@ function mapProblemToDTO(problem: Problem): CreateProblemRequest {
   return {
     ...rest,
     description: problem.description || '',
-    inputDescription: problem.inputDescription || '',
-    outputDescription: problem.outputDescription || '',
     maxScore: problem.maxScore || 0,
     timeLimitMs: problem.timeLimitMs,
     memoryLimitKb: problem.memoryLimitKb,
@@ -246,30 +308,30 @@ function mapProblemToDTO(problem: Problem): CreateProblemRequest {
     tagIds: tags.map((tag) => tag.id),
     topicIds: topics.map((topic) => topic.id),
     testcaseFile: testcase || null,
-    testcaseSamples: problem.sampleTestcases || [],
+    sampleTestcases: problem.sampleTestcases || [],
     constraints: problem.constraints,
     isPremium: problem.isPremium,
     isPublished: problem.isPublished,
     hints: problem.hints,
-    hasOfficialSolution: problem.hasOfficialSolution,
     officialSolutionContent: problem.officialSolutionContent,
   };
 }
 
-function mapProblemDataResponseToProblemData(
-  problemResponse: ProblemDataResponse
-): Problem {
-  return {
-    ...problemResponse,
-    testcaseResponse: problemResponse.testcase,
-    testcase: null,
-    sampleTestcases: problemResponse.testcaseSamples,
-    constraints: '', // Default if missing in response
-    isActive: true, // Default if missing
-    topics: problemResponse.topics || [],
-    tags: problemResponse.tags || [],
-  };
-}
+// function mapProblemDataResponseToProblemData(
+//   problemResponse: ProblemDataResponse
+// ): Problem {
+//   return {
+//     ...problemResponse,
+//     testcaseResponse: problemResponse.testcase,
+//     testcase: null,
+//     sampleTestcases: problemResponse.testcaseSamples,
+//     constraints: '', // Default if missing in response
+//     isActive: true, // Default if missing
+//     topics: problemResponse.topics || [],
+//     tags: problemResponse.tags || [],
+//   };
+// }
+
 
 export const ProblemsService = {
   getProblemList,
@@ -277,6 +339,7 @@ export const ProblemsService = {
   mapProblemToDTO,
   getProblemDetail,
   getProblemById,
-  mapProblemDataResponseToProblemData,
+  // mapProblemDataResponseToProblemData,
   updateProblem,
+  updateProblemStatus
 };

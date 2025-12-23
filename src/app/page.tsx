@@ -1,7 +1,5 @@
 "use client";
 
-import { ParticleBackground } from "@/components/particle-background";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   Award,

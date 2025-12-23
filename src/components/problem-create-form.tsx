@@ -18,8 +18,6 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setDraft, clearDraft } from '@/store/slices/create-problem-slice';
 import { useDialog } from '@/components/providers/dialog-provider';
 
-import { TagsService } from '@/services/tags-service';
-import { TopicsService } from '@/services/topics-service';
 import { ProblemsService } from '@/services/problems-service';
 
 import { GeneralInformationStep } from './problems/problem-form-steps/general-information-step';
@@ -56,7 +54,7 @@ export const CreateProblemSchema = ProblemSchema.omit({
             .array(
                 z.object({
                     input: z.string().min(1, 'Input cannot be empty'),
-                    output: z.string().min(1, 'Output cannot be empty'),
+                    expectedOutput: z.string().min(1, 'Output cannot be empty'),
                     explanation: z.string().optional(),
                 })
             )
@@ -92,14 +90,12 @@ const STEPS = [
 export default function ProblemCreateForm() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
-
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
     const dispatch = useAppDispatch();
     const draft = useAppSelector((state) => state.createProblem);
+    const { tags: availableTags, topics: availableTopics } = useAppSelector((state) => state.metadata);
     const { confirm } = useDialog();
 
     const form = useForm<CreateProblemFormValues>({
@@ -146,26 +142,7 @@ export default function ProblemCreateForm() {
         }
     }, [watchedValues, dispatch, draft]);
 
-    // Fetch topics and tags
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const [topicsRes, tagsRes] = await Promise.all([
-                    TopicsService.getAllTopics(),
-                    TagsService.getAllTags(),
-                ]);
-                setAvailableTopics(topicsRes.data.data.data);
-                setAvailableTags(tagsRes.data.data.data);
-            } catch (err) {
-                console.error('Failed to fetch topics or tags', err);
-                toastService.error('Failed to load topics and tags.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+
 
     // handleNext and handleBack removed as we use Stepper for navigation
 
@@ -225,21 +202,17 @@ export default function ProblemCreateForm() {
         try {
             const problemRequest: CreateProblemRequest = {
                 ...data,
-                inputDescription: data.inputDescription || '',
-                outputDescription: data.outputDescription || '',
-                maxScore: data.maxScore || 100,
                 tagIds: data.tags.map((t: any) => t.id),
                 topicIds: data.topics.map((t: any) => t.id),
                 testcaseFile: data.testcaseFile,
-                testcaseSamples:
+                sampleTestcases:
                     data.sampleTestcases?.map((tc) => ({
                         input: tc.input,
-                        expectedOutput: tc.output,
+                        expectedOutput: tc.expectedOutput,
                         explanation: tc.explanation,
                     })) || [],
                 hints: data.hints,
             };
-
             await ProblemsService.createProblem(problemRequest);
 
             toastService.success('Problem created successfully!');

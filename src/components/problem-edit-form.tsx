@@ -15,8 +15,7 @@ import { toastService } from '@/services/toasts-service';
 import { useRouter } from 'next/navigation';
 import { useDialog } from '@/components/providers/dialog-provider';
 
-import { TagsService } from '@/services/tags-service';
-import { TopicsService } from '@/services/topics-service';
+import { useAppSelector } from '@/store/hooks';
 import { ProblemsService } from '@/services/problems-service';
 
 import { GeneralInformationStep } from './problems/problem-form-steps/general-information-step';
@@ -48,8 +47,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+    const { tags: availableTags, topics: availableTopics } = useAppSelector((state) => state.metadata);
     const [originalProblem, setOriginalProblem] = useState<Problem | null>(null);
 
     const router = useRouter();
@@ -69,14 +67,9 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const [topicsRes, tagsRes, problemRes] = await Promise.all([
-                    TopicsService.getAllTopics(),
-                    TagsService.getAllTags(),
+                const [problemRes] = await Promise.all([
                     ProblemsService.getProblemById(problemId),
                 ]);
-
-                setAvailableTopics(topicsRes.data.data.data);
-                setAvailableTags(tagsRes.data.data.data);
 
                 const problem = problemRes.data.data;
                 setOriginalProblem(problem);
@@ -90,10 +83,10 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                 // The form expects objects for MultiSelect.
                 // So we need to manually map IDs back to objects from the available lists.
 
-                const selectedTopics = topicsRes.data.data.data.filter((t) =>
+                const selectedTopics = availableTopics.filter((t) =>
                     formValues.topicIds.includes(t.id)
                 );
-                const selectedTags = tagsRes.data.data.data.filter((t) =>
+                const selectedTags = availableTags.filter((t) =>
                     formValues.tagIds.includes(t.id)
                 );
 
@@ -102,7 +95,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                     topics: selectedTopics,
                     tags: selectedTags,
                     // Ensure arrays are initialized
-                    sampleTestcases: formValues.testcaseSamples || [],
+                    sampleTestcases: formValues.sampleTestcases || [],
                     hints: formValues.hints || [],
                     testcaseFile: null, // File input cannot be pre-populated
                 });
@@ -114,8 +107,10 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                 setIsLoading(false);
             }
         };
-        fetchData();
-    }, [problemId, reset, router]);
+        if (availableTopics.length > 0 && availableTags.length > 0) {
+            fetchData();
+        }
+    }, [problemId, reset, router, availableTopics, availableTags]);
 
     const handleCancel = async () => {
         const confirmed = await confirm({
@@ -176,16 +171,14 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
             const updatedProblem: CreateProblemRequest = {
                 ...data,
                 id: originalProblem.id,
-                inputDescription: data.inputDescription || '',
-                outputDescription: data.outputDescription || '',
                 maxScore: data.maxScore || 100,
                 tagIds: data.tags.map((t: any) => t.id),
                 topicIds: data.topics.map((t: any) => t.id),
                 testcaseFile: data.testcaseFile,
-                testcaseSamples:
+                sampleTestcases:
                     data.sampleTestcases?.map((tc) => ({
                         input: tc.input,
-                        expectedOutput: tc.output,
+                        expectedOutput: tc.expectedOutput,
                         explanation: tc.explanation,
                     })) || [],
                 hints: data.hints,

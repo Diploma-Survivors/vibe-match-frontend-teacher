@@ -140,7 +140,7 @@ export function TestCasesStep() {
               const current = watch('sampleTestcases') || [];
               setValue(
                 'sampleTestcases',
-                [...current, { input: '', output: '', explanation: '' }],
+                [...current, { input: '', expectedOutput: '', explanation: '' }],
                 { shouldValidate: true }
               );
             }}
@@ -151,7 +151,7 @@ export function TestCasesStep() {
           </Button>
         </div>
 
-        {watch('sampleTestcases')?.map((testcase, index) => (
+        {watch('sampleTestcases')?.map((sampleTestCase, index) => (
           <div
             key={index}
             className="border rounded-lg p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50"
@@ -179,7 +179,7 @@ export function TestCasesStep() {
               <div className="space-y-2">
                 <Label>INPUT</Label>
                 <Textarea
-                  value={testcase.input}
+                  value={sampleTestCase.input}
                   onChange={(e) => {
                     const current = [...watch('sampleTestcases')];
                     current[index].input = e.target.value;
@@ -202,10 +202,10 @@ export function TestCasesStep() {
               <div className="space-y-2">
                 <Label>OUTPUT</Label>
                 <Textarea
-                  value={testcase.output}
+                  value={sampleTestCase.expectedOutput}
                   onChange={(e) => {
                     const current = [...watch('sampleTestcases')];
-                    current[index].output = e.target.value;
+                    current[index].expectedOutput = e.target.value;
                     setValue('sampleTestcases', current, {
                       shouldValidate: true,
                     });
@@ -213,19 +213,19 @@ export function TestCasesStep() {
                   placeholder="[0,1]"
                   className={cn(
                     'font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0',
-                    errors.sampleTestcases?.[index]?.output && 'border-red-500'
+                    errors.sampleTestcases?.[index]?.expectedOutput && 'border-red-500'
                   )}
                 />
-                {errors.sampleTestcases?.[index]?.output && (
+                {errors.sampleTestcases?.[index]?.expectedOutput && (
                   <p className="text-sm text-red-500">
-                    {errors.sampleTestcases[index]?.output?.message}
+                    {errors.sampleTestcases[index]?.expectedOutput?.message}
                   </p>
                 )}
               </div>
               <div className="col-span-1 md:col-span-2 space-y-2">
                 <Label>Explanation (Optional)</Label>
                 <Textarea
-                  value={testcase.explanation || ''}
+                  value={sampleTestCase.explanation || ''}
                   onChange={(e) => {
                     const current = [...watch('sampleTestcases')];
                     current[index].explanation = e.target.value;
