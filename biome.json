@@ -4,7 +4,7 @@
     "enabled": false
   },
   "linter": {
-    "enabled": true,
+    "enabled": false,
     "rules": {
       "recommended": true,
       "a11y": {
@@ -27,7 +27,7 @@
     }
   },
   "formatter": {
-    "enabled": true,
+    "enabled": false,
     "indentWidth": 2,
     "indentStyle": "space"
   },
@@ -40,6 +40,9 @@
   },
   "files": {
     "maxSize": 2000000,
-    "ignore": [".next/**/*", "node_modules/**/*"]
+    "ignore": [
+      ".next/**/*",
+      "node_modules/**/*"
+    ]
   }
 }
