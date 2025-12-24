@@ -18,7 +18,16 @@ import {
   MoreHorizontal,
   Trash2,
   Unlock,
+  BarChart2,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { FaList } from 'react-icons/fa6';
@@ -376,48 +385,47 @@ export default function ProblemTable({
                     {!selectionMode && (
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Tooltip content="Edit">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                              asChild
-                            >
-                              <Link href={`/problems/${problem.id}/edit`}>
-                                <Edit className="h-4 w-4" />
-                              </Link>
-                            </Button>
-                          </Tooltip>
-                          <Tooltip
-                            content={
-                              problem.isActive ? 'Deactivate' : 'Activate'
-                            }
-                          >
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => onStatusChange?.(problem)}
-                              className={`h-8 w-8 ${problem.isActive
-                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
-                                : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
-                                }`}
-                            >
-                              {problem.isActive ? (
-                                <Lock className="h-4 w-4" />
-                              ) : (
-                                <Unlock className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </Tooltip>
-                          <Tooltip content="Delete">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </Tooltip>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem asChild>
+                                <Link href={`/problems/${problem.id}/edit`}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link href={`/problems/${problem.id}/statistics`}>
+                                  <BarChart2 className="mr-2 h-4 w-4" />
+                                  Statistics
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => onStatusChange?.(problem)}>
+                                {problem.isActive ? (
+                                  <>
+                                    <Lock className="mr-2 h-4 w-4" />
+                                    Deactivate
+                                  </>
+                                ) : (
+                                  <>
+                                    <Unlock className="mr-2 h-4 w-4" />
+                                    Activate
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     )}
