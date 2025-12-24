@@ -21,15 +21,17 @@ import {
 import { Plus } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks';
 
-interface RelatedProblemsModalProps {
+interface SelectProblemsModalProps {
+  title: string;
   selectedProblemIds: number[];
   onProblemsSelect: (problems: Problem[]) => void;
 }
 
-export function RelatedProblemsModal({
+export function SelectProblemsModal({
+  title,
   selectedProblemIds,
   onProblemsSelect,
-}: RelatedProblemsModalProps) {
+}: SelectProblemsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [localSelectedIds, setLocalSelectedIds] = useState<Set<number>>(
     new Set(selectedProblemIds)
@@ -76,12 +78,12 @@ export function RelatedProblemsModal({
           className="w-full justify-start text-slate-500 font-normal"
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add related problems...
+          Add problems...
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Select Related Problems</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4 space-y-4">

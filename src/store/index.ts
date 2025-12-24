@@ -11,6 +11,7 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import aiReviewReducer from './slices/ai-review-slice';
+import createContestReducer from './slices/create-contest-slice';
 import createProblemReducer from './slices/create-problem-slice';
 import metadataReducer from './slices/metadata-slice';
 
@@ -23,6 +24,16 @@ const persistConfig = {
 const persistedCreateProblemReducer = persistReducer(
   persistConfig,
   createProblemReducer
+);
+
+const createContestPersistConfig = {
+  key: 'createContest',
+  storage,
+};
+
+const persistedCreateContestReducer = persistReducer(
+  createContestPersistConfig,
+  createContestReducer
 );
 
 const metadataPersistConfig = {
@@ -39,6 +50,7 @@ export const store = configureStore({
   reducer: {
     aiReview: aiReviewReducer,
     createProblem: persistedCreateProblemReducer,
+    createContest: persistedCreateContestReducer,
     metadata: persistedMetadataReducer,
   },
   middleware: (getDefaultMiddleware) =>

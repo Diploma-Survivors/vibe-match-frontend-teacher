@@ -11,7 +11,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Badge } from '@/components/ui/badge';
-import { RelatedProblemsModal } from '@/components/related-problems-modal';
+import { SelectProblemsModal } from '@/components/related-problems-modal';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DIFFICULTY_OPTIONS } from '@/types/problems';
@@ -244,7 +244,8 @@ export function GeneralInformationStep({
             </Badge>
           ))}
         </div>
-        <RelatedProblemsModal
+        <SelectProblemsModal
+          title="Select Similar Problems"
           selectedProblemIds={watch('similarProblems') || []}
           onProblemsSelect={(problems) => {
             const newIds = problems.map((p) => p.id);

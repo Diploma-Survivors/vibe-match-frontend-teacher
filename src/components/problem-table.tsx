@@ -140,7 +140,7 @@ export default function ProblemTable({
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-              Chọn bài tập
+              Select multiple problems
             </h3>
             <Button
               type="button"
@@ -149,8 +149,8 @@ export default function ProblemTable({
               className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-sm"
             >
               {isMultipleSelect
-                ? `Chọn ${selectedProblemsMap.size} bài tập`
-                : 'Chọn bài tập'}
+                ? `Select ${selectedProblemsMap.size} problems`
+                : 'Select problem'}
             </Button>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function ProblemTable({
           <TableHeader>
             <TableRow className="bg-slate-50/50 dark:bg-slate-700/20 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 border-b border-slate-200 dark:border-slate-700">
               {selectionMode && (
-                <TableHead className="w-12 text-center">Chọn</TableHead>
+                <TableHead className="w-12 text-center">Select</TableHead>
               )}
               <TableHead className="w-20 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                 ID

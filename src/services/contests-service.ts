@@ -1,8 +1,8 @@
 import clientApi from '@/lib/apis/axios-client';
-import type { ApiResponse } from '@/types/api';
+import { HttpStatus, type ApiResponse } from '@/types/api';
 import type {
   Contest,
-  ContestDTO,
+  ContestCreateRequest,
   ContestProblemDTO,
   LeaderboardRequest,
   LeaderboardResponse,
@@ -12,37 +12,140 @@ import type {
 } from '@/types/contest';
 import type { AxiosResponse } from 'axios';
 
+import { ProblemDifficulty } from '@/types/problems';
+import { addMinutes } from 'date-fns';
+
+  const mockContest: Contest = {
+    id:1,
+    name: 'Mock Contest ',
+    description: 'This is a mock contest description.',
+    startTime: new Date().toISOString(),
+    durationMinutes: 120,
+    problems: [
+      {
+        problem: {
+          id: 1,
+          title: 'Two Sum',
+          difficulty: ProblemDifficulty.EASY,
+          slug: 'two-sum',
+          acceptanceRate: 45.6,
+          isPremium: false,
+          isPublished: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          timeLimitMs: 1000,
+          memoryLimitKb: 256000,
+          maxScore: 100,
+          topics: [],
+          tags: [],
+          similarProblems: [],
+          description: 'Mock description',
+          constraints: '',
+          sampleTestcases: [],
+          hints: [],
+          hasOfficialSolution: false,
+          isActive: true,
+        },
+        order: 0,
+      },
+      {
+        problem: {
+          id: 2,
+          title: 'Add Two Numbers',
+          difficulty: ProblemDifficulty.MEDIUM,
+          slug: 'add-two-numbers',
+          acceptanceRate: 32.1,
+          isPremium: false,
+          isPublished: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          timeLimitMs: 1000,
+          memoryLimitKb: 256000,
+          maxScore: 100,
+          topics: [],
+          tags: [],
+          similarProblems: [],
+          description: 'Mock description',
+          constraints: '',
+          sampleTestcases: [],
+          hints: [],
+          hasOfficialSolution: false,
+          isActive: true,
+        },
+        order: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+    createdBy: 'Mock User',
+    status: undefined, // Let UI derive it
+    isActive: true,
+  };
+
 async function createContest(
-  contestDTO: ContestDTO
-): Promise<AxiosResponse<ApiResponse<ContestDTO>>> {
-  return await clientApi.post<ApiResponse<ContestDTO>>('/contests', contestDTO);
+  contestDTO: ContestCreateRequest
+): Promise<AxiosResponse<ApiResponse<Contest>>> {
+  // Mock API call
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+    return {
+    data: {
+      data: mockContest,
+      status: HttpStatus.OK,
+      apiVersion: '1.0',
+    },
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config: {} as any,
+  };
 }
 
-function mapContestToDTO(contest: Contest): ContestDTO {
+function mapContestToDTO(contest: Contest): ContestCreateRequest {
   return {
     ...contest,
-    problems: contest.problems.map(
-      (problem) =>
-        ({
-          problemId: problem.id,
-          score: problem.score,
-        }) as ContestProblemDTO
-    ),
+    problems: contest.problems.map((problem) => ({
+      problemId: problem.problem.id,
+      order: problem.order,
+    })),
   };
 }
 
 async function getContestById(id: string) {
-  return await clientApi.get(`/contests/${id}`);
+  // Mock API call
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+
+
+  return {
+    data: {
+      data: mockContest,
+      status: 200,
+      apiVersion: '1.0',
+    },
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config: {} as any,
+  };
 }
 
 async function updateContest(
   id: string,
-  contestDTO: ContestDTO
-): Promise<AxiosResponse<ApiResponse<ContestDTO>>> {
-  return await clientApi.put<ApiResponse<ContestDTO>>(
-    `/contests/${id}`,
-    contestDTO
-  );
+  contestDTO: ContestCreateRequest
+): Promise<AxiosResponse<ApiResponse<Contest>>> {
+  // Mock API call
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return {
+    data: {
+      data: mockContest,
+      status: HttpStatus.OK,
+      apiVersion: '1.0',
+    },
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config: {} as any,
+  };
 }
 
 async function getContestLeaderboard(
