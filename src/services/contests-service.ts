@@ -229,6 +229,30 @@ async function getSubmissionById(submissionId: string) {
   return response.data.data;
 }
 
+async function getContests(params?: any) {
+  // Mock API call
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return {
+    data: {
+      data: [mockContest],
+      status: 200,
+      apiVersion: '1.0',
+      meta: {
+        page: 1,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      }
+    },
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config: {} as any,
+  };
+}
+
 export const ContestsService = {
   createContest,
   mapContestToDTO,
@@ -238,4 +262,5 @@ export const ContestsService = {
   getContestSubmissionsOverview,
   getSubmissionDetails,
   getSubmissionById,
+  getContests,
 };

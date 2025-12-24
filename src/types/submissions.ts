@@ -43,6 +43,7 @@ export interface Submission {
   problemId: number;
   languageId: number;
   sourceCode?: string;
+  contestId?: number;
 }
 
 export interface SubmissionFilters {
@@ -50,6 +51,7 @@ export interface SubmissionFilters {
   languageIds?: number[];
   problemIds?: number[];
   search?: string;
+  contestIds?: number[];
 }
 
 export enum SubmissionSortBy {

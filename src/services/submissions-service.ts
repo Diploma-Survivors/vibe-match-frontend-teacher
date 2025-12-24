@@ -82,6 +82,7 @@ const MOCK_SUBMISSIONS: any[] = Array.from({ length: 100 }).map((_, index) => {
     submittedAt: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
     problemId: 1,
     languageId: (index % 4) + 1,
+    contestId: Math.random() > 0.5 ? 1 : undefined,
   };
 });
 
@@ -111,6 +112,12 @@ export const SubmissionsService = {
         (s) => params.filters?.problemIds?.includes(s.problemId)
       );
     }
+
+    if (params.filters?.contestIds && params.filters.contestIds.length > 0) {
+      filteredSubmissions = filteredSubmissions.filter(
+       (s) => s.contestId && params.filters?.contestIds?.includes(s.contestId)
+     );
+   }
 
     // Sort
     if (params.sortBy) {

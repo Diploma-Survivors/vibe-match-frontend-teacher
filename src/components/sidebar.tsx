@@ -55,7 +55,6 @@ export default function Sidebar({ onLogout }: SideBarProps) {
           icon: PlusCircle,
         },
         { name: 'Manage Tags/Topics', href: '/tags', icon: Tag },
-        { name: 'Manage Submissions', href: '/problems/submissions', icon: CheckSquare },
       ],
     },
     {
@@ -69,6 +68,12 @@ export default function Sidebar({ onLogout }: SideBarProps) {
           href: '/contests/submissions',
           icon: CheckSquare,
         },
+      ],
+    },
+    {
+      title: 'SUBMISSION MANAGEMENT',
+      items: [
+        { name: 'Manage Submissions', href: '/problems/submissions', icon: CheckSquare },
       ],
     },
     {
