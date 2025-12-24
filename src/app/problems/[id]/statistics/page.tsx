@@ -16,7 +16,7 @@ import { LanguageTable } from '@/components/problems/statistics/language-table';
 import { StatisticsSkeleton } from '@/components/problems/statistics/skeleton';
 import { ProblemsService } from '@/services/problems-service';
 import type { ProblemStatistics } from '@/types/problem-statistics';
-import { Edit, ChevronLeft, Calendar } from 'lucide-react';
+import { Edit, ChevronLeft, Calendar, ChevronRight } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -152,9 +152,16 @@ export default function ProblemStatisticsPage() {
                     </Select>
 
                     <Link href={`/problems/${id}/edit`}>
-                        <Button variant="outline" className="cursor-pointer">
+                        <Button variant="default" className="cursor-pointer bg-green-600 hover:bg-green-700 text-white">
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Problem
+                        </Button>
+                    </Link>
+
+                    <Link href={`/problems/submissions?problemIds=${id}`}>
+                        <Button variant="ghost" className="cursor-pointer">
+                            Go to all submissions
+                            <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                     </Link>
                 </div>

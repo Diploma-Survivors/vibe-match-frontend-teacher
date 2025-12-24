@@ -10,6 +10,7 @@ import {
   SubmissionStatus,
 } from '@/types/submissions';
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -44,7 +45,36 @@ export default function useSubmissions(): UseSubmissionsReturn {
     error: null,
   });
 
-  const [filters, setFilters] = useState<SubmissionFilters>({});
+  const searchParams = useSearchParams();
+
+  const [filters, setFilters] = useState<SubmissionFilters>(() => {
+    const initialFilters: SubmissionFilters = {};
+    
+    // Parse problemIds
+    const problemIds = searchParams.getAll('problemIds').map(Number).filter((n: number) => !isNaN(n));
+    if (problemIds.length > 0) initialFilters.problemIds = problemIds;
+
+    // Parse contestIds
+    const contestIds = searchParams.getAll('contestIds').map(Number).filter((n: number) => !isNaN(n));
+    if (contestIds.length > 0) initialFilters.contestIds = contestIds;
+
+    // Parse languageIds
+    const languageIds = searchParams.getAll('languageIds').map(Number).filter((n: number) => !isNaN(n));
+    if (languageIds.length > 0) initialFilters.languageIds = languageIds;
+
+    // Parse status
+    const status = searchParams.get('status');
+    if (status && Object.values(SubmissionStatus).includes(status as SubmissionStatus)) {
+      initialFilters.status = status as SubmissionStatus;
+    }
+
+    // Parse search
+    const search = searchParams.get('search');
+    if (search) initialFilters.search = search;
+
+    return initialFilters;
+  });
+
   const [sortBy, setSortBy] = useState<SubmissionSortBy>(SubmissionSortBy.ID);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 

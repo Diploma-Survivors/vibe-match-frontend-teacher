@@ -406,6 +406,12 @@ export default function ProblemTable({
                                   Statistics
                                 </Link>
                               </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link href={`/problems/submissions?problemIds=${problem.id}`}>
+                                  <FaList className="mr-2 h-4 w-4" />
+                                  View Submissions
+                                </Link>
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => onStatusChange?.(problem)}>
                                 {problem.isActive ? (
                                   <>
