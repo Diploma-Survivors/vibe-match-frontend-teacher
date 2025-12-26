@@ -407,7 +407,7 @@ export default function ProblemTable({
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
-                                <Link href={`/problems/submissions?problemIds=${problem.id}`}>
+                                <Link href={`/submissions?problemIds=${problem.id}`}>
                                   <FaList className="mr-2 h-4 w-4" />
                                   View Submissions
                                 </Link>

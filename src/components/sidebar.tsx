@@ -62,18 +62,12 @@ export default function Sidebar({ onLogout }: SideBarProps) {
       items: [
         { name: 'Contest List', href: '/contests', icon: Trophy },
         { name: 'Create New Contest', href: '/contests/create', icon: Plus },
-        { name: 'Live Dashboard', href: '/contests/live', icon: MonitorPlay },
-        {
-          name: 'Manage Submissions',
-          href: '/contests/submissions',
-          icon: CheckSquare,
-        },
       ],
     },
     {
       title: 'SUBMISSION MANAGEMENT',
       items: [
-        { name: 'Manage Submissions', href: '/problems/submissions', icon: CheckSquare },
+        { name: 'Manage Submissions', href: '/submissions', icon: CheckSquare },
       ],
     },
     {

@@ -1,3 +1,4 @@
+import { ProgrammingLanguage } from '@/types/languages';
 import { Problem } from '@/types/problems';
 import {
   GetSubmissionListRequest,
@@ -22,69 +23,59 @@ public:
     }
 };`;
 
-const MOCK_SUBMISSIONS: any[] = Array.from({ length: 100 }).map((_, index) => {
-  const statuses = Object.values(SubmissionStatus);
-  // Ensure we cycle through all statuses to have at least one of each
-  const status = statuses[index % statuses.length];
-  
-  return {
-    id: index + 1,
-    status: status,
-    executionTime: Math.floor(Math.random() * 1000),
-    memoryUsed: Math.floor(Math.random() * 50000),  
-    testcasesPassed: status === SubmissionStatus.ACCEPTED ? 10 : Math.floor(Math.random() * 10),
-    totalTestcases: 10,
-    testcaseResults:
-      Array.from({ length: 10 }).map((_, i) => {
-            // For accepted submissions, all test cases are accepted
-            // For others, make the last one fail with the submission status
-            // and mix in some other statuses for variety if requested,
-            // but strictly following the submission status logic:
-            // usually if overall is X, at least one test case is X.
-            
-            let caseStatus = SubmissionStatus.ACCEPTED;
-            if (status !== SubmissionStatus.ACCEPTED) {
-                // Make the last test case fail with the main status
-                if (i === 9) {
-                    caseStatus = status;
-                } 
-                // Just for "include all statuses" variety as requested, 
-                // maybe we can make some intermediate ones different if it's not Accepted?
-                // But to be consistent, usually it's Accepted until the first failure.
-                // I will stick to: Accepted...Accepted -> FailureStatus.
-            }
+const MOCK_SUBMISSIONS: any[] = [];
 
-            return {
-              testcaseId: i + 1,
-              status: caseStatus,
-              actualOutput: 'Actual output content...',
-              expectedOutput: 'Expected output content...',
-              executionTime: Math.floor(Math.random() * 100),
-              memoryUsed: Math.floor(Math.random() * 50000),
-              error: caseStatus !== SubmissionStatus.ACCEPTED ? 'Error description...' : '',
-            };
-          }),
-    sourceCode: MOCK_SOURCE_CODE,
-    user: {
-      id: 1,
-      username: 'html',
-      fullName: 'John Doe',
-      email: 'john.doe@example.com',
-      avatarUrl: 'https://github.com/shadcn.png',
-    } as Partial<UserProfile>,
-    problem: {
-      id: 1,
-      title: `Problem ${index + 1}`,
-      slug: `problem-${index + 1}`,
-    } as Partial<Problem>,
-    compileError: status === SubmissionStatus.COMPILATION_ERROR ? 'Syntax error on line 5...' : '',
-    runtimeError: status === SubmissionStatus.RUNTIME_ERROR ? 'Runtime error: index out of bounds...' : '',
-    submittedAt: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
-    problemId: 1,
-    languageId: (index % 4) + 1,
-    contestId: Math.random() > 0.5 ? 1 : undefined,
-  };
-});
+// Generate 5 submissions for each of the 100 users to ensure everyone has history
+for (let userId = 1; userId <= 100; userId++) {
+  for (let i = 0; i < 5; i++) {
+    const globalIndex = (userId - 1) * 5 + i;
+    const statuses = Object.values(SubmissionStatus);
+    const status = statuses[globalIndex % statuses.length];
+    
+    MOCK_SUBMISSIONS.push({
+      id: globalIndex + 1,
+      status: status,
+      executionTime: Math.floor(Math.random() * 1000),
+      memoryUsed: Math.floor(Math.random() * 50000),  
+      testcasesPassed: status === SubmissionStatus.ACCEPTED ? 10 : Math.floor(Math.random() * 10),
+      totalTestcases: 10,
+      testcaseResults: Array.from({ length: 10 }).map((_, j) => {
+        let caseStatus = SubmissionStatus.ACCEPTED;
+        if (status !== SubmissionStatus.ACCEPTED) {
+            if (j === 9) caseStatus = status;
+        }
+        return {
+          testcaseId: j + 1,
+          status: caseStatus,
+          actualOutput: 'Actual output content...',
+          expectedOutput: 'Expected output content...',
+          executionTime: Math.floor(Math.random() * 100),
+          memoryUsed: Math.floor(Math.random() * 50000),
+          error: caseStatus !== SubmissionStatus.ACCEPTED ? 'Error description...' : '',
+        };
+      }),
+      sourceCode: MOCK_SOURCE_CODE,
+      user: {
+        id: userId,
+        username: `user_${userId}`,
+        fullName: `User ${userId}`,
+        email: `user_${userId}@example.com`,
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+      } as Partial<UserProfile>,
+      problem: {
+        id: (i % 4) + 1,
+        title: `Problem ${(i % 4) + 1}`,
+        slug: `problem-${(i % 4) + 1}`,
+      } as Partial<Problem>,
+      compileError: status === SubmissionStatus.COMPILATION_ERROR ? 'Syntax error on line 5...' : '',
+      runtimeError: status === SubmissionStatus.RUNTIME_ERROR ? 'Runtime error: index out of bounds...' : '',
+      submittedAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+      problemId: (i % 4) + 1,
+      languageId: (i % 4) + 1,
+      contestId: 1,
+    });
+  }
+}
 
 export const SubmissionsService = {
   getSubmissions: async (
@@ -118,6 +109,12 @@ export const SubmissionsService = {
        (s) => s.contestId && params.filters?.contestIds?.includes(s.contestId)
      );
    }
+
+    if (params.filters?.userId) {
+      filteredSubmissions = filteredSubmissions.filter(
+        (s) => s.user.id === params.filters?.userId
+      );
+    }
 
     // Sort
     if (params.sortBy) {
@@ -166,3 +163,42 @@ export const SubmissionsService = {
     return { data: submission };
   },
 };
+
+
+export const getStatusColor = (status: SubmissionStatus) => {
+        switch (status) {
+            case SubmissionStatus.ACCEPTED:
+                return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800';
+            case SubmissionStatus.WRONG_ANSWER:
+                return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800';
+            case SubmissionStatus.PENDING:
+            case SubmissionStatus.RUNNING:
+                return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800';
+            case SubmissionStatus.TIME_LIMIT_EXCEEDED:
+                return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800';
+            default:
+                // Runtime errors and others
+                return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800';
+        }
+    };
+
+export const getStatusLabel = (status: SubmissionStatus) => {
+        const RUNTIME_ERRORS = [
+            SubmissionStatus.SIGSEGV,
+            SubmissionStatus.SIGXFSZ,
+            SubmissionStatus.SIGFPE,
+            SubmissionStatus.SIGABRT,
+            SubmissionStatus.NZEC,
+            SubmissionStatus.RUNTIME_ERROR,
+        ];
+
+        if (RUNTIME_ERRORS.includes(status)) {
+            return 'Runtime Error';
+        }
+        return status;
+    };
+
+export const getLanguageName = (languageId: number, languages: ProgrammingLanguage[]) => {
+        const language = languages.find((l) => l.id === languageId);
+        return language ? language.name : 'Unknown';
+    };

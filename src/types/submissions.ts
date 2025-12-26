@@ -52,6 +52,7 @@ export interface SubmissionFilters {
   problemIds?: number[];
   search?: string;
   contestIds?: number[];
+  userId?: number;
 }
 
 export enum SubmissionSortBy {

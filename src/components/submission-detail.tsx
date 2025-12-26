@@ -25,8 +25,8 @@ import { useAppSelector } from '@/store/hooks';
 
 interface SubmissionDetailProps {
     submission: Submission | null;
-    isLoading: boolean;
-    error: string | null;
+    isLoading?: boolean;
+    error?: string | null;
 }
 
 export default function SubmissionDetail({ submission, isLoading, error }: SubmissionDetailProps) {

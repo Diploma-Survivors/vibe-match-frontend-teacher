@@ -27,8 +27,8 @@ import {
     ArrowDown,
     Lock,
     Unlock,
+    BarChart2,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -41,6 +41,7 @@ import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip } from './ui/tooltip';
+import Link from 'next/link';
 
 interface ContestTableProps {
     contests: Contest[];
@@ -219,12 +220,20 @@ export default function ContestTable({
                                                         </Link>
                                                     </DropdownMenuItem>
                                                 ) : (
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/contests/${contest.id}`} className="cursor-pointer">
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            View
-                                                        </Link>
-                                                    </DropdownMenuItem>
+                                                    <>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}`} className="cursor-pointer">
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                View
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}/statistics`} className='cursor-pointer'>
+                                                                <BarChart2 className="mr-2 h-4 w-4" />
+                                                                Statistics
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    </>
                                                 )}
 
                                                 <DropdownMenuItem

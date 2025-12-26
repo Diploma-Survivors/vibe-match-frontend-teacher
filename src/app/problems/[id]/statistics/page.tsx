@@ -158,7 +158,7 @@ export default function ProblemStatisticsPage() {
                         </Button>
                     </Link>
 
-                    <Link href={`/problems/submissions?problemIds=${id}`}>
+                    <Link href={`/submissions?problemIds=${id}`}>
                         <Button variant="ghost" className="cursor-pointer">
                             Go to all submissions
                             <ChevronRight className="ml-2 h-4 w-4" />
