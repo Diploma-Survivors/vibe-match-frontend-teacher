@@ -19,6 +19,7 @@ import { toastService } from '@/services/toasts-service';
 import { Tooltip } from '@/components/ui/tooltip';
 import { TableSkeleton } from './table-skeleton';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { useTranslations } from 'next-intl';
 
 interface TagsTableProps {
     tags: Tag[];
@@ -41,6 +42,7 @@ export function TagsTable({
     onDelete,
     onStatusChange,
 }: TagsTableProps) {
+    const t = useTranslations('TagsTable');
     const limit = 10;
 
     if (loading) {
@@ -53,20 +55,20 @@ export function TagsTable({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[80px] text-center">TAG ID</TableHead>
-                            <TableHead className="text-center">TAG NAME</TableHead>
-                            <TableHead className="text-center">SLUG</TableHead>
-                            <TableHead className="text-center">POST COUNT</TableHead>
-                            <TableHead className="text-center">STATUS</TableHead>
-                            <TableHead className="text-center">CREATED DATE</TableHead>
-                            <TableHead className="text-center">ACTIONS</TableHead>
+                            <TableHead className="w-[80px] text-center">{t('tagId')}</TableHead>
+                            <TableHead className="text-center">{t('tagName')}</TableHead>
+                            <TableHead className="text-center">{t('slug')}</TableHead>
+                            <TableHead className="text-center">{t('postCount')}</TableHead>
+                            <TableHead className="text-center">{t('status')}</TableHead>
+                            <TableHead className="text-center">{t('createdDate')}</TableHead>
+                            <TableHead className="text-center">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {tags.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center h-24">
-                                    No tags found.
+                                    {t('noTagsFound')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -89,7 +91,7 @@ export function TagsTable({
                                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
                                             }
                                         >
-                                            {tag.status === 'active' ? 'Active' : 'Inactive'}
+                                            {tag.status === 'active' ? t('active') : t('inactive')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
@@ -97,7 +99,7 @@ export function TagsTable({
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <div className="flex items-center justify-center gap-2">
-                                            <Tooltip content="Edit">
+                                            <Tooltip content={t('edit')}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -109,7 +111,7 @@ export function TagsTable({
                                             </Tooltip>
                                             <Tooltip
                                                 content={
-                                                    tag.status === 'active' ? 'Deactivate' : 'Activate'
+                                                    tag.status === 'active' ? t('deactivate') : t('activate')
                                                 }
                                             >
                                                 <Button
@@ -128,7 +130,7 @@ export function TagsTable({
                                                     )}
                                                 </Button>
                                             </Tooltip>
-                                            <Tooltip content="Delete">
+                                            <Tooltip content={t('delete')}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -152,7 +154,7 @@ export function TagsTable({
                 currentPage={page}
                 totalPages={totalPages}
                 onPageChange={onPageChange}
-                entityName="tags"
+                entityName={t('entityName')}
             />
         </div>
     );

@@ -12,8 +12,10 @@ import {
 } from '@/lib/utils/testcase-file-validations';
 import { cn } from '@/lib/utils';
 import type { CreateProblemFormValues } from '@/components/problem-create-form';
+import { useTranslations } from 'next-intl';
 
 export function TestCasesStep() {
+  const t = useTranslations('CreateProblemForm.testCases');
   const {
     watch,
     setValue,
@@ -25,12 +27,10 @@ export function TestCasesStep() {
       <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
         <h4 className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-semibold mb-2">
           <FileJson className="h-5 w-5" />
-          Instructions:
+          {t('instructionsTitle')}
         </h4>
         <p className="text-sm text-blue-600 dark:text-blue-300">
-          You can enter sample test cases to display publicly as examples, and
-          upload full test cases (Hidden Test Cases) for the automated grading
-          system.
+          {t('instructions')}
         </p>
       </div>
 
@@ -38,10 +38,10 @@ export function TestCasesStep() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-base font-semibold">
-            System Test Cases (Hidden)
+            {t('systemTestCasesLabel')}
           </Label>
           <span className="text-xs text-slate-500">
-            File test case used to grade.
+            {t('systemTestCasesDescription')}
           </span>
         </div>
 
@@ -57,7 +57,7 @@ export function TestCasesStep() {
                 const formatValidation = validateTestcaseFileFormat(file);
                 if (!formatValidation.isValid) {
                   toastService.error(
-                    formatValidation.error || 'Invalid file format'
+                    formatValidation.error || t('invalidFormat')
                   );
                   return;
                 }
@@ -66,14 +66,14 @@ export function TestCasesStep() {
                 const contentValidation = validateTestcaseFileContent(text);
                 if (!contentValidation.isValid) {
                   toastService.error(
-                    contentValidation.error || 'Invalid file content'
+                    contentValidation.error || t('invalidContent')
                   );
                   return;
                 }
 
                 setValue('testcaseFile', file, { shouldValidate: true });
                 toastService.success(
-                  `Valid testcase file loaded with ${contentValidation.testcaseCount} test cases.`
+                  t('validFileLoaded', { count: contentValidation.testcaseCount })
                 );
               }}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -84,12 +84,12 @@ export function TestCasesStep() {
             <div className="text-center space-y-1">
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 <span className="text-green-600 dark:text-green-500">
-                  Click to upload file
+                  {t('uploadClick')}
                 </span>{' '}
-                or drag and drop file here
+                {t('uploadDrag')}
               </p>
               <p className="text-xs text-slate-500">
-                Support .JSON format (Max 25MB)
+                {t('uploadFormat')}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function TestCasesStep() {
                 </p>
                 <p className="text-xs text-slate-500">
                   {(watch('testcaseFile').size / 1024 / 1024).toFixed(2)} MB •
-                  Uploaded just now
+                  {t('uploadedJustNow')}
                 </p>
               </div>
             </div>
@@ -131,7 +131,7 @@ export function TestCasesStep() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label className="text-base">Sample Test Cases (Public)</Label>
+          <Label className="text-base">{t('sampleTestCasesLabel')}</Label>
           <Button
             type="button"
             variant="outline"
@@ -147,7 +147,7 @@ export function TestCasesStep() {
             className="text-green-600 border-green-200 hover:bg-green-50 cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add Sample Test Case
+            {t('addSampleTestCase')}
           </Button>
         </div>
 
@@ -157,7 +157,7 @@ export function TestCasesStep() {
             className="border rounded-lg p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50"
           >
             <div className="flex items-center justify-between">
-              <Badge variant="secondary">Example {index + 1}</Badge>
+              <Badge variant="secondary">{t('examplePrefix')} {index + 1}</Badge>
               <Button
                 type="button"
                 variant="ghost"
@@ -177,7 +177,7 @@ export function TestCasesStep() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>INPUT</Label>
+                <Label>{t('inputLabel')}</Label>
                 <Textarea
                   value={sampleTestCase.input}
                   onChange={(e) => {
@@ -187,7 +187,7 @@ export function TestCasesStep() {
                       shouldValidate: true,
                     });
                   }}
-                  placeholder="nums = [2,7,11,15], target = 9"
+                  placeholder={t('inputPlaceholder')}
                   className={cn(
                     'font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0',
                     errors.sampleTestcases?.[index]?.input && 'border-red-500'
@@ -200,7 +200,7 @@ export function TestCasesStep() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>OUTPUT</Label>
+                <Label>{t('outputLabel')}</Label>
                 <Textarea
                   value={sampleTestCase.expectedOutput}
                   onChange={(e) => {
@@ -210,7 +210,7 @@ export function TestCasesStep() {
                       shouldValidate: true,
                     });
                   }}
-                  placeholder="[0,1]"
+                  placeholder={t('outputPlaceholder')}
                   className={cn(
                     'font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0',
                     errors.sampleTestcases?.[index]?.expectedOutput && 'border-red-500'
@@ -223,7 +223,7 @@ export function TestCasesStep() {
                 )}
               </div>
               <div className="col-span-1 md:col-span-2 space-y-2">
-                <Label>Explanation (Optional)</Label>
+                <Label>{t('explanationLabel')}</Label>
                 <Textarea
                   value={sampleTestCase.explanation || ''}
                   onChange={(e) => {
@@ -233,7 +233,7 @@ export function TestCasesStep() {
                       shouldValidate: true,
                     });
                   }}
-                  placeholder="Because nums[0] + nums[1] == 9, we return [0, 1]."
+                  placeholder={t('explanationPlaceholder')}
                   className="text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>

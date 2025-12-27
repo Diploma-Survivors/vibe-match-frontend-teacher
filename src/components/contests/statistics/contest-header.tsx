@@ -6,6 +6,7 @@ import { ContestStatus } from '@/types/contest';
 import { ContestStatistics } from '@/types/contest-statistics';
 import { Megaphone, Timer } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ContestHeaderProps {
     stats: ContestStatistics;
@@ -14,6 +15,7 @@ interface ContestHeaderProps {
 
 export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
     const [timeLeft, setTimeLeft] = useState<string>('');
+    const t = useTranslations('ContestStatistics.header');
 
     useEffect(() => {
         if (stats.status !== ContestStatus.ONGOING) return;
@@ -68,7 +70,7 @@ export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
                     </Badge>
                 </div>
                 <div className="text-sm text-slate-500 dark:text-slate-400">
-                    Started at {new Date(stats.startTime).toLocaleString()}
+                    {t('startedAt')} {new Date(stats.startTime).toLocaleString()}
                 </div>
             </div>
 
@@ -86,7 +88,7 @@ export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
                 className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg transition-all"
             >
                 <Megaphone className="w-4 h-4 mr-2" />
-                Broadcast Message
+                {t('broadcast')}
             </Button>
         </div>
     );

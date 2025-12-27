@@ -6,6 +6,7 @@ import { useApp } from '@/contexts/app-context';
 import { SidebarProvider, useSidebar } from '@/contexts/sidebar-context';
 import { cn } from '@/lib/utils';
 import { signOut } from 'next-auth/react';
+import LanguageSwitcher from '@/components/language-switcher';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isOpen, isMobile } = useSidebar();
@@ -29,7 +30,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="container mx-auto p-6">
-          <Breadcrumbs />
+          <div className="flex justify-between items-center mb-6">
+            <Breadcrumbs />
+            <LanguageSwitcher />
+          </div>
           {children}
         </div>
       </main>

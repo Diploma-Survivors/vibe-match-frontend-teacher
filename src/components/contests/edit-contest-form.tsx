@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ export default function EditContestForm({
     isSubmitting,
 }: EditContestFormProps) {
     const { confirm } = useDialog();
+    const t = useTranslations('EditContestPage.form');
 
     const defaultValues = {
         name: initialData.name,
@@ -67,10 +69,10 @@ export default function EditContestForm({
 
     const handleCancel = async () => {
         const confirmed = await confirm({
-            title: 'Cancel Editing',
-            message: 'Are you sure you want to cancel? All unsaved changes will be lost.',
-            confirmText: 'Yes, Cancel',
-            cancelText: 'No, Keep Editing',
+            title: t('cancelTitle'),
+            message: t('cancelMessage'),
+            confirmText: t('confirmCancel'),
+            cancelText: t('keepEditing'),
             color: 'red',
         });
 
@@ -100,10 +102,10 @@ export default function EditContestForm({
 
             <div className="flex justify-end gap-4">
                 <Button type="button" variant="outline" onClick={handleCancel}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : 'Update Contest'}
+                    {isSubmitting ? t('saving') : t('update')}
                 </Button>
             </div>
         </form>

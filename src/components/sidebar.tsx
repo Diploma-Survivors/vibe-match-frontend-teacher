@@ -26,9 +26,9 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@/i18n/routing';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface SideBarProps {
   onLogout: () => void;
@@ -37,51 +37,52 @@ interface SideBarProps {
 export default function Sidebar({ onLogout }: SideBarProps) {
   const { isOpen, setIsOpen, toggle, isMobile } = useSidebar();
   const pathname = usePathname();
+  const t = useTranslations('Sidebar');
 
   const { user } = useApp();
 
   const navSections = [
     {
-      title: 'OVERVIEW',
-      items: [{ name: 'Dashboard', href: '/', icon: LayoutDashboard }],
+      title: t('overview'),
+      items: [{ name: t('dashboard'), href: '/', icon: LayoutDashboard }],
     },
     {
-      title: 'PROBLEM MANAGEMENT',
+      title: t('problemManagement'),
       items: [
-        { name: 'Problem List', href: '/problems', icon: FileCode },
+        { name: t('problemList'), href: '/problems', icon: FileCode },
         {
-          name: 'Create New Problem',
+          name: t('createNewProblem'),
           href: '/problems/create',
           icon: PlusCircle,
         },
-        { name: 'Manage Tags/Topics', href: '/tags', icon: Tag },
+        { name: t('manageTagsTopics'), href: '/tags', icon: Tag },
       ],
     },
     {
-      title: 'CONTEST MANAGEMENT',
+      title: t('contestManagement'),
       items: [
-        { name: 'Contest List', href: '/contests', icon: Trophy },
-        { name: 'Create New Contest', href: '/contests/create', icon: Plus },
+        { name: t('contestList'), href: '/contests', icon: Trophy },
+        { name: t('createNewContest'), href: '/contests/create', icon: Plus },
       ],
     },
     {
-      title: 'SUBMISSION MANAGEMENT',
+      title: t('submissionManagement'),
       items: [
-        { name: 'Manage Submissions', href: '/submissions', icon: CheckSquare },
+        { name: t('manageSubmissions'), href: '/submissions', icon: CheckSquare },
       ],
     },
     {
-      title: 'USER MANAGEMENT',
+      title: t('userManagement'),
       items: [
-        { name: 'User List', href: '/users', icon: Users },
-        { name: 'Feedback & Reports', href: '/reports', icon: Flag },
+        { name: t('userList'), href: '/users', icon: Users },
+        { name: t('feedbackReports'), href: '/reports', icon: Flag },
       ],
     },
     {
-      title: 'SYSTEM & AI',
+      title: t('systemAi'),
       items: [
-        { name: 'Manage AI Prompts', href: '/ai-prompts', icon: Sparkles },
-        { name: 'General Settings', href: '/settings', icon: Settings },
+        { name: t('manageAiPrompts'), href: '/ai-prompts', icon: Sparkles },
+        { name: t('generalSettings'), href: '/settings', icon: Settings },
       ],
     },
   ];
@@ -262,7 +263,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
                 {user?.fullName || user?.username || 'User'}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {user?.email || 'No email'}
+                {user?.email || t('noEmail')}
               </p>
             </motion.div>
           </div>
@@ -281,7 +282,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
               onClick={onLogout}
             >
               <LogOut size={16} />
-              <span>Logout</span>
+              <span>{t('logout')}</span>
             </Button>
           </motion.div>
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useForm, useWatch, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ import {
 } from '@/types/problems';
 
 import { toastService } from '@/services/toasts-service';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setDraft, clearDraft } from '@/store/slices/create-problem-slice';
 import { useDialog } from '@/components/providers/dialog-provider';
@@ -28,8 +28,9 @@ import { SolutionHintsStep } from './problems/problem-form-steps/solution-hints-
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import type { CreateProblemRequest } from '@/types/problems';
+import { useTranslations } from 'next-intl';
 
-export const CreateProblemSchema = ProblemSchema.omit({
+export const getCreateProblemSchema = (t: (key: string) => string) => ProblemSchema.omit({
     id: true,
     slug: true,
     createdAt: true,
@@ -42,23 +43,23 @@ export const CreateProblemSchema = ProblemSchema.omit({
         hints: z
             .array(
                 z.object({
-                    content: z.string().min(1, 'Hint content cannot be empty'),
+                    content: z.string().min(1, t('validation.hintEmpty')),
                     order: z.number(),
                 })
             )
             .optional(),
         testcaseFile: z
             .any()
-            .refine((file) => file instanceof File, 'Testcase file is required'),
+            .refine((file) => file instanceof File, t('validation.testcaseFileRequired')),
         sampleTestcases: z
             .array(
                 z.object({
-                    input: z.string().min(1, 'Input cannot be empty'),
-                    expectedOutput: z.string().min(1, 'Output cannot be empty'),
+                    input: z.string().min(1, t('validation.inputEmpty')),
+                    expectedOutput: z.string().min(1, t('validation.outputEmpty')),
                     explanation: z.string().optional(),
                 })
             )
-            .min(1, 'At least one sample test case is required'),
+            .min(1, t('validation.sampleTestCaseRequired')),
         officialSolutionContent: z.string().optional(),
     })
     .superRefine((data, ctx) => {
@@ -70,24 +71,20 @@ export const CreateProblemSchema = ProblemSchema.omit({
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message:
-                        'Official solution content must be longer than 16 characters',
+                        t('validation.solutionContentLength'),
                     path: ['officialSolutionContent'],
                 });
             }
         }
     });
 
+// Helper to infer type (we can use a dummy t function for type inference)
+const dummyT = (key: string) => key;
+export const CreateProblemSchema = getCreateProblemSchema(dummyT);
 export type CreateProblemFormValues = z.infer<typeof CreateProblemSchema>;
 
-const STEPS = [
-    { title: 'General Information', description: 'General Info' },
-    { title: 'Problem Description', description: 'Description' },
-    { title: 'Constraints', description: 'Constraints' },
-    { title: 'Test Cases', description: 'Test Cases' },
-    { title: 'Solution & Hints', description: 'Solution & Hints' },
-];
-
 export default function ProblemCreateForm() {
+    const t = useTranslations('CreateProblemForm');
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -98,8 +95,10 @@ export default function ProblemCreateForm() {
     const { tags: availableTags, topics: availableTopics } = useAppSelector((state) => state.metadata);
     const { confirm } = useDialog();
 
+    const schema = useMemo(() => getCreateProblemSchema(t), [t]);
+
     const form = useForm<CreateProblemFormValues>({
-        resolver: zodResolver(CreateProblemSchema),
+        resolver: zodResolver(schema),
         defaultValues: draft, // Initialize with saved draft from Redux
         mode: 'onChange',
     });
@@ -142,17 +141,20 @@ export default function ProblemCreateForm() {
         }
     }, [watchedValues, dispatch, draft]);
 
-
-
-    // handleNext and handleBack removed as we use Stepper for navigation
+    const STEPS = [
+        { title: t('steps.generalInfo'), description: 'General Info' },
+        { title: t('steps.description'), description: 'Description' },
+        { title: t('steps.constraints'), description: 'Constraints' },
+        { title: t('steps.testCases'), description: 'Test Cases' },
+        { title: t('steps.solutionHints'), description: 'Solution & Hints' },
+    ];
 
     const handleCancel = async () => {
         const confirmed = await confirm({
-            title: 'Cancel creating problem',
-            message:
-                'Are you sure you want to cancel? Any unsaved changes will be lost.',
-            confirmText: 'Yes',
-            cancelText: 'No',
+            title: t('cancelDialog.title'),
+            message: t('cancelDialog.message'),
+            confirmText: t('cancelDialog.yes'),
+            cancelText: t('cancelDialog.no'),
             color: 'red',
         });
 
@@ -192,7 +194,7 @@ export default function ProblemCreateForm() {
         }
 
         setErrorSteps(newErrorSteps);
-        toastService.error('Please fix the errors in the highlighted steps.');
+        toastService.error(t('messages.fixErrors'));
     };
 
     const onSubmit = async (data: CreateProblemFormValues) => {
@@ -215,14 +217,14 @@ export default function ProblemCreateForm() {
             };
             await ProblemsService.createProblem(problemRequest);
 
-            toastService.success('Problem created successfully!');
+            toastService.success(t('messages.createSuccess'));
             dispatch(clearDraft());
 
             // Redirect to problems list
             router.push('/problems');
         } catch (err) {
             console.error('Error creating problem:', err);
-            toastService.error('Failed to create problem. Please try again.');
+            toastService.error(t('messages.createError'));
         } finally {
             setIsSubmitting(false);
         }
@@ -349,14 +351,14 @@ export default function ProblemCreateForm() {
                                     onClick={handleCancel}
                                     className="min-w-[100px] cursor-pointer"
                                 >
-                                    Cancel
+                                    {t('buttons.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="min-w-[100px] bg-green-600 hover:bg-green-700 text-white cursor-pointer"
                                 >
-                                    {isSubmitting ? 'Saving...' : 'Save Problem'}
+                                    {isSubmitting ? t('buttons.saving') : t('buttons.saveProblem')}
                                 </Button>
                             </div>
                         </form>

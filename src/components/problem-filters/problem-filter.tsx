@@ -35,6 +35,7 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useTranslations } from 'next-intl';
 
 interface ProblemFilterProps {
   keyWord: string;
@@ -66,6 +67,7 @@ export default function ProblemFilter({
   tags,
   topics,
 }: ProblemFilterProps) {
+  const t = useTranslations('ProblemFilter');
   // Search states for dropdowns
   const [topicSearch, setTopicSearch] = useState('');
   const [tagSearch, setTagSearch] = useState('');
@@ -104,25 +106,25 @@ export default function ProblemFilter({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Find ..."
+            placeholder={t('searchPlaceholder')}
             value={keyWord}
             onChange={(e) => onKeywordChange(e.target.value)}
             className="pl-10 h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
         <div className="flex items-center gap-2">
-          <div>Sort by:</div>
+          <div>{t('sortByLabel')}</div>
           <Select
             value={sortBy}
             onValueChange={(value) => onSortByChange(value as SortBy)}
           >
             <SelectTrigger className="w-[180px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t('sortByPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={SortBy.ID} className="cursor-pointer">ID</SelectItem>
-              <SelectItem value={SortBy.DIFFICULTY} className="cursor-pointer">Difficulty</SelectItem>
-              <SelectItem value={SortBy.ACCEPTANCE_RATE} className="cursor-pointer">Acceptance</SelectItem>
+              <SelectItem value={SortBy.ID} className="cursor-pointer">{t('id')}</SelectItem>
+              <SelectItem value={SortBy.DIFFICULTY} className="cursor-pointer">{t('difficulty')}</SelectItem>
+              <SelectItem value={SortBy.ACCEPTANCE_RATE} className="cursor-pointer">{t('acceptance')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -153,7 +155,7 @@ export default function ProblemFilter({
               variant="outline"
               className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
             >
-              Difficulty
+              {t('difficulty')}
               {filters.difficulty && filters.difficulty.length > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                   {filters.difficulty.length}
@@ -163,7 +165,7 @@ export default function ProblemFilter({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('selectDifficulty')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {DIFFICULTY_OPTIONS.map((option) => {
               const isChecked = filters.difficulty?.includes(option.value as any);
@@ -179,7 +181,7 @@ export default function ProblemFilter({
                   <div className={`flex items-center justify-center w-4 h-4 mr-2 border rounded ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-slate-300'}`}>
                     {isChecked && <Check className="h-3 w-3" />}
                   </div>
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-sm">{t(`difficultyOptions.${option.value}`)}</span>
                 </div>
               );
             })}
@@ -198,12 +200,12 @@ export default function ProblemFilter({
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-[150px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" className="cursor-pointer">All Status</SelectItem>
-            <SelectItem value="active" className="cursor-pointer">Active</SelectItem>
-            <SelectItem value="inactive" className="cursor-pointer">Inactive</SelectItem>
+            <SelectItem value="all" className="cursor-pointer">{t('allStatus')}</SelectItem>
+            <SelectItem value="active" className="cursor-pointer">{t('active')}</SelectItem>
+            <SelectItem value="inactive" className="cursor-pointer">{t('inactive')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -214,7 +216,7 @@ export default function ProblemFilter({
               variant="outline"
               className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
             >
-              Topics
+              {t('topics')}
               {filters.topicIds && filters.topicIds.length > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                   {filters.topicIds.length}
@@ -226,7 +228,7 @@ export default function ProblemFilter({
           <DropdownMenuContent align="start" className="w-64 max-h-80 overflow-y-auto">
             <div className="p-2 sticky top-0 bg-white dark:bg-slate-950 z-10">
               <Input
-                placeholder="Search topics..."
+                placeholder={t('searchTopics')}
                 value={topicSearch}
                 onChange={(e) => setTopicSearch(e.target.value)}
                 className="h-8 text-xs focus-visible:ring-0"
@@ -234,7 +236,7 @@ export default function ProblemFilter({
             </div>
             <DropdownMenuSeparator />
             {filteredTopics.length === 0 ? (
-              <div className="p-2 text-sm text-slate-500">No topics found</div>
+              <div className="p-2 text-sm text-slate-500">{t('noTopicsFound')}</div>
             ) : (
               filteredTopics.map((topic) => {
                 const isChecked = filters.topicIds?.includes(topic.id);
@@ -265,7 +267,7 @@ export default function ProblemFilter({
               variant="outline"
               className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
             >
-              Tags
+              {t('tags')}
               {filters.tagIds && filters.tagIds.length > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                   {filters.tagIds.length}
@@ -277,7 +279,7 @@ export default function ProblemFilter({
           <DropdownMenuContent align="start" className="w-64 max-h-80 overflow-y-auto">
             <div className="p-2 sticky top-0 bg-white dark:bg-slate-950 z-10">
               <Input
-                placeholder="Search tags..."
+                placeholder={t('searchTags')}
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
                 className="h-8 text-xs focus-visible:ring-0"
@@ -285,7 +287,7 @@ export default function ProblemFilter({
             </div>
             <DropdownMenuSeparator />
             {filteredTags.length === 0 ? (
-              <div className="p-2 text-sm text-slate-500">No tags found</div>
+              <div className="p-2 text-sm text-slate-500">{t('noTagsFound')}</div>
             ) : (
               filteredTags.map((tag) => {
                 const isChecked = filters.tagIds?.includes(tag.id);
@@ -316,7 +318,7 @@ export default function ProblemFilter({
           className="h-10 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
-          Reset
+          {t('reset')}
         </Button>
       </div>
     </div>

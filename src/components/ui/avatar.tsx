@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,

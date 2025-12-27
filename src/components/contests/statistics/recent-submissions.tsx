@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { SubmissionsService } from '@/services/submissions-service';
 import { Submission, SubmissionSortBy, SubmissionStatus } from '@/types/submissions';
 import { ChevronRight, Clock, History } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { SortOrder } from '@/types/problems';
 

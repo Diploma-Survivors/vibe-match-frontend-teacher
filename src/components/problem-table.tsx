@@ -28,7 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import React, { useState } from 'react';
 import { FaList } from 'react-icons/fa6';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +36,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { useTranslations } from 'next-intl';
 
 export enum ProblemTableMode {
   VIEW = 'view',
@@ -78,6 +79,7 @@ export default function ProblemTable({
   onProblemView,
   onStatusChange,
 }: ProblemTableProps) {
+  const t = useTranslations('ProblemTable');
   const selectionMode =
     mode === ProblemTableMode.SELECT ||
     mode === ProblemTableMode.MULTIPLE_SELECT;
@@ -149,7 +151,7 @@ export default function ProblemTable({
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">
-              Select multiple problems
+              {t('selectMultiple')}
             </h3>
             <Button
               type="button"
@@ -158,8 +160,8 @@ export default function ProblemTable({
               className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-all duration-200 shadow-sm"
             >
               {isMultipleSelect
-                ? `Select ${selectedProblemsMap.size} problems`
-                : 'Select problem'}
+                ? t('selectCount', { count: selectedProblemsMap.size })
+                : t('selectProblem')}
             </Button>
           </div>
         </div>
@@ -170,32 +172,32 @@ export default function ProblemTable({
           <TableHeader>
             <TableRow className="bg-slate-50/50 dark:bg-slate-700/20 hover:bg-slate-50/50 dark:hover:bg-slate-700/20 border-b border-slate-200 dark:border-slate-700">
               {selectionMode && (
-                <TableHead className="w-12 text-center">Select</TableHead>
+                <TableHead className="w-12 text-center">{t('select')}</TableHead>
               )}
               <TableHead className="w-20 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                ID
+                {t('id')}
               </TableHead>
               <TableHead className="font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                Title
+                {t('title')}
               </TableHead>
               <TableHead className="w-32 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                Difficulty
+                {t('difficulty')}
               </TableHead>
               <TableHead className="w-32 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                Status
+                {t('status')}
               </TableHead>
               <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                ACCEPTANCE
+                {t('acceptance')}
               </TableHead>
               <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                TAGS
+                {t('tags')}
               </TableHead>
               <TableHead className="w-48 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                Topics
+                {t('topics')}
               </TableHead>
               {!selectionMode && (
                 <TableHead className="w-24 font-semibold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider text-right">
-                  Actions
+                  {t('actions')}
                 </TableHead>
               )}
             </TableRow>
@@ -259,7 +261,7 @@ export default function ProblemTable({
                   colSpan={selectionMode ? 9 : 8}
                   className="h-32 text-center text-slate-500"
                 >
-                  Không tìm thấy bài tập nào
+                  {t('noProblemsFound')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -308,7 +310,7 @@ export default function ProblemTable({
                           </Link>
                         )}
                         <span className="text-xs text-slate-500 mt-1">
-                          Last updated:{' '}
+                          {t('lastUpdated')}{' '}
                           {new Date(
                             problem.updatedAt || ''
                           ).toLocaleDateString()}
@@ -333,7 +335,7 @@ export default function ProblemTable({
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400'
                           } border-0`}
                       >
-                        {problem.isActive ? 'Active' : 'Inactive'}
+                        {problem.isActive ? t('active') : t('inactive')}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -388,47 +390,47 @@ export default function ProblemTable({
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">{t('openMenu')}</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                               <DropdownMenuItem asChild>
                                 <Link href={`/problems/${problem.id}/edit`}>
                                   <Edit className="mr-2 h-4 w-4" />
-                                  Edit
+                                  {t('edit')}
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
                                 <Link href={`/problems/${problem.id}/statistics`}>
                                   <BarChart2 className="mr-2 h-4 w-4" />
-                                  Statistics
+                                  {t('statistics')}
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
                                 <Link href={`/submissions?problemIds=${problem.id}`}>
                                   <FaList className="mr-2 h-4 w-4" />
-                                  View Submissions
+                                  {t('viewSubmissions')}
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => onStatusChange?.(problem)}>
                                 {problem.isActive ? (
                                   <>
                                     <Lock className="mr-2 h-4 w-4" />
-                                    Deactivate
+                                    {t('deactivate')}
                                   </>
                                 ) : (
                                   <>
                                     <Unlock className="mr-2 h-4 w-4" />
-                                    Activate
+                                    {t('activate')}
                                   </>
                                 )}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem className="text-red-600">
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
+                                {t('delete')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -449,7 +451,7 @@ export default function ProblemTable({
         totalPages={totalPages}
         onPageChange={onPageChange}
         meta={meta || undefined}
-        entityName="problems"
+        entityName={t('entityName')}
       />
     </div>
   );

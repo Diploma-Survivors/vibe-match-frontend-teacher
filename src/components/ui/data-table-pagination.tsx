@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface DataTablePaginationProps {
     currentPage: number;
@@ -22,6 +23,8 @@ export function DataTablePagination({
     meta,
     entityName = 'items',
 }: DataTablePaginationProps) {
+    const t = useTranslations('DataTablePagination');
+
     if (totalPages <= 1 && !meta) return null;
 
     const renderPaginationButtons = () => {
@@ -106,22 +109,20 @@ export function DataTablePagination({
         );
     };
 
+    const start = meta ? (meta.page - 1) * meta.limit + 1 : (currentPage - 1) * 10 + 1;
+    const end = meta ? Math.min(meta.page * meta.limit, meta.total) : Math.min(currentPage * 10, totalPages * 10);
+    const total = meta?.total || totalPages * 10;
+
     return (
         <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-slate-500 dark:text-slate-400">
-                Showing{' '}
-                <span className="font-medium text-slate-900 dark:text-slate-200">
-                    {meta ? (meta.page - 1) * meta.limit + 1 : (currentPage - 1) * 10 + 1}
-                </span>{' '}
-                -{' '}
-                <span className="font-medium text-slate-900 dark:text-slate-200">
-                    {meta ? Math.min(meta.page * meta.limit, meta.total) : Math.min(currentPage * 10, totalPages * 10)}
-                </span>{' '}
-                of{' '}
-                <span className="font-medium text-slate-900 dark:text-slate-200">
-                    {meta?.total || totalPages * 10}
-                </span>{' '}
-                {entityName}
+                {t.rich('summary', {
+                    start,
+                    end,
+                    total,
+                    entityName,
+                    bold: (chunks) => <span className="font-medium text-slate-900 dark:text-slate-200">{chunks}</span>
+                })}
             </div>
             {renderPaginationButtons()}
         </div>

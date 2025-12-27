@@ -37,6 +37,7 @@ import useContest from '@/hooks/use-contest';
 import useProblems from '@/hooks/use-problems';
 import { ProblemEndpointType, Problem } from '@/types/problems';
 import { Contest } from '@/types/contest';
+import { useTranslations } from 'next-intl';
 
 interface SubmissionFilterProps {
     filters: SubmissionFilters;
@@ -70,6 +71,7 @@ export default function SubmissionFilter({
     sortOrder: 'asc' | 'desc';
     onSortOrderChange: (sortOrder: 'asc' | 'desc') => void;
 }) {
+    const t = useTranslations('SubmissionFilter');
     // Problem Filter State
     const [problemSearch, setProblemSearch] = useState('');
     const [accumulatedProblems, setAccumulatedProblems] = useState<Problem[]>([]);
@@ -243,7 +245,7 @@ export default function SubmissionFilter({
                 <div className="relative w-full">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
-                        placeholder="Find ..."
+                        placeholder={t('searchPlaceholder')}
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         className="pl-9 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus-visible:ring-0"
@@ -251,14 +253,14 @@ export default function SubmissionFilter({
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto">
-                    <span className="text-sm text-slate-500 whitespace-nowrap">Sort by:</span>
+                    <span className="text-sm text-slate-500 whitespace-nowrap">{t('sortByLabel')}</span>
                     <Select value={sortBy} onValueChange={(value) => onSortByChange(value as SubmissionSortBy)}>
                         <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={SubmissionSortBy.ID}>ID</SelectItem>
-                            <SelectItem value={SubmissionSortBy.SUBMITTED_AT}>Submitted At</SelectItem>
+                            <SelectItem value={SubmissionSortBy.ID}>{t('id')}</SelectItem>
+                            <SelectItem value={SubmissionSortBy.SUBMITTED_AT}>{t('submittedAt')}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Button
@@ -285,7 +287,7 @@ export default function SubmissionFilter({
                             variant="outline"
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer min-w-[150px] justify-between"
                         >
-                            Problems
+                            {t('problems')}
                             {selectedProblemsCount > 0 && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                                     {selectedProblemsCount}
@@ -297,7 +299,7 @@ export default function SubmissionFilter({
                     <DropdownMenuContent align="start" className="w-80 max-h-80 overflow-y-auto">
                         <div className="p-2 sticky top-0 bg-white dark:bg-slate-950 z-10">
                             <Input
-                                placeholder="Search problems..."
+                                placeholder={t('searchProblems')}
                                 value={problemSearch}
                                 onChange={(e) => setProblemSearch(e.target.value)}
                                 className="h-8 text-xs focus-visible:ring-0"
@@ -305,7 +307,7 @@ export default function SubmissionFilter({
                         </div>
                         <DropdownMenuSeparator />
                         {accumulatedProblems.length === 0 && !isProblemsLoading ? (
-                            <div className="p-2 text-sm text-slate-500">No problems found</div>
+                            <div className="p-2 text-sm text-slate-500">{t('noProblemsFound')}</div>
                         ) : (
                             accumulatedProblems.map((problem) => (
                                 <div
@@ -339,7 +341,7 @@ export default function SubmissionFilter({
                             variant="outline"
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer min-w-[150px] justify-between"
                         >
-                            Contests
+                            {t('contests')}
                             {selectedContestsCount > 0 && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                                     {selectedContestsCount}
@@ -351,7 +353,7 @@ export default function SubmissionFilter({
                     <DropdownMenuContent align="start" className="w-80 max-h-80 overflow-y-auto">
                         <div className="p-2 sticky top-0 bg-white dark:bg-slate-950 z-10">
                             <Input
-                                placeholder="Search contests..."
+                                placeholder={t('searchContests')}
                                 value={contestSearch}
                                 onChange={(e) => setContestSearch(e.target.value)}
                                 className="h-8 text-xs focus-visible:ring-0"
@@ -359,7 +361,7 @@ export default function SubmissionFilter({
                         </div>
                         <DropdownMenuSeparator />
                         {accumulatedContests.length === 0 && !isContestsLoading ? (
-                            <div className="p-2 text-sm text-slate-500">No contests found</div>
+                            <div className="p-2 text-sm text-slate-500">{t('noContestsFound')}</div>
                         ) : (
                             accumulatedContests.map((contest) => (
                                 <div
@@ -393,7 +395,7 @@ export default function SubmissionFilter({
                             variant="outline"
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer min-w-[150px] justify-between"
                         >
-                            Languages
+                            {t('languages')}
                             {selectedLanguagesCount > 0 && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                                     {selectedLanguagesCount}
@@ -405,7 +407,7 @@ export default function SubmissionFilter({
                     <DropdownMenuContent align="start" className="w-64 max-h-80 overflow-y-auto">
                         <div className="p-2 sticky top-0 bg-white dark:bg-slate-950 z-10">
                             <Input
-                                placeholder="Search languages..."
+                                placeholder={t('searchLanguages')}
                                 value={languageSearch}
                                 onChange={(e) => setLanguageSearch(e.target.value)}
                                 className="h-8 text-xs focus-visible:ring-0"
@@ -413,7 +415,7 @@ export default function SubmissionFilter({
                         </div>
                         <DropdownMenuSeparator />
                         {filteredLanguages.length === 0 ? (
-                            <div className="p-2 text-sm text-slate-500">No languages found</div>
+                            <div className="p-2 text-sm text-slate-500">{t('noLanguagesFound')}</div>
                         ) : (
                             filteredLanguages.map((lang) => (
                                 <div
@@ -447,15 +449,15 @@ export default function SubmissionFilter({
                     }}
                 >
                     <SelectTrigger className="w-[180px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
-                        <SelectValue placeholder="Status" />
+                        <SelectValue placeholder={t('status')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all" className="cursor-pointer">All Statuses</SelectItem>
+                        <SelectItem value="all" className="cursor-pointer">{t('allStatuses')}</SelectItem>
                         {Object.values(SubmissionStatus)
                             .filter(status => !RUNTIME_ERROR_STATUSES.includes(status) || status === SubmissionStatus.RUNTIME_ERROR)
                             .map((status) => (
                                 <SelectItem key={status} value={status} className="cursor-pointer">
-                                    {status}
+                                    {t(`statusOptions.${status}`)}
                                 </SelectItem>
                             ))}
                     </SelectContent>
@@ -473,7 +475,7 @@ export default function SubmissionFilter({
                     className="h-10 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                 >
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Reset
+                    {t('reset')}
                 </Button>
             </div>
         </div>

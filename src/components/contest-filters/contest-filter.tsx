@@ -21,7 +21,6 @@ import {
     type ContestFilters,
     ContestSortBy,
     ContestStatus,
-    CONTEST_STATUS_LABELS,
 } from '@/types/contest';
 import { SortOrder } from '@/types/problems';
 import {
@@ -37,6 +36,7 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
+import { useTranslations } from 'next-intl';
 
 interface ContestFilterProps {
     keyword: string;
@@ -64,6 +64,8 @@ export default function ContestFilter({
     onSearch,
     onReset,
 }: ContestFilterProps) {
+    const t = useTranslations('ContestFilter');
+
     const handleStatusChange = (status: ContestStatus) => {
         const currentStatuses = filters.statuses || [];
         const newStatuses = currentStatuses.includes(status)
@@ -97,25 +99,25 @@ export default function ContestFilter({
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
-                        placeholder="Search contests..."
+                        placeholder={t('searchPlaceholder')}
                         value={keyword}
                         onChange={(e) => onKeywordChange(e.target.value)}
                         className="pl-10 h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="text-sm font-medium text-slate-500">Sort by:</div>
+                    <div className="text-sm font-medium text-slate-500">{t('sortByLabel')}</div>
                     <Select
                         value={sortBy}
                         onValueChange={(value) => onSortByChange(value as ContestSortBy)}
                     >
                         <SelectTrigger className="w-[180px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
-                            <SelectValue placeholder="Sort by" />
+                            <SelectValue placeholder={t('sortByPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={ContestSortBy.ID} className="cursor-pointer">ID</SelectItem>
-                            <SelectItem value={ContestSortBy.START_TIME} className="cursor-pointer">Start Time</SelectItem>
-                            <SelectItem value={ContestSortBy.DURATION} className="cursor-pointer">Duration</SelectItem>
+                            <SelectItem value={ContestSortBy.ID} className="cursor-pointer">{t('id')}</SelectItem>
+                            <SelectItem value={ContestSortBy.START_TIME} className="cursor-pointer">{t('startTime')}</SelectItem>
+                            <SelectItem value={ContestSortBy.DURATION} className="cursor-pointer">{t('duration')}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Button
@@ -146,7 +148,7 @@ export default function ContestFilter({
                             variant="outline"
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                         >
-                            Status
+                            {t('status')}
                             {filters.statuses && filters.statuses.length > 0 && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                                     {filters.statuses.length}
@@ -156,7 +158,7 @@ export default function ContestFilter({
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-48">
-                        <DropdownMenuLabel>Select Status</DropdownMenuLabel>
+                        <DropdownMenuLabel>{t('selectStatus')}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {Object.values(ContestStatus).map((status) => {
                             const isChecked = filters.statuses?.includes(status);
@@ -172,7 +174,7 @@ export default function ContestFilter({
                                     <div className={`flex items-center justify-center w-4 h-4 mr-2 border rounded ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-slate-300'}`}>
                                         {isChecked && <Check className="h-3 w-3" />}
                                     </div>
-                                    <span className="text-sm">{CONTEST_STATUS_LABELS[status]}</span>
+                                    <span className="text-sm">{t(`statusOptions.${status}`)}</span>
                                 </div>
                             );
                         })}
@@ -187,10 +189,10 @@ export default function ContestFilter({
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                         >
                             <Calendar className="mr-2 h-4 w-4 opacity-50" />
-                            Start Time
+                            {t('startTime')}
                             {(filters.startTimeRange?.from || filters.startTimeRange?.to) && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                                    Active
+                                    {t('active')}
                                 </Badge>
                             )}
                             <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -198,10 +200,10 @@ export default function ContestFilter({
                     </PopoverTrigger>
                     <PopoverContent className="w-80 p-4" align="start">
                         <div className="space-y-4">
-                            <h4 className="font-medium leading-none">Date Range</h4>
+                            <h4 className="font-medium leading-none">{t('dateRange')}</h4>
                             <div className="grid gap-2">
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label htmlFor="from">From</Label>
+                                    <Label htmlFor="from">{t('from')}</Label>
                                     <Input
                                         id="from"
                                         type="date"
@@ -211,7 +213,7 @@ export default function ContestFilter({
                                     />
                                 </div>
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label htmlFor="to">To</Label>
+                                    <Label htmlFor="to">{t('to')}</Label>
                                     <Input
                                         id="to"
                                         type="date"
@@ -232,7 +234,7 @@ export default function ContestFilter({
                     className="h-10 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                 >
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Reset
+                    {t('reset')}
                 </Button>
             </div>
         </div>

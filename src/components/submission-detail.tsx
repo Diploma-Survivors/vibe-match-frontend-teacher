@@ -1,6 +1,7 @@
 'use client';
 
 import { Submission, SubmissionStatus, languageMap } from '@/types/submissions';
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,11 +32,12 @@ interface SubmissionDetailProps {
 
 export default function SubmissionDetail({ submission, isLoading, error }: SubmissionDetailProps) {
     const { languages } = useAppSelector((state) => state.metadata);
+    const t = useTranslations('SubmissionDetail');
 
     const handleCopyCode = () => {
         if (submission?.sourceCode) {
             navigator.clipboard.writeText(submission.sourceCode);
-            toastService.success('Code copied to clipboard');
+            toastService.success(t('sourceCode.copySuccess'));
         }
     };
 
@@ -49,7 +51,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            toastService.success('Code downloaded successfully');
+            toastService.success(t('sourceCode.downloadSuccess'));
             URL.revokeObjectURL(url);
         }
     };
@@ -115,8 +117,8 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
             <div className="container mx-auto py-6 flex items-center justify-center min-h-[50vh]">
                 <div className="text-center space-y-4">
                     <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
-                    <h2 className="text-xl font-semibold">Error Loading Submission</h2>
-                    <p className="text-muted-foreground">{error || 'Submission not found'}</p>
+                    <h2 className="text-xl font-semibold">{t('errors.title')}</h2>
+                    <p className="text-muted-foreground">{error || t('errors.notFound')}</p>
                 </div>
             </div>
         );
@@ -128,14 +130,14 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold">Submission #{submission.id}</h1>
+                        <h1 className="text-2xl font-bold">{t('title', { id: submission.id })}</h1>
                         <Badge variant="outline" className={cn("px-3 py-1 flex items-center gap-1.5", getStatusColor(submission.status))}>
                             {getStatusIcon(submission.status)}
                             {submission.status}
                         </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <span>Submitted by</span>
+                        <span>{t('submittedBy')}</span>
                         <div className="flex items-center gap-1.5 font-medium text-foreground">
                             <Avatar className="h-5 w-5">
                                 <AvatarImage src={submission.user.avatarUrl || ''} />
@@ -155,14 +157,14 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                            Status
+                            {t('status.label')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{submission.status}</div>
                         {/* Placeholder for sub-status info if any */}
                         <div className="text-xs text-muted-foreground mt-1">
-                            {submission.status === SubmissionStatus.ACCEPTED ? 'All test cases passed' : 'Check details below'}
+                            {submission.status === SubmissionStatus.ACCEPTED ? t('status.allPassed') : t('status.checkDetails')}
                         </div>
                     </CardContent>
                 </Card>
@@ -171,7 +173,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <Clock className="h-4 w-4 text-blue-500" />
-                            Runtime
+                            {t('metrics.runtime')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -183,7 +185,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <Cpu className="h-4 w-4 text-purple-500" />
-                            Memory
+                            {t('metrics.memory')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -195,7 +197,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <Code2 className="h-4 w-4 text-orange-500" />
-                            Language
+                            {t('metrics.language')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -209,16 +211,16 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                 <div className="border-b bg-muted/40 px-4 py-2 flex items-center justify-between">
                     <div className="flex items-center font-medium text-sm">
                         <Code2 className="h-4 w-4 text-muted-foreground" />
-                        SOURCE CODE
+                        {t('sourceCode.title')}
                     </div>
                     <div className="flex items-center gap-1">
                         <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5" onClick={handleCopyCode}>
                             <Copy className="h-3.5 w-3.5" />
-                            Copy
+                            {t('sourceCode.copy')}
                         </Button>
                         <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5" onClick={handleDownloadCode}>
                             <Download className="h-3.5 w-3.5" />
-                            Download
+                            {t('sourceCode.download')}
                         </Button>
                     </div>
                 </div>
@@ -239,13 +241,13 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
             {submission.testcaseResults && submission.testcaseResults.length > 0 && (
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold">Test Case Results</h2>
+                        <h2 className="text-lg font-semibold">{t('testCases.title')}</h2>
                         <div className="flex gap-2">
                             <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">
-                                Total: {submission.totalTestcases}
+                                {t('testCases.total', { count: submission.totalTestcases })}
                             </Badge>
                             <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50">
-                                Passed: {submission.testcasesPassed}
+                                {t('testCases.passed', { count: submission.testcasesPassed })}
                             </Badge>
                         </div>
                     </div>
@@ -281,7 +283,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                                                 )}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="font-medium">Test Case #{result.testcaseId}</span>
+                                                <span className="font-medium">{t('testCases.caseTitle', { id: result.testcaseId })}</span>
                                                 <Badge variant="secondary" className={cn(
                                                     "w-fit text-[10px] h-5 px-1.5 font-normal",
                                                     result.status === SubmissionStatus.ACCEPTED
@@ -309,17 +311,17 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                                     {/* Content */}
                                     {result.status === SubmissionStatus.RUNTIME_ERROR || result.status.includes('Error') ? (
                                         <div className="space-y-2">
-                                            <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-wider">Error Message</span>
+                                            <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-wider">{t('testCases.errorMessage')}</span>
                                             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/30 rounded-md p-3 text-sm font-mono text-yellow-800 dark:text-yellow-200 flex items-start gap-2">
                                                 <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                {result.error || 'Unknown runtime error occurred'}
+                                                {result.error || t('testCases.unknownError')}
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Expected Output</span>
-                                                <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-md p-3 text-sm font-mono text-muted-foreground min-h-[3rem]">
+                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('testCases.expectedOutput')}</span>
+                                                <div className="bg-slate-5 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-md p-3 text-sm font-mono text-muted-foreground min-h-[3rem]">
                                                     {result.expectedOutput}
                                                 </div>
                                             </div>
@@ -327,7 +329,7 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                                                 <span className={cn(
                                                     "text-xs font-bold uppercase tracking-wider",
                                                     result.status === SubmissionStatus.ACCEPTED ? "text-green-600 dark:text-green-500" : "text-red-600 dark:text-red-500"
-                                                )}>Actual Output</span>
+                                                )}>{t('testCases.actualOutput')}</span>
                                                 <div className={cn(
                                                     "border rounded-md p-3 text-sm font-mono min-h-[3rem]",
                                                     result.status === SubmissionStatus.ACCEPTED

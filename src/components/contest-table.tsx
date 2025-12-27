@@ -41,7 +41,8 @@ import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip } from './ui/tooltip';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 
 interface ContestTableProps {
     contests: Contest[];
@@ -70,6 +71,8 @@ export default function ContestTable({
     onDelete,
     onStatusChange,
 }: ContestTableProps) {
+    const t = useTranslations('ContestTable');
+
     const handleSort = (column: ContestSortBy) => {
         if (sortBy === column) {
             onSortOrderChange(
@@ -97,12 +100,12 @@ export default function ContestTable({
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[80px]">ID</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Start Time</TableHead>
-                                <TableHead>Duration</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="w-[80px]">{t('id')}</TableHead>
+                                <TableHead>{t('name')}</TableHead>
+                                <TableHead>{t('startTime')}</TableHead>
+                                <TableHead>{t('duration')}</TableHead>
+                                <TableHead>{t('status')}</TableHead>
+                                <TableHead className="text-right">{t('actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -134,16 +137,16 @@ export default function ContestTable({
                                 onClick={() => handleSort(ContestSortBy.ID)}
                             >
                                 <div className="flex items-center">
-                                    ID
+                                    {t('id')}
                                 </div>
                             </TableHead>
-                            <TableHead>Name</TableHead>
+                            <TableHead>{t('name')}</TableHead>
                             <TableHead
                                 className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 onClick={() => handleSort(ContestSortBy.START_TIME)}
                             >
                                 <div className="flex items-center">
-                                    Start Time
+                                    {t('startTime')}
                                 </div>
                             </TableHead>
                             <TableHead
@@ -151,19 +154,19 @@ export default function ContestTable({
                                 onClick={() => handleSort(ContestSortBy.DURATION)}
                             >
                                 <div className="flex items-center">
-                                    Duration
+                                    {t('duration')}
                                 </div>
                             </TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Visibility</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead>{t('visibility')}</TableHead>
+                            <TableHead className="text-right">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {contests.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="h-24 text-center text-slate-500">
-                                    No contests found.
+                                    {t('noContestsFound')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -182,7 +185,7 @@ export default function ContestTable({
                                         {format(new Date(contest.startTime), 'PP p')}
                                     </TableCell>
                                     <TableCell>
-                                        {contest.durationMinutes} mins
+                                        {contest.durationMinutes} {t('mins')}
                                     </TableCell>
                                     <TableCell>
                                         <Badge
@@ -201,7 +204,7 @@ export default function ContestTable({
                                                 : 'bg-slate-50 text-slate-500 border-slate-200'
                                                 }`}
                                         >
-                                            {contest.isActive ? 'Active' : 'Inactive'}
+                                            {contest.isActive ? t('active') : t('inactive')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -216,7 +219,7 @@ export default function ContestTable({
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/contests/${contest.id}/edit`} className="cursor-pointer">
                                                             <Edit className="mr-2 h-4 w-4" />
-                                                            Edit
+                                                            {t('edit')}
                                                         </Link>
                                                     </DropdownMenuItem>
                                                 ) : (
@@ -224,13 +227,13 @@ export default function ContestTable({
                                                         <DropdownMenuItem asChild>
                                                             <Link href={`/contests/${contest.id}`} className="cursor-pointer">
                                                                 <Eye className="mr-2 h-4 w-4" />
-                                                                View
+                                                                {t('view')}
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
                                                             <Link href={`/contests/${contest.id}/statistics`} className='cursor-pointer'>
                                                                 <BarChart2 className="mr-2 h-4 w-4" />
-                                                                Statistics
+                                                                {t('statistics')}
                                                             </Link>
                                                         </DropdownMenuItem>
                                                     </>
@@ -243,12 +246,12 @@ export default function ContestTable({
                                                     {contest.isActive ? (
                                                         <>
                                                             <Lock className="mr-2 h-4 w-4" />
-                                                            Deactivate
+                                                            {t('deactivate')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Unlock className="mr-2 h-4 w-4" />
-                                                            Activate
+                                                            {t('activate')}
                                                         </>
                                                     )}
                                                 </DropdownMenuItem>
@@ -258,7 +261,7 @@ export default function ContestTable({
                                                     onClick={() => onDelete?.(contest)}
                                                 >
                                                     <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
+                                                    {t('delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -282,7 +285,7 @@ export default function ContestTable({
                         hasPreviousPage: meta.hasPreviousPage,
                         hasNextPage: meta.hasNextPage,
                     }}
-                    entityName="contests"
+                    entityName={t('entityName')}
                 />
             )}
         </div>

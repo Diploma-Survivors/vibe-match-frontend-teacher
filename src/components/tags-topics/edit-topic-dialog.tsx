@@ -16,12 +16,7 @@ import { Button } from '@/components/ui/button';
 import { TopicsService } from '@/services/topics-service';
 import { toastService } from '@/services/toasts-service';
 import { Topic } from '@/types/topics';
-
-const formSchema = z.object({
-    name: z.string().min(1, 'Topic name is required').max(50, 'Topic name is too long'),
-    slug: z.string().optional(),
-    description: z.string().optional(),
-});
+import { useTranslations } from 'next-intl';
 
 interface EditTopicDialogProps {
     topic: Topic | null;
@@ -31,7 +26,14 @@ interface EditTopicDialogProps {
 }
 
 export function EditTopicDialog({ topic, open, onOpenChange, onSuccess }: EditTopicDialogProps) {
+    const t = useTranslations('EditTopicDialog');
     const [loading, setLoading] = useState(false);
+
+    const formSchema = z.object({
+        name: z.string().min(1, t('topicNameRequired')).max(50, t('topicNameTooLong')),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,12 +60,12 @@ export function EditTopicDialog({ topic, open, onOpenChange, onSuccess }: EditTo
         setLoading(true);
         try {
             await TopicsService.updateTopic(topic.id, values);
-            toastService.success('Topic updated successfully');
+            toastService.success(t('updateTopicSuccess'));
             onOpenChange(false);
             onSuccess();
         } catch (error) {
             console.error('Failed to update topic:', error);
-            toastService.error('Failed to update topic');
+            toastService.error(t('updateTopicError'));
         } finally {
             setLoading(false);
         }
@@ -73,17 +75,17 @@ export function EditTopicDialog({ topic, open, onOpenChange, onSuccess }: EditTo
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px] data-[state=open]:slide-in-from-top-0">
                 <DialogHeader>
-                    <DialogTitle>Edit Topic</DialogTitle>
+                    <DialogTitle>{t('editTopicTitle')}</DialogTitle>
                     <DialogDescription>
-                        Make changes to the topic here. Click save when you're done.
+                        {t('editTopicDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('nameLabel')}</Label>
                         <Input
                             id="name"
-                            placeholder="e.g. Algorithms"
+                            placeholder={t('namePlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('name')}
                         />
@@ -94,10 +96,10 @@ export function EditTopicDialog({ topic, open, onOpenChange, onSuccess }: EditTo
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('descriptionLabel')}</Label>
                         <Input
                             id="description"
-                            placeholder="Topic description"
+                            placeholder={t('descriptionPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('description')}
                         />
@@ -109,7 +111,7 @@ export function EditTopicDialog({ topic, open, onOpenChange, onSuccess }: EditTo
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>
-                            {loading ? 'Saving...' : 'Save changes'}
+                            {loading ? t('saving') : t('saveChanges')}
                         </Button>
                     </DialogFooter>
                 </form>

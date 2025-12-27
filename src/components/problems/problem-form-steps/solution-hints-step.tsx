@@ -8,8 +8,10 @@ import { Plus, X } from 'lucide-react';
 import MarkdownEditor from '@/components/markdown-editor/markdown-editor';
 import { cn } from '@/lib/utils';
 import type { CreateProblemFormValues } from '@/components/problem-create-form';
+import { useTranslations } from 'next-intl';
 
 export function SolutionHintsStep() {
+  const t = useTranslations('CreateProblemForm.solutionHints');
   const {
     control,
     watch,
@@ -23,9 +25,9 @@ export function SolutionHintsStep() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <Label className="text-base">Official Solution</Label>
+            <Label className="text-base">{t('officialSolutionLabel')}</Label>
             <p className="text-sm text-slate-500">
-              Enable to provide an official solution for this problem.
+              {t('officialSolutionDescription')}
             </p>
           </div>
           <Controller
@@ -69,9 +71,9 @@ export function SolutionHintsStep() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <Label className="text-base">Hints</Label>
+            <Label className="text-base">{t('hintsLabel')}</Label>
             <p className="text-sm text-slate-500">
-              Provide hints to help users solve the problem.
+              {t('hintsDescription')}
             </p>
           </div>
           <Button
@@ -89,7 +91,7 @@ export function SolutionHintsStep() {
             className="text-blue-600 border-blue-200 hover:bg-blue-50 cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add Hint
+            {t('addHint')}
           </Button>
         </div>
 
@@ -100,7 +102,7 @@ export function SolutionHintsStep() {
               className="flex gap-4 items-start animate-in fade-in slide-in-from-top-2 duration-200"
             >
               <Badge variant="outline" className="mt-2 shrink-0">
-                Hint {index + 1}
+                {t('hintPrefix')} {index + 1}
               </Badge>
               <div className="flex-1">
                 <Textarea
@@ -113,7 +115,7 @@ export function SolutionHintsStep() {
                     };
                     setValue('hints', current, { shouldValidate: true });
                   }}
-                  placeholder={`Enter hint #${index + 1}...`}
+                  placeholder={t('hintPlaceholder', { index: index + 1 })}
                   className={cn(
                     'min-h-[80px] focus-visible:ring-0 focus-visible:ring-offset-0',
                     errors.hints?.[index]?.content && 'border-red-500'
@@ -145,7 +147,7 @@ export function SolutionHintsStep() {
           ))}
           {(!watch('hints') || watch('hints')?.length === 0) && (
             <div className="text-center py-8 text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg">
-              No hints added yet. Click "Add Hint" to start.
+              {t('noHints')}
             </div>
           )}
         </div>

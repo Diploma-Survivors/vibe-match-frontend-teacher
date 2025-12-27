@@ -38,6 +38,8 @@ import { Pagination } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 import { DataTablePagination } from './ui/data-table-pagination';
 import { getLanguageName, getStatusColor, getStatusLabel } from '@/services/submissions-service';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface SubmissionTableProps {
     submissions: Submission[];
@@ -62,6 +64,8 @@ export default function SubmissionTable({
     onSortOrderChange,
     languages,
 }: SubmissionTableProps) {
+    const t = useTranslations('SubmissionTable');
+
     const handleSort = (column: SubmissionSortBy) => {
         if (sortBy === column) {
             onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -83,13 +87,13 @@ export default function SubmissionTable({
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>User</TableHead>
-                                <TableHead>Problem</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Statistics</TableHead>
-                                <TableHead>Language</TableHead>
-                                <TableHead>Submitted At</TableHead>
+                                <TableHead>{t('id')}</TableHead>
+                                <TableHead>{t('user')}</TableHead>
+                                <TableHead>{t('problem')}</TableHead>
+                                <TableHead>{t('status')}</TableHead>
+                                <TableHead>{t('statistics')}</TableHead>
+                                <TableHead>{t('language')}</TableHead>
+                                <TableHead>{t('submittedAt')}</TableHead>
                                 <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -119,13 +123,13 @@ export default function SubmissionTable({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>User</TableHead>
-                            <TableHead>Problem</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Statistics</TableHead>
-                            <TableHead>Language</TableHead>
-                            <TableHead>Submitted At</TableHead>
+                            <TableHead>{t('id')}</TableHead>
+                            <TableHead>{t('user')}</TableHead>
+                            <TableHead>{t('problem')}</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead>{t('statistics')}</TableHead>
+                            <TableHead>{t('language')}</TableHead>
+                            <TableHead>{t('submittedAt')}</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -133,7 +137,7 @@ export default function SubmissionTable({
                         {submissions.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={8} className="h-24 text-center">
-                                    No submissions found.
+                                    {t('noSubmissionsFound')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -196,14 +200,14 @@ export default function SubmissionTable({
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                                    <a href={`/problems/submissions/${submission.id}`}>
+                                                    <Link href={`/submissions/${submission.id}`}>
                                                         <Eye className="mr-2 h-4 w-4" />
-                                                        View Details
-                                                    </a>
+                                                        {t('viewDetails')}
+                                                    </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
                                                     <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
+                                                    {t('delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -220,7 +224,7 @@ export default function SubmissionTable({
                 totalPages={totalPages}
                 onPageChange={onPageChange}
                 meta={meta || undefined}
-                entityName="problems"
+                entityName={t('entityName')}
             />
         </div>
     );

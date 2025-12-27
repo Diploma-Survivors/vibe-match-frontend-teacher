@@ -17,20 +17,22 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { TagsService } from '@/services/tags-service';
 import { toastService } from '@/services/toasts-service';
-
-const formSchema = z.object({
-    name: z.string().min(1, 'Tag name is required').max(50, 'Tag name is too long'),
-    slug: z.string().optional(),
-    description: z.string().optional(),
-});
+import { useTranslations } from 'next-intl';
 
 interface CreateTagDialogProps {
     onSuccess: () => void;
 }
 
 export function CreateTagDialog({ onSuccess }: CreateTagDialogProps) {
+    const t = useTranslations('CreateTagDialog');
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const formSchema = z.object({
+        name: z.string().min(1, t('tagNameRequired')).max(50, t('tagNameTooLong')),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,13 +47,13 @@ export function CreateTagDialog({ onSuccess }: CreateTagDialogProps) {
         setLoading(true);
         try {
             await TagsService.createTag(values);
-            toastService.success('Tag created successfully');
+            toastService.success(t('createTagSuccess'));
             setOpen(false);
             form.reset();
             onSuccess();
         } catch (error) {
             console.error('Failed to create tag:', error);
-            toastService.error('Failed to create tag');
+            toastService.error(t('createTagError'));
         } finally {
             setLoading(false);
         }
@@ -63,22 +65,22 @@ export function CreateTagDialog({ onSuccess }: CreateTagDialogProps) {
                 <Button className="bg-green-600 hover:bg-green-700 text-white text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300">
 
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Tag
+                    {t('createTagButton')}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] data-[state=open]:slide-in-from-top-0">
                 <DialogHeader>
-                    <DialogTitle>Create Tag</DialogTitle>
+                    <DialogTitle>{t('createTagTitle')}</DialogTitle>
                     <DialogDescription>
-                        Add a new tag to categorize problems.
+                        {t('createTagDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('nameLabel')}</Label>
                         <Input
                             id="name"
-                            placeholder="e.g. Dynamic Programming"
+                            placeholder={t('namePlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('name')}
                         />
@@ -89,26 +91,26 @@ export function CreateTagDialog({ onSuccess }: CreateTagDialogProps) {
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{t('slugLabel')}</Label>
                         <Input
                             id="slug"
-                            placeholder="e.g. dynamic-programming"
+                            placeholder={t('slugPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('slug')}
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('descriptionLabel')}</Label>
                         <Input
                             id="description"
-                            placeholder="Tag description"
+                            placeholder={t('descriptionPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('description')}
                         />
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>
-                            {loading ? 'Creating...' : 'Create'}
+                            {loading ? t('creating') : t('create')}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DistributionBucket } from '@/types/problem-statistics';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 interface PerformanceAnalysisProps {
     runtimeDistribution: DistributionBucket[];
@@ -10,16 +11,18 @@ interface PerformanceAnalysisProps {
 }
 
 export function PerformanceAnalysis({ runtimeDistribution, memoryDistribution }: PerformanceAnalysisProps) {
+    const t = useTranslations('ProblemStatistics.performance');
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DistributionChart
-                title="Runtime Distribution (ms)"
+                title={t('runtimeTitle')}
                 data={runtimeDistribution}
                 color="#3b82f6"
                 unit="ms"
             />
             <DistributionChart
-                title="Memory Distribution (MB)"
+                title={t('memoryTitle')}
                 data={memoryDistribution}
                 color="#8b5cf6"
                 unit="MB"
@@ -36,6 +39,8 @@ interface DistributionChartProps {
 }
 
 function DistributionChart({ title, data, color, unit }: DistributionChartProps) {
+    const t = useTranslations('ProblemStatistics.performance');
+
     return (
         <Card>
             <CardHeader>
@@ -64,7 +69,7 @@ function DistributionChart({ title, data, color, unit }: DistributionChartProps)
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div className="flex flex-col">
                                                     <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                        Range
+                                                        {t('range')}
                                                     </span>
                                                     <span className="font-bold text-muted-foreground">
                                                         {label}
@@ -72,7 +77,7 @@ function DistributionChart({ title, data, color, unit }: DistributionChartProps)
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                        Count
+                                                        {t('count')}
                                                     </span>
                                                     <span className="font-bold">
                                                         {dataPoint.count}
@@ -81,10 +86,10 @@ function DistributionChart({ title, data, color, unit }: DistributionChartProps)
                                                 {dataPoint.percentile !== undefined && (
                                                     <div className="col-span-2 flex flex-col border-t pt-2">
                                                         <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                            Percentile
+                                                            {t('percentile')}
                                                         </span>
                                                         <span className="font-bold text-green-600">
-                                                            Beats {dataPoint.percentile}% of users
+                                                            {t('beats', { percent: dataPoint.percentile })}
                                                         </span>
                                                     </div>
                                                 )}

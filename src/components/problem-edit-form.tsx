@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Stepper } from '@/components/ui/stepper';
@@ -12,7 +12,7 @@ import {
 } from '@/types/problems';
 
 import { toastService } from '@/services/toasts-service';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { useDialog } from '@/components/providers/dialog-provider';
 
 import { useAppSelector } from '@/store/hooks';
@@ -27,23 +27,18 @@ import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import type { CreateProblemRequest, Problem } from '@/types/problems';
 import {
-    CreateProblemSchema,
+    getCreateProblemSchema,
     type CreateProblemFormValues,
 } from './problem-create-form';
-
-const STEPS = [
-    { title: 'General Information', description: 'General Info' },
-    { title: 'Problem Description', description: 'Description' },
-    { title: 'Constraints', description: 'Constraints' },
-    { title: 'Test Cases', description: 'Test Cases' },
-    { title: 'Solution & Hints', description: 'Solution & Hints' },
-];
+import { useTranslations } from 'next-intl';
 
 interface ProblemEditFormProps {
     problemId: number;
 }
 
 export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
+    const t = useTranslations('CreateProblemForm');
+    const tEdit = useTranslations('EditProblemForm');
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -53,8 +48,10 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
     const router = useRouter();
     const { confirm } = useDialog();
 
+    const schema = useMemo(() => getCreateProblemSchema(t), [t]);
+
     const form = useForm<CreateProblemFormValues>({
-        resolver: zodResolver(CreateProblemSchema),
+        resolver: zodResolver(schema),
         mode: 'onChange',
     });
 
@@ -101,7 +98,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                 });
             } catch (err) {
                 console.error('Failed to fetch problem data', err);
-                toastService.error('Failed to load problem data.');
+                toastService.error(tEdit('messages.loadError'));
                 router.push('/problems');
             } finally {
                 setIsLoading(false);
@@ -110,15 +107,22 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
         if (availableTopics.length > 0 && availableTags.length > 0) {
             fetchData();
         }
-    }, [problemId, reset, router, availableTopics, availableTags]);
+    }, [problemId, reset, router, availableTopics, availableTags, tEdit]);
+
+    const STEPS = [
+        { title: t('steps.generalInfo'), description: 'General Info' },
+        { title: t('steps.description'), description: 'Description' },
+        { title: t('steps.constraints'), description: 'Constraints' },
+        { title: t('steps.testCases'), description: 'Test Cases' },
+        { title: t('steps.solutionHints'), description: 'Solution & Hints' },
+    ];
 
     const handleCancel = async () => {
         const confirmed = await confirm({
-            title: 'Cancel editing problem',
-            message:
-                'Are you sure you want to cancel? Any unsaved changes will be lost.',
-            confirmText: 'Yes',
-            cancelText: 'No',
+            title: tEdit('cancelDialog.title'),
+            message: tEdit('cancelDialog.message'),
+            confirmText: tEdit('cancelDialog.yes'),
+            cancelText: tEdit('cancelDialog.no'),
             color: 'red',
         });
 
@@ -156,7 +160,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
         }
 
         setErrorSteps(newErrorSteps);
-        toastService.error('Please fix the errors in the highlighted steps.');
+        toastService.error(t('messages.fixErrors'));
     };
 
     const onSubmit = async (data: CreateProblemFormValues) => {
@@ -187,11 +191,11 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
 
             await ProblemsService.updateProblem(updatedProblem);
 
-            toastService.success('Problem updated successfully!');
+            toastService.success(tEdit('messages.updateSuccess'));
             router.push('/problems');
         } catch (err) {
             console.error('Error updating problem:', err);
-            toastService.error('Failed to update problem. Please try again.');
+            toastService.error(tEdit('messages.updateError'));
         } finally {
             setIsSubmitting(false);
         }
@@ -316,14 +320,14 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                                     onClick={handleCancel}
                                     className="min-w-[100px] cursor-pointer"
                                 >
-                                    Cancel
+                                    {t('buttons.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="min-w-[100px] bg-green-600 hover:bg-green-700 text-white cursor-pointer"
                                 >
-                                    {isSubmitting ? 'Updating...' : 'Update Problem'}
+                                    {isSubmitting ? tEdit('buttons.updating') : tEdit('buttons.updateProblem')}
                                 </Button>
                             </div>
                         </form>

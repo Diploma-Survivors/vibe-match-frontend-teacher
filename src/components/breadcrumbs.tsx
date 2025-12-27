@@ -1,8 +1,7 @@
 'use client';
 
 import { ChevronRight, Home } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@/i18n/routing';
 import React from 'react';
 
 export default function Breadcrumbs() {
@@ -31,7 +30,7 @@ export default function Breadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="mb-6 flex items-center text-sm text-slate-500 dark:text-slate-400"
+      className="flex items-center text-sm text-slate-500 dark:text-slate-400"
     >
       <Link
         href="/"

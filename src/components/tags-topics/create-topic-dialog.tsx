@@ -17,20 +17,22 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { TopicsService } from '@/services/topics-service';
 import { toastService } from '@/services/toasts-service';
-
-const formSchema = z.object({
-    name: z.string().min(1, 'Topic name is required').max(50, 'Topic name is too long'),
-    slug: z.string().optional(),
-    description: z.string().min(1, 'Description is required').max(200, 'Description is too long'),
-});
+import { useTranslations } from 'next-intl';
 
 interface CreateTopicDialogProps {
     onSuccess: () => void;
 }
 
 export function CreateTopicDialog({ onSuccess }: CreateTopicDialogProps) {
+    const t = useTranslations('CreateTopicDialog');
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const formSchema = z.object({
+        name: z.string().min(1, t('topicNameRequired')).max(50, t('topicNameTooLong')),
+        slug: z.string().optional(),
+        description: z.string().min(1, t('descriptionRequired')).max(200, t('descriptionTooLong')),
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,13 +47,13 @@ export function CreateTopicDialog({ onSuccess }: CreateTopicDialogProps) {
         setLoading(true);
         try {
             await TopicsService.createTopic(values);
-            toastService.success('Topic created successfully');
+            toastService.success(t('createTopicSuccess'));
             setOpen(false);
             form.reset();
             onSuccess();
         } catch (error) {
             console.error('Failed to create topic:', error);
-            toastService.error('Failed to create topic');
+            toastService.error(t('createTopicError'));
         } finally {
             setLoading(false);
         }
@@ -62,22 +64,22 @@ export function CreateTopicDialog({ onSuccess }: CreateTopicDialogProps) {
             <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700 text-white text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Topic
+                    {t('createTopicButton')}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] data-[state=open]:slide-in-from-top-0">
                 <DialogHeader>
-                    <DialogTitle>Create Topic</DialogTitle>
+                    <DialogTitle>{t('createTopicTitle')}</DialogTitle>
                     <DialogDescription>
-                        Add a new topic to categorize problems.
+                        {t('createTopicDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('nameLabel')}</Label>
                         <Input
                             id="name"
-                            placeholder="e.g. Algorithms"
+                            placeholder={t('namePlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('name')}
                         />
@@ -88,19 +90,19 @@ export function CreateTopicDialog({ onSuccess }: CreateTopicDialogProps) {
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{t('slugLabel')}</Label>
                         <Input
                             id="slug"
-                            placeholder="e.g. algorithms"
+                            placeholder={t('slugPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('slug')}
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('descriptionLabel')}</Label>
                         <Input
                             id="description"
-                            placeholder="Topic description"
+                            placeholder={t('descriptionPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('description')}
                         />
@@ -112,7 +114,7 @@ export function CreateTopicDialog({ onSuccess }: CreateTopicDialogProps) {
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>
-                            {loading ? 'Creating...' : 'Create'}
+                            {loading ? t('creating') : t('create')}
                         </Button>
                     </DialogFooter>
                 </form>

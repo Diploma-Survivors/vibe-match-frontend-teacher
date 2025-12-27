@@ -14,12 +14,14 @@ import {
 import type { LanguageStat } from '@/types/problem-statistics';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface LanguageTableProps {
     languages: LanguageStat[];
 }
 
 export function LanguageTable({ languages }: LanguageTableProps) {
+    const t = useTranslations('ProblemStatistics.language');
     const [search, setSearch] = useState('');
 
     const filteredLanguages = languages.filter((lang) =>
@@ -29,11 +31,11 @@ export function LanguageTable({ languages }: LanguageTableProps) {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-lg font-medium">Language Statistics</CardTitle>
+                <CardTitle className="text-lg font-medium">{t('title')}</CardTitle>
                 <div className="relative w-64">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search language..."
+                        placeholder={t('searchPlaceholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="pl-8"
@@ -44,11 +46,11 @@ export function LanguageTable({ languages }: LanguageTableProps) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="font-bold">Language</TableHead>
-                            <TableHead className="text-right">Submissions</TableHead>
-                            <TableHead className="w-[200px]">AC Rate</TableHead>
-                            <TableHead className="text-right">Avg Runtime</TableHead>
-                            <TableHead className="text-right">Avg Memory</TableHead>
+                            <TableHead className="font-bold">{t('headers.language')}</TableHead>
+                            <TableHead className="text-right">{t('headers.submissions')}</TableHead>
+                            <TableHead className="w-[200px]">{t('headers.acRate')}</TableHead>
+                            <TableHead className="text-right">{t('headers.avgRuntime')}</TableHead>
+                            <TableHead className="text-right">{t('headers.avgMemory')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -71,7 +73,7 @@ export function LanguageTable({ languages }: LanguageTableProps) {
                         {filteredLanguages.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                    No languages found matching "{search}"
+                                    {t('noResults', { search })}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -79,7 +81,7 @@ export function LanguageTable({ languages }: LanguageTableProps) {
                 </Table>
                 <div className="flex items-center justify-end space-x-2 py-4">
                     <div className="text-xs text-muted-foreground">
-                        Showing {filteredLanguages.length} languages
+                        {t('showing', { count: filteredLanguages.length })}
                     </div>
                 </div>
             </CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
     const dispatch = useAppDispatch();
     const draft = useAppSelector((state) => state.createContest);
     const { confirm } = useDialog();
+    const t = useTranslations('CreateContestPage.form');
 
     const defaultValues = {
         name: draft.name,
@@ -69,10 +71,10 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
 
     const handleCancel = async () => {
         const confirmed = await confirm({
-            title: 'Cancel Contest Creation',
-            message: 'Are you sure you want to cancel? All unsaved changes will be lost.',
-            confirmText: 'Yes, Cancel',
-            cancelText: 'No, Keep Editing',
+            title: t('cancelTitle'),
+            message: t('cancelMessage'),
+            confirmText: t('confirmCancel'),
+            cancelText: t('keepEditing'),
             color: 'red',
         });
 
@@ -110,10 +112,10 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
 
             <div className="flex justify-end gap-4">
                 <Button type="button" variant="outline" onClick={handleCancel}>
-                    Cancel
+                    {t('cancel')}
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Creating...' : 'Create Contest'}
+                    {isSubmitting ? t('creating') : t('create')}
                 </Button>
             </div>
         </form>

@@ -16,12 +16,7 @@ import { Button } from '@/components/ui/button';
 import { TagsService } from '@/services/tags-service';
 import { toastService } from '@/services/toasts-service';
 import { Tag } from '@/types/tags';
-
-const formSchema = z.object({
-    name: z.string().min(1, 'Tag name is required').max(50, 'Tag name is too long'),
-    slug: z.string().optional(),
-    description: z.string().optional(),
-});
+import { useTranslations } from 'next-intl';
 
 interface EditTagDialogProps {
     tag: Tag | null;
@@ -31,7 +26,14 @@ interface EditTagDialogProps {
 }
 
 export function EditTagDialog({ tag, open, onOpenChange, onSuccess }: EditTagDialogProps) {
+    const t = useTranslations('EditTagDialog');
     const [loading, setLoading] = useState(false);
+
+    const formSchema = z.object({
+        name: z.string().min(1, t('tagNameRequired')).max(50, t('tagNameTooLong')),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,12 +60,12 @@ export function EditTagDialog({ tag, open, onOpenChange, onSuccess }: EditTagDia
         setLoading(true);
         try {
             await TagsService.updateTag(tag.id, values);
-            toastService.success('Tag updated successfully');
+            toastService.success(t('updateTagSuccess'));
             onOpenChange(false);
             onSuccess();
         } catch (error) {
             console.error('Failed to update tag:', error);
-            toastService.error('Failed to update tag');
+            toastService.error(t('updateTagError'));
         } finally {
             setLoading(false);
         }
@@ -73,17 +75,17 @@ export function EditTagDialog({ tag, open, onOpenChange, onSuccess }: EditTagDia
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px] data-[state=open]:slide-in-from-top-0">
                 <DialogHeader>
-                    <DialogTitle>Edit Tag</DialogTitle>
+                    <DialogTitle>{t('editTagTitle')}</DialogTitle>
                     <DialogDescription>
-                        Make changes to the tag here. Click save when you're done.
+                        {t('editTagDescription')}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('nameLabel')}</Label>
                         <Input
                             id="name"
-                            placeholder="e.g. Dynamic Programming"
+                            placeholder={t('namePlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('name')}
                         />
@@ -94,26 +96,26 @@ export function EditTagDialog({ tag, open, onOpenChange, onSuccess }: EditTagDia
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="slug">Slug</Label>
+                        <Label htmlFor="slug">{t('slugLabel')}</Label>
                         <Input
                             id="slug"
-                            placeholder="e.g. dynamic-programming"
+                            placeholder={t('slugPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('slug')}
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('descriptionLabel')}</Label>
                         <Input
                             id="description"
-                            placeholder="Tag description"
+                            placeholder={t('descriptionPlaceholder')}
                             className="focus-visible:ring-0 focus-visible:ring-offset-0"
                             {...form.register('description')}
                         />
                     </div>
                     <DialogFooter>
                         <Button type="submit" disabled={loading}>
-                            {loading ? 'Saving...' : 'Save changes'}
+                            {loading ? t('saving') : t('saveChanges')}
                         </Button>
                     </DialogFooter>
                 </form>

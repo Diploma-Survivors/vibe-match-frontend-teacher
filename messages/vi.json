@@ -1,0 +1,633 @@
+{
+    "HomePage": {
+        "title": "Chào mừng đến với Sol Vibe",
+        "about": "Giới thiệu"
+    },
+    "LocaleSwitcher": {
+        "label": "Đổi ngôn ngữ",
+        "en": "Tiếng Anh",
+        "vi": "Tiếng Việt"
+    },
+    "LoginPage": {
+        "welcome": "Chào mừng đến với sFinx",
+        "createAccount": "Tạo tài khoản để bắt đầu",
+        "enterLogin": "Nhập thông tin đăng nhập để truy cập tài khoản của bạn",
+        "email": "Email",
+        "fullName": "Họ và tên",
+        "username": "Tên đăng nhập",
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "signUp": "Đăng ký",
+        "login": "Đăng nhập",
+        "orLoginWith": "Hoặc đăng nhập bằng",
+        "google": "Google",
+        "alreadyHaveAccount": "Đã có tài khoản? ",
+        "dontHaveAccount": "Chưa có tài khoản? ",
+        "passwordsDoNotMatch": "Mật khẩu không khớp",
+        "registrationSuccess": "Đăng ký thành công! Đang đăng nhập...",
+        "registrationFailed": "Đăng ký thất bại"
+    },
+    "Sidebar": {
+        "overview": "TỔNG QUAN",
+        "dashboard": "Dashboard",
+        "problemManagement": "QUẢN LÝ BÀI TẬP",
+        "problemList": "Danh sách bài tập",
+        "createNewProblem": "Tạo bài tập mới",
+        "manageTagsTopics": "Quản lý Tag/Topic",
+        "contestManagement": "QUẢN LÝ CUỘC THI",
+        "contestList": "Danh sách cuộc thi",
+        "createNewContest": "Tạo cuộc thi mới",
+        "submissionManagement": "QUẢN LÝ BÀI NỘP",
+        "manageSubmissions": "Quản lý bài nộp",
+        "userManagement": "QUẢN LÝ NGƯỜI DÙNG",
+        "userList": "Danh sách người dùng",
+        "feedbackReports": "Phản hồi & Báo cáo",
+        "systemAi": "HỆ THỐNG & AI",
+        "manageAiPrompts": "Quản lý Prompt AI",
+        "generalSettings": "Cài đặt chung",
+        "logout": "Đăng xuất",
+        "noEmail": "Không có email"
+    },
+    "ContestsPage": {
+        "title": "Danh sách cuộc thi",
+        "description": "Quản lý các cuộc thi và giải đấu.",
+        "createContest": "Tạo cuộc thi mới",
+        "deleteTitle": "Xóa cuộc thi",
+        "deleteMessage": "Bạn có chắc chắn muốn xóa cuộc thi \"{name}\"? Hành động này không thể hoàn tác.",
+        "deleteConfirm": "Xóa",
+        "cancel": "Hủy",
+        "deleteSuccess": "Xóa cuộc thi thành công",
+        "deleteError": "Xóa cuộc thi thất bại",
+        "activate": "Kích hoạt",
+        "deactivate": "Hủy kích hoạt",
+        "confirmActivateTitle": "Xác nhận kích hoạt",
+        "confirmDeactivateTitle": "Xác nhận hủy kích hoạt",
+        "confirmActivateMessage": "Bạn có chắc chắn muốn kích hoạt cuộc thi \"{name}\"?",
+        "confirmDeactivateMessage": "Bạn có chắc chắn muốn hủy kích hoạt cuộc thi \"{name}\"?",
+        "activateSuccess": "Kích hoạt cuộc thi thành công",
+        "deactivateSuccess": "Hủy kích hoạt cuộc thi thành công",
+        "activateError": "Kích hoạt cuộc thi thất bại",
+        "deactivateError": "Hủy kích hoạt cuộc thi thất bại"
+    },
+    "ProblemsPage": {
+        "title": "Danh sách bài tập",
+        "description": "Quản lý bài tập với sFinx.",
+        "createProblem": "Tạo bài tập mới",
+        "activate": "Kích hoạt",
+        "deactivate": "Hủy kích hoạt",
+        "cancel": "Hủy",
+        "confirmActivateTitle": "Xác nhận kích hoạt",
+        "confirmDeactivateTitle": "Xác nhận hủy kích hoạt",
+        "confirmActivateMessage": "Bạn có chắc chắn muốn kích hoạt bài tập \"{title}\"?",
+        "confirmDeactivateMessage": "Bạn có chắc chắn muốn hủy kích hoạt bài tập \"{title}\"?",
+        "activateSuccess": "Kích hoạt bài tập thành công",
+        "deactivateSuccess": "Hủy kích hoạt bài tập thành công",
+        "activateError": "Kích hoạt bài tập thất bại",
+        "deactivateError": "Hủy kích hoạt bài tập thất bại"
+    },
+    "SubmissionsPage": {
+        "title": "Danh sách bài nộp",
+        "description": "Xem và quản lý tất cả các bài nộp."
+    },
+    "ContestTable": {
+        "id": "ID",
+        "name": "Tên",
+        "startTime": "Thời gian bắt đầu",
+        "duration": "Thời lượng",
+        "status": "Trạng thái",
+        "visibility": "Hiển thị",
+        "actions": "Hành động",
+        "noContestsFound": "Không tìm thấy cuộc thi nào.",
+        "mins": "phút",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "edit": "Chỉnh sửa",
+        "view": "Xem",
+        "statistics": "Thống kê",
+        "deactivate": "Hủy kích hoạt",
+        "activate": "Kích hoạt",
+        "delete": "Xóa",
+        "entityName": "cuộc thi"
+    },
+    "ProblemTable": {
+        "selectMultiple": "Chọn nhiều bài tập",
+        "selectCount": "Chọn {count} bài tập",
+        "selectProblem": "Chọn bài tập",
+        "select": "Chọn",
+        "id": "ID",
+        "title": "Tiêu đề",
+        "difficulty": "Độ khó",
+        "status": "Trạng thái",
+        "acceptance": "TỈ LỆ CHẤP NHẬN",
+        "tags": "THẺ",
+        "topics": "CHỦ ĐỀ",
+        "actions": "Hành động",
+        "noProblemsFound": "Không tìm thấy bài tập nào",
+        "lastUpdated": "Cập nhật lần cuối:",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "openMenu": "Mở menu",
+        "edit": "Chỉnh sửa",
+        "statistics": "Thống kê",
+        "viewSubmissions": "Xem bài nộp",
+        "deactivate": "Hủy kích hoạt",
+        "activate": "Kích hoạt",
+        "delete": "Xóa",
+        "entityName": "bài tập"
+    },
+    "SubmissionTable": {
+        "id": "ID",
+        "user": "Người dùng",
+        "problem": "Bài tập",
+        "status": "Trạng thái",
+        "statistics": "Thống kê",
+        "language": "Ngôn ngữ",
+        "submittedAt": "Thời gian nộp",
+        "noSubmissionsFound": "Không tìm thấy bài nộp nào.",
+        "viewDetails": "Xem chi tiết",
+        "delete": "Xóa",
+        "entityName": "bài nộp"
+    },
+    "DataTablePagination": {
+        "summary": "Hiển thị <bold>{start}</bold> - <bold>{end}</bold> trong số <bold>{total}</bold> {entityName}"
+    },
+    "ContestFilter": {
+        "searchPlaceholder": "Tìm kiếm cuộc thi...",
+        "sortByLabel": "Sắp xếp theo:",
+        "sortByPlaceholder": "Sắp xếp theo",
+        "id": "ID",
+        "startTime": "Thời gian bắt đầu",
+        "duration": "Thời lượng",
+        "status": "Trạng thái",
+        "selectStatus": "Chọn trạng thái",
+        "dateRange": "Khoảng thời gian",
+        "from": "Từ",
+        "to": "Đến",
+        "reset": "Đặt lại",
+        "active": "Đang chọn",
+        "statusOptions": {
+            "UPCOMING": "Sắp diễn ra",
+            "ONGOING": "Đang diễn ra",
+            "FINISHED": "Đã kết thúc"
+        }
+    },
+    "ProblemFilter": {
+        "searchPlaceholder": "Tìm kiếm...",
+        "sortByLabel": "Sắp xếp theo:",
+        "sortByPlaceholder": "Sắp xếp theo",
+        "id": "ID",
+        "difficulty": "Độ khó",
+        "acceptance": "Tỉ lệ chấp nhận",
+        "selectDifficulty": "Chọn độ khó",
+        "status": "Trạng thái",
+        "allStatus": "Tất cả trạng thái",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "topics": "Chủ đề",
+        "searchTopics": "Tìm kiếm chủ đề...",
+        "noTopicsFound": "Không tìm thấy chủ đề",
+        "tags": "Thẻ",
+        "searchTags": "Tìm kiếm thẻ...",
+        "noTagsFound": "Không tìm thấy thẻ",
+        "reset": "Đặt lại",
+        "difficultyOptions": {
+            "easy": "Dễ",
+            "medium": "Trung bình",
+            "hard": "Khó"
+        }
+    },
+    "SubmissionFilter": {
+        "searchPlaceholder": "Tìm kiếm...",
+        "sortByLabel": "Sắp xếp theo:",
+        "id": "ID",
+        "submittedAt": "Thời gian nộp",
+        "problems": "Bài tập",
+        "searchProblems": "Tìm kiếm bài tập...",
+        "noProblemsFound": "Không tìm thấy bài tập",
+        "contests": "Cuộc thi",
+        "searchContests": "Tìm kiếm cuộc thi...",
+        "noContestsFound": "Không tìm thấy cuộc thi",
+        "languages": "Ngôn ngữ",
+        "searchLanguages": "Tìm kiếm ngôn ngữ...",
+        "noLanguagesFound": "Không tìm thấy ngôn ngữ",
+        "status": "Trạng thái",
+        "allStatuses": "Tất cả trạng thái",
+        "reset": "Đặt lại",
+        "statusOptions": {
+            "Pending": "Đang chờ",
+            "Running": "Đang chạy",
+            "Accepted": "Chấp nhận",
+            "Wrong Answer": "Sai kết quả",
+            "Time Limit Exceeded": "Quá thời gian",
+            "SIGSEGV": "Lỗi bộ nhớ (SIGSEGV)",
+            "SIGXFSZ": "Lỗi kích thước file (SIGXFSZ)",
+            "SIGFPE": "Lỗi tính toán (SIGFPE)",
+            "SIGABRT": "Lỗi hủy bỏ (SIGABRT)",
+            "NZEC": "Lỗi runtime (NZEC)",
+            "Runtime Error": "Lỗi thực thi",
+            "Compilation Error": "Lỗi biên dịch",
+            "Unknown Error": "Lỗi không xác định"
+        }
+    },
+    "TagsPage": {
+        "tagsList": "Danh sách thẻ",
+        "topicsList": "Danh sách chủ đề",
+        "searchPlaceholder": "Tìm kiếm theo tên, slug...",
+        "allStatuses": "Tất cả trạng thái",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "sortBy": "Sắp xếp theo:",
+        "id": "ID",
+        "postCount": "Số bài viết",
+        "createdAt": "Ngày tạo",
+        "resetFilters": "Đặt lại bộ lọc",
+        "confirmDeleteTitle": "Bạn có chắc chắn không?",
+        "confirmDeleteTagMessage": "Hành động này không thể hoàn tác. Thẻ <span className=\"font-semibold text-foreground\"> \"{name}\" </span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
+        "confirmDeleteTopicMessage": "Hành động này không thể hoàn tác. Chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\" </span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
+        "delete": "Xóa",
+        "cancel": "Hủy",
+        "deleteTagSuccess": "Xóa thẻ thành công",
+        "deleteTagError": "Xóa thẻ thất bại",
+        "deleteTopicSuccess": "Xóa chủ đề thành công",
+        "deleteTopicError": "Xóa chủ đề thất bại",
+        "confirmActivateTitle": "Xác nhận kích hoạt",
+        "confirmDeactivateTitle": "Xác nhận hủy kích hoạt",
+        "confirmActivateTagMessage": "Bạn có chắc chắn muốn kích hoạt thẻ <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "confirmDeactivateTagMessage": "Bạn có chắc chắn muốn hủy kích hoạt thẻ <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "confirmActivateTopicMessage": "Bạn có chắc chắn muốn kích hoạt chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "confirmDeactivateTopicMessage": "Bạn có chắc chắn muốn hủy kích hoạt chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "activate": "Kích hoạt",
+        "deactivate": "Hủy kích hoạt",
+        "activateTagSuccess": "Kích hoạt thẻ thành công",
+        "deactivateTagSuccess": "Hủy kích hoạt thẻ thành công",
+        "activateTagError": "Kích hoạt thẻ thất bại",
+        "deactivateTagError": "Hủy kích hoạt thẻ thất bại",
+        "activateTopicSuccess": "Kích hoạt chủ đề thành công",
+        "deactivateTopicSuccess": "Hủy kích hoạt chủ đề thành công",
+        "activateTopicError": "Kích hoạt chủ đề thất bại",
+        "deactivateTopicError": "Hủy kích hoạt chủ đề thất bại"
+    },
+    "CreateTagDialog": {
+        "tagNameRequired": "Tên thẻ là bắt buộc",
+        "tagNameTooLong": "Tên thẻ quá dài",
+        "createTagSuccess": "Tạo thẻ thành công",
+        "createTagError": "Tạo thẻ thất bại",
+        "createTagButton": "Tạo thẻ",
+        "createTagTitle": "Tạo thẻ",
+        "createTagDescription": "Thêm thẻ mới để phân loại bài tập.",
+        "nameLabel": "Tên",
+        "namePlaceholder": "ví dụ: Quy hoạch động",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "ví dụ: quy-hoach-dong",
+        "descriptionLabel": "Mô tả",
+        "descriptionPlaceholder": "Mô tả thẻ",
+        "creating": "Đang tạo...",
+        "create": "Tạo"
+    },
+    "EditTagDialog": {
+        "tagNameRequired": "Tên thẻ là bắt buộc",
+        "tagNameTooLong": "Tên thẻ quá dài",
+        "updateTagSuccess": "Cập nhật thẻ thành công",
+        "updateTagError": "Cập nhật thẻ thất bại",
+        "editTagTitle": "Chỉnh sửa thẻ",
+        "editTagDescription": "Thay đổi thông tin thẻ tại đây. Nhấn lưu khi hoàn tất.",
+        "nameLabel": "Tên",
+        "namePlaceholder": "ví dụ: Quy hoạch động",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "ví dụ: quy-hoach-dong",
+        "descriptionLabel": "Mô tả",
+        "descriptionPlaceholder": "Mô tả thẻ",
+        "saving": "Đang lưu...",
+        "saveChanges": "Lưu thay đổi"
+    },
+    "CreateTopicDialog": {
+        "topicNameRequired": "Tên chủ đề là bắt buộc",
+        "topicNameTooLong": "Tên chủ đề quá dài",
+        "descriptionRequired": "Mô tả là bắt buộc",
+        "descriptionTooLong": "Mô tả quá dài",
+        "createTopicSuccess": "Tạo chủ đề thành công",
+        "createTopicError": "Tạo chủ đề thất bại",
+        "createTopicButton": "Tạo chủ đề",
+        "createTopicTitle": "Tạo chủ đề",
+        "createTopicDescription": "Thêm chủ đề mới để phân loại bài tập.",
+        "nameLabel": "Tên",
+        "namePlaceholder": "ví dụ: Thuật toán",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "ví dụ: thuat-toan",
+        "descriptionLabel": "Mô tả",
+        "descriptionPlaceholder": "Mô tả chủ đề",
+        "creating": "Đang tạo...",
+        "create": "Tạo"
+    },
+    "EditTopicDialog": {
+        "topicNameRequired": "Tên chủ đề là bắt buộc",
+        "topicNameTooLong": "Tên chủ đề quá dài",
+        "updateTopicSuccess": "Cập nhật chủ đề thành công",
+        "updateTopicError": "Cập nhật chủ đề thất bại",
+        "editTopicTitle": "Chỉnh sửa chủ đề",
+        "editTopicDescription": "Thay đổi thông tin chủ đề tại đây. Nhấn lưu khi hoàn tất.",
+        "nameLabel": "Tên",
+        "namePlaceholder": "ví dụ: Thuật toán",
+        "descriptionLabel": "Mô tả",
+        "descriptionPlaceholder": "Mô tả chủ đề",
+        "saving": "Đang lưu...",
+        "saveChanges": "Lưu thay đổi"
+    },
+    "TagsTable": {
+        "tagId": "ID THẺ",
+        "tagName": "TÊN THẺ",
+        "slug": "SLUG",
+        "postCount": "SỐ BÀI VIẾT",
+        "status": "TRẠNG THÁI",
+        "createdDate": "NGÀY TẠO",
+        "actions": "HÀNH ĐỘNG",
+        "noTagsFound": "Không tìm thấy thẻ nào.",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "edit": "Chỉnh sửa",
+        "deactivate": "Hủy kích hoạt",
+        "activate": "Kích hoạt",
+        "delete": "Xóa",
+        "entityName": "thẻ"
+    },
+    "TopicsTable": {
+        "topicId": "ID CHỦ ĐỀ",
+        "topicName": "TÊN CHỦ ĐỀ",
+        "slug": "SLUG",
+        "postCount": "SỐ BÀI VIẾT",
+        "status": "TRẠNG THÁI",
+        "createdDate": "NGÀY TẠO",
+        "actions": "HÀNH ĐỘNG",
+        "noTopicsFound": "Không tìm thấy chủ đề nào.",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "edit": "Chỉnh sửa",
+        "deactivate": "Hủy kích hoạt",
+        "activate": "Kích hoạt",
+        "delete": "Xóa",
+        "entityName": "chủ đề"
+    },
+    "CreateProblemForm": {
+        "steps": {
+            "generalInfo": "Thông tin chung",
+            "description": "Mô tả bài tập",
+            "constraints": "Ràng buộc",
+            "testCases": "Test Cases",
+            "solutionHints": "Lời giải & Gợi ý"
+        },
+        "validation": {
+            "hintEmpty": "Nội dung gợi ý không được để trống",
+            "testcaseFileRequired": "File testcase là bắt buộc",
+            "inputEmpty": "Input không được để trống",
+            "outputEmpty": "Output không được để trống",
+            "sampleTestCaseRequired": "Cần ít nhất một test case mẫu",
+            "solutionContentLength": "Nội dung lời giải chính thức phải dài hơn 16 ký tự"
+        },
+        "cancelDialog": {
+            "title": "Hủy tạo bài tập",
+            "message": "Bạn có chắc chắn muốn hủy? Mọi thay đổi chưa lưu sẽ bị mất.",
+            "yes": "Có",
+            "no": "Không"
+        },
+        "messages": {
+            "fixErrors": "Vui lòng sửa các lỗi trong các bước được đánh dấu.",
+            "createSuccess": "Tạo bài tập thành công!",
+            "createError": "Tạo bài tập thất bại. Vui lòng thử lại."
+        },
+        "buttons": {
+            "cancel": "Hủy",
+            "saving": "Đang lưu...",
+            "saveProblem": "Lưu bài tập"
+        },
+        "generalInfo": {
+            "titleLabel": "Tiêu đề bài tập",
+            "titlePlaceholder": "Ví dụ: Two Sum",
+            "difficultyLabel": "Độ khó",
+            "difficultyPlaceholder": "Chọn độ khó",
+            "premiumLabel": "Nội dung Premium",
+            "premiumDescription": "Dành riêng cho thành viên premium.",
+            "maxScoreLabel": "Điểm tối đa",
+            "timeLimitLabel": "Giới hạn thời gian (ms)",
+            "memoryLimitLabel": "Giới hạn bộ nhớ (KB)",
+            "topicsLabel": "Chủ đề",
+            "topicsPlaceholder": "Chọn chủ đề...",
+            "topicsSearchPlaceholder": "Tìm kiếm chủ đề...",
+            "tagsLabel": "Thẻ",
+            "tagsPlaceholder": "Chọn thẻ...",
+            "tagsSearchPlaceholder": "Tìm kiếm thẻ...",
+            "similarProblemsLabel": "Bài tập tương tự",
+            "problemPrefix": "Bài tập #",
+            "selectSimilarProblems": "Chọn bài tập tương tự"
+        },
+        "testCases": {
+            "instructionsTitle": "Hướng dẫn:",
+            "instructions": "Bạn có thể nhập các test case mẫu để hiển thị công khai làm ví dụ, và tải lên file test case đầy đủ (Test Case Ẩn) cho hệ thống chấm điểm tự động.",
+            "systemTestCasesLabel": "Test Case Hệ thống (Ẩn)",
+            "systemTestCasesDescription": "File test case được sử dụng để chấm điểm.",
+            "uploadClick": "Nhấn để tải lên file",
+            "uploadDrag": "hoặc kéo thả file vào đây",
+            "uploadFormat": "Hỗ trợ định dạng .JSON (Tối đa 25MB)",
+            "uploadedJustNow": "Vừa tải lên",
+            "sampleTestCasesLabel": "Test Case Mẫu (Công khai)",
+            "addSampleTestCase": "Thêm Test Case Mẫu",
+            "examplePrefix": "Ví dụ",
+            "inputLabel": "INPUT",
+            "inputPlaceholder": "nums = [2,7,11,15], target = 9",
+            "outputLabel": "OUTPUT",
+            "outputPlaceholder": "[0,1]",
+            "explanationLabel": "Giải thích (Tùy chọn)",
+            "explanationPlaceholder": "Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1].",
+            "invalidFormat": "Định dạng file không hợp lệ",
+            "invalidContent": "Nội dung file không hợp lệ",
+            "validFileLoaded": "File testcase hợp lệ với {count} test case."
+        },
+        "solutionHints": {
+            "officialSolutionLabel": "Lời giải chính thức",
+            "officialSolutionDescription": "Bật để cung cấp lời giải chính thức cho bài tập này.",
+            "hintsLabel": "Gợi ý",
+            "hintsDescription": "Cung cấp gợi ý để giúp người dùng giải quyết bài tập.",
+            "addHint": "Thêm gợi ý",
+            "hintPrefix": "Gợi ý",
+            "hintPlaceholder": "Nhập gợi ý #{index}...",
+            "noHints": "Chưa có gợi ý nào. Nhấn \"Thêm gợi ý\" để bắt đầu."
+        }
+    },
+    "EditProblemForm": {
+        "cancelDialog": {
+            "title": "Hủy chỉnh sửa bài tập",
+            "message": "Bạn có chắc chắn muốn hủy? Mọi thay đổi chưa lưu sẽ bị mất.",
+            "yes": "Có",
+            "no": "Không"
+        },
+        "messages": {
+            "updateSuccess": "Cập nhật bài tập thành công!",
+            "updateError": "Cập nhật bài tập thất bại. Vui lòng thử lại.",
+            "loadError": "Tải dữ liệu bài tập thất bại."
+        },
+        "buttons": {
+            "updateProblem": "Cập nhật bài tập",
+            "updating": "Đang cập nhật..."
+        }
+    },
+    "CreateProblemPage": {
+        "title": "Tạo Bài Tập Mới",
+        "description": "Thiết lập bài tập lập trình đa bước với quy trình chi tiết."
+    },
+    "EditProblemPage": {
+        "title": "Chỉnh Sửa Bài Tập",
+        "description": "Cập nhật thông tin và nội dung bài tập."
+    },
+    "ProblemStatistics": {
+        "title": "Thống kê",
+        "dateRange": {
+            "pick": "Chọn khoảng thời gian",
+            "label": "Khoảng thời gian",
+            "from": "Từ",
+            "to": "Đến",
+            "placeholder": "Chọn khoảng thời gian",
+            "all": "Tất cả",
+            "last30d": "30 ngày qua",
+            "last7d": "7 ngày qua",
+            "custom": "Tùy chỉnh"
+        },
+        "buttons": {
+            "editProblem": "Chỉnh sửa bài tập",
+            "allSubmissions": "Xem tất cả bài nộp"
+        },
+        "kpi": {
+            "submissions": "Bài nộp",
+            "totalSubmissions": "Tổng số bài nộp",
+            "totalAccepted": "Tổng số chấp nhận",
+            "acceptanceRate": "Tỷ lệ chấp nhận",
+            "solvers": "Người giải",
+            "totalAttempts": "Tổng số lượt thử",
+            "totalSolved": "Tổng số đã giải",
+            "avgTime": "Thời gian giải trung bình"
+        },
+        "verdict": {
+            "title": "Phân bố kết quả"
+        },
+        "performance": {
+            "runtimeTitle": "Phân bố thời gian chạy (ms)",
+            "memoryTitle": "Phân bố bộ nhớ (MB)",
+            "range": "KHOẢNG",
+            "count": "SỐ LƯỢNG",
+            "percentile": "PHẦN TRĂM",
+            "beats": "Hơn {percent}% người dùng"
+        },
+        "language": {
+            "title": "Thống kê ngôn ngữ",
+            "searchPlaceholder": "Tìm kiếm ngôn ngữ...",
+            "headers": {
+                "language": "Ngôn ngữ",
+                "submissions": "Bài nộp",
+                "acRate": "Tỷ lệ AC",
+                "avgRuntime": "TG chạy TB",
+                "avgMemory": "Bộ nhớ TB"
+            },
+            "noResults": "Không tìm thấy ngôn ngữ nào khớp với \"{search}\"",
+            "showing": "Hiển thị {count} ngôn ngữ"
+        },
+        "errors": {
+            "loadFailed": "Tải thống kê thất bại."
+        }
+    },
+    "CreateContestPage": {
+        "title": "Tạo Cuộc Thi Mới",
+        "description": "Điền thông tin chi tiết để tạo cuộc thi mới.",
+        "form": {
+            "cancel": "Hủy",
+            "create": "Tạo Cuộc Thi",
+            "creating": "Đang tạo...",
+            "cancelTitle": "Hủy Tạo Cuộc Thi",
+            "cancelMessage": "Bạn có chắc chắn muốn hủy? Mọi thay đổi chưa lưu sẽ bị mất.",
+            "confirmCancel": "Có, Hủy",
+            "keepEditing": "Không, Tiếp tục chỉnh sửa",
+            "success": "Tạo cuộc thi thành công",
+            "error": "Tạo cuộc thi thất bại"
+        }
+    },
+    "EditContestPage": {
+        "title": "Chỉnh Sửa Cuộc Thi",
+        "description": "Cập nhật thông tin cuộc thi và danh sách bài tập.",
+        "form": {
+            "cancel": "Hủy",
+            "update": "Cập Nhật Cuộc Thi",
+            "saving": "Đang lưu...",
+            "cancelTitle": "Hủy Chỉnh Sửa",
+            "cancelMessage": "Bạn có chắc chắn muốn hủy? Mọi thay đổi chưa lưu sẽ bị mất.",
+            "confirmCancel": "Có, Hủy",
+            "keepEditing": "Không, Tiếp tục chỉnh sửa",
+            "success": "Cập nhật cuộc thi thành công",
+            "error": "Cập nhật cuộc thi thất bại",
+            "loadError": "Tải dữ liệu cuộc thi thất bại"
+        }
+    },
+    "ViewContestPage": {
+        "back": "Quay lại Danh sách Cuộc thi",
+        "minutes": "phút",
+        "description": "Mô tả",
+        "problems": {
+            "title": "Bài Tập",
+            "order": "Thứ tự",
+            "problem": "Bài tập",
+            "difficulty": "Độ khó",
+            "points": "Điểm",
+            "empty": "Chưa có bài tập nào được thêm vào cuộc thi này."
+        },
+        "loadError": "Tải dữ liệu cuộc thi thất bại"
+    },
+    "ContestStatistics": {
+        "header": {
+            "startedAt": "Bắt đầu lúc",
+            "broadcast": "Phát Thông Báo",
+            "broadcastComingSoon": "Tính năng phát thông báo sắp ra mắt!"
+        },
+        "metrics": {
+            "activeParticipants": "Người tham gia tích cực",
+            "registered": "Đã đăng ký",
+            "submissionRate": "Tỷ lệ nộp bài",
+            "totalSubmissions": "Tổng số bài nộp",
+            "acceptanceRate": "Tỷ lệ chấp nhận",
+            "ac": "AC",
+            "nonAc": "Không AC"
+        },
+        "loadError": "Tải thống kê thất bại"
+    },
+    "SubmissionDetail": {
+        "title": "Bài nộp #{id}",
+        "submittedBy": "Nộp bởi",
+        "status": {
+            "label": "Trạng thái",
+            "allPassed": "Tất cả test case đã qua",
+            "checkDetails": "Xem chi tiết bên dưới"
+        },
+        "metrics": {
+            "runtime": "Thời gian chạy",
+            "memory": "Bộ nhớ",
+            "language": "Ngôn ngữ"
+        },
+        "sourceCode": {
+            "title": "MÃ NGUỒN",
+            "copy": "Sao chép",
+            "download": "Tải xuống",
+            "copySuccess": "Đã sao chép mã vào bộ nhớ tạm",
+            "downloadSuccess": "Tải xuống mã thành công"
+        },
+        "testCases": {
+            "title": "Kết quả Test Case",
+            "total": "Tổng: {count}",
+            "passed": "Đã qua: {count}",
+            "caseTitle": "Test Case #{id}",
+            "errorMessage": "Thông báo lỗi",
+            "unknownError": "Đã xảy ra lỗi runtime không xác định",
+            "expectedOutput": "Đầu ra mong đợi",
+            "actualOutput": "Đầu ra thực tế"
+        },
+        "errors": {
+            "loadFailed": "Tải chi tiết bài nộp thất bại",
+            "notFound": "Không tìm thấy bài nộp",
+            "title": "Lỗi Tải Bài Nộp"
+        }
+    }
+}

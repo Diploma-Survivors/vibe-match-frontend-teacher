@@ -18,6 +18,7 @@ import { DIFFICULTY_OPTIONS } from '@/types/problems';
 import type { Topic } from '@/types/topics';
 import type { Tag } from '@/types/tags';
 import type { CreateProblemFormValues } from '@/components/problem-create-form';
+import { useTranslations } from 'next-intl';
 
 interface GeneralInformationStepProps {
   availableTopics: Topic[];
@@ -28,6 +29,7 @@ export function GeneralInformationStep({
   availableTopics,
   availableTags,
 }: GeneralInformationStepProps) {
+  const t = useTranslations('CreateProblemForm.generalInfo');
   const {
     control,
     formState: { errors },
@@ -50,7 +52,7 @@ export function GeneralInformationStep({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="title">
-          Problem Title <span className="text-red-500">*</span>
+          {t('titleLabel')} <span className="text-red-500">*</span>
         </Label>
         <Controller
           name="title"
@@ -59,7 +61,7 @@ export function GeneralInformationStep({
             <Input
               {...field}
               id="title"
-              placeholder="Example: Two Sum"
+              placeholder={t('titlePlaceholder')}
               className={cn(
                 'focus-visible:ring-0 focus-visible:ring-offset-0',
                 errors.title ? 'border-red-500' : ''
@@ -74,14 +76,14 @@ export function GeneralInformationStep({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="difficulty">Difficulty</Label>
+          <Label htmlFor="difficulty">{t('difficultyLabel')}</Label>
           <Controller
             name="difficulty"
             control={control}
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger className="focus:ring-0 focus:ring-offset-0 cursor-pointer">
-                  <SelectValue placeholder="Select difficulty" />
+                  <SelectValue placeholder={t('difficultyPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {DIFFICULTY_OPTIONS.map((option) => (
@@ -117,10 +119,10 @@ export function GeneralInformationStep({
               htmlFor="isPremium"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
-              Premium Content
+              {t('premiumLabel')}
             </Label>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Exclusive for premium members.
+              {t('premiumDescription')}
             </p>
           </div>
         </div>
@@ -128,7 +130,7 @@ export function GeneralInformationStep({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="maxScore">Max Score</Label>
+          <Label htmlFor="maxScore">{t('maxScoreLabel')}</Label>
           <Controller
             name="maxScore"
             control={control}
@@ -145,7 +147,7 @@ export function GeneralInformationStep({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="timeLimitMs">Time Limit (ms)</Label>
+          <Label htmlFor="timeLimitMs">{t('timeLimitLabel')}</Label>
           <Controller
             name="timeLimitMs"
             control={control}
@@ -162,7 +164,7 @@ export function GeneralInformationStep({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="memoryLimitKb">Memory Limit (KB)</Label>
+          <Label htmlFor="memoryLimitKb">{t('memoryLimitLabel')}</Label>
           <Controller
             name="memoryLimitKb"
             control={control}
@@ -181,7 +183,7 @@ export function GeneralInformationStep({
       </div>
 
       <div className="space-y-2">
-        <Label>Topics</Label>
+        <Label>{t('topicsLabel')}</Label>
         <MultiSelect
           options={topicOptions}
           selectedValues={
@@ -193,8 +195,8 @@ export function GeneralInformationStep({
               .filter(Boolean);
             setValue('topics', selectedTopics as any);
           }}
-          placeholder="Select topics..."
-          searchPlaceholder="Search topics..."
+          placeholder={t('topicsPlaceholder')}
+          searchPlaceholder={t('topicsSearchPlaceholder')}
         />
         {errors.topics && (
           <p className="text-sm text-red-500">
@@ -204,7 +206,7 @@ export function GeneralInformationStep({
       </div>
 
       <div className="space-y-2">
-        <Label>Tags</Label>
+        <Label>{t('tagsLabel')}</Label>
         <MultiSelect
           options={tagOptions}
           selectedValues={watch('tags')?.map((t: any) => t.id.toString()) || []}
@@ -214,8 +216,8 @@ export function GeneralInformationStep({
               .filter(Boolean);
             setValue('tags', selectedTags as any);
           }}
-          placeholder="Select tags..."
-          searchPlaceholder="Search tags..."
+          placeholder={t('tagsPlaceholder')}
+          searchPlaceholder={t('tagsSearchPlaceholder')}
         />
         {errors.tags && (
           <p className="text-sm text-red-500">
@@ -225,12 +227,12 @@ export function GeneralInformationStep({
       </div>
 
       <div className="space-y-2">
-        <Label>Similar Problems</Label>
+        <Label>{t('similarProblemsLabel')}</Label>
         <div className="flex flex-wrap gap-2 mb-2">
           {/* Display selected similar problems */}
           {watch('similarProblems')?.map((id) => (
             <Badge key={id} variant="outline" className="gap-1">
-              Problem #{id}
+              {t('problemPrefix')}{id}
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => {
@@ -245,7 +247,7 @@ export function GeneralInformationStep({
           ))}
         </div>
         <SelectProblemsModal
-          title="Select Similar Problems"
+          title={t('selectSimilarProblems')}
           selectedProblemIds={watch('similarProblems') || []}
           onProblemsSelect={(problems) => {
             const newIds = problems.map((p) => p.id);

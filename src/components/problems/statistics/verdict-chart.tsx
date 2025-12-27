@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { VerdictCount } from '@/types/problem-statistics';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 interface VerdictChartProps {
     verdicts: VerdictCount[];
@@ -11,6 +12,7 @@ interface VerdictChartProps {
 const COLORS = ['#22c55e', '#ef4444', '#eab308', '#f97316', '#a855f7'];
 
 export function VerdictChart({ verdicts }: VerdictChartProps) {
+    const t = useTranslations('ProblemStatistics.verdict');
     const data = verdicts.map((v) => ({
         name: v.verdict,
         value: v.count,
@@ -20,7 +22,7 @@ export function VerdictChart({ verdicts }: VerdictChartProps) {
     return (
         <Card className="h-full flex flex-col">
             <CardHeader>
-                <CardTitle className="text-sm font-medium">Verdict Distribution</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 min-h-[250px] flex items-center">
                 <ResponsiveContainer width="100%" height="100%">
