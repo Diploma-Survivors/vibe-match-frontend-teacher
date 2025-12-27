@@ -3,7 +3,7 @@
 import { ThemeProvider } from '@/components/providers';
 import { AppProvider } from '@/contexts/app-context';
 import { ReduxProvider } from '@/store/providers';
-import type { IssuerType, UserInfo } from '@/types/states';
+import type { DecodedAccessToken, IssuerType, UserInfo } from '@/types/states';
 import Dialog from '@mui/material/Dialog';
 import { SessionProvider } from 'next-auth/react';
 import { DialogProvider } from './dialog-provider';
@@ -11,14 +11,12 @@ import { ToastProvider } from './toast-provider';
 
 interface ClientProviderProps {
   children: React.ReactNode;
-  initialUser: UserInfo | null;
-  initialIssuer: IssuerType;
+  decodedAccessToken: DecodedAccessToken | null;
 }
 
 export function ClientProvider({
   children,
-  initialUser,
-  initialIssuer,
+  decodedAccessToken,
 }: ClientProviderProps) {
   return (
     <SessionProvider>
@@ -26,10 +24,7 @@ export function ClientProvider({
         <DialogProvider>
           <ToastProvider>
             <ReduxProvider>
-              <AppProvider
-                initialUser={initialUser}
-                initialIssuer={initialIssuer}
-              >
+              <AppProvider decodedAccessToken={decodedAccessToken}>
                 {children}
               </AppProvider>
             </ReduxProvider>
