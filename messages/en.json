@@ -133,7 +133,8 @@
         "deactivate": "Deactivate",
         "activate": "Activate",
         "delete": "Delete",
-        "entityName": "problems"
+        "entityName": "problems",
+        "premium": "Premium"
     },
     "SubmissionTable": {
         "id": "ID",
@@ -443,7 +444,14 @@
             "explanationPlaceholder": "Because nums[0] + nums[1] == 9, we return [0, 1].",
             "invalidFormat": "Invalid file format",
             "invalidContent": "Invalid file content",
-            "validFileLoaded": "Valid testcase file loaded with {count} test cases."
+            "validFileLoaded": "Valid testcase file loaded with {count} test cases.",
+            "rightClickToSave": "Right click, then click 'Save Link As' to download file.",
+            "removeFileConfirmTitle": "Are you sure you want to remove this file?",
+            "removeFileConfirmMessage": "This action cannot be undone.",
+            "removeFileConfirmYes": "Yes",
+            "removeFileConfirmNo": "No",
+            "fileRemovedSuccess": "File has been removed successfully.",
+            "fileRemovedError": "Failed to remove file. Please try again."
         },
         "solutionHints": {
             "officialSolutionLabel": "Official Solution",

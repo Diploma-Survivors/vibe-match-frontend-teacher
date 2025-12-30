@@ -38,6 +38,15 @@ export const getCreateProblemSchema = (t: (key: string) => string) => ProblemSch
     createdBy: true,
     updatedBy: true,
     hints: true,
+    acceptanceRate: true,
+    averageTimeToSolve: true,
+    difficultyRating: true,
+    totalSubmissions: true,
+    totalAccepted: true,
+    totalAttempts: true,
+    totalSolved: true,
+    testcaseCount: true,
+    testcaseFileKey: true,
 })
     .extend({
         hints: z
@@ -48,9 +57,8 @@ export const getCreateProblemSchema = (t: (key: string) => string) => ProblemSch
                 })
             )
             .optional(),
-        testcaseFile: z
-            .any()
-            .refine((file) => file instanceof File, t('validation.testcaseFileRequired')),
+        testcaseFileUrl: z.string().optional(),
+        testcaseFile: z.any().optional(),
         sampleTestcases: z
             .array(
                 z.object({
@@ -63,6 +71,14 @@ export const getCreateProblemSchema = (t: (key: string) => string) => ProblemSch
         officialSolutionContent: z.string().optional(),
     })
     .superRefine((data, ctx) => {
+        if (!data.testcaseFileUrl && !(data.testcaseFile instanceof File)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('validation.testcaseFileRequired'),
+                path: ['testcaseFile'],
+            });
+        }
+
         if (data.hasOfficialSolution) {
             if (
                 !data.officialSolutionContent ||
@@ -338,7 +354,7 @@ export default function ProblemCreateForm() {
                             {currentStep === 2 && <ConstraintsStep />}
 
                             {/* Step 4: Test Cases */}
-                            {currentStep === 3 && <TestCasesStep />}
+                            {currentStep === 3 && <TestCasesStep isEditMode={false} />}
 
                             {/* Step 5: Solution & Hints */}
                             {currentStep === 4 && <SolutionHintsStep />}

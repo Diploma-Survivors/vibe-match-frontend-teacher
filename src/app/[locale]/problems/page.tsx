@@ -66,7 +66,7 @@ export default function ProblemsPage() {
     if (confirmed) {
       try {
         // Mock API call
-        await ProblemsService.updateProblemStatus(problem.id, newStatus);
+        await ProblemsService.updateProblemStatus(problem.id);
 
         toastService.success(newStatus ? t('activateSuccess') : t('deactivateSuccess'));
         refresh();

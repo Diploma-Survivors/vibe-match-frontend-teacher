@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { FileJson, CloudUpload, Plus, X } from 'lucide-react';
+import { FileJson, CloudUpload, Plus, X, Loader2 } from 'lucide-react';
 import { toastService } from '@/services/toasts-service';
 import {
   validateTestcaseFileFormat,
@@ -13,14 +14,52 @@ import {
 import { cn } from '@/lib/utils';
 import type { CreateProblemFormValues } from '@/components/problem-create-form';
 import { useTranslations } from 'next-intl';
+import { ProblemsService } from '@/services/problems-service';
+import { useDialog } from '@/components/providers/dialog-provider';
+import { Tooltip } from '@/components/ui/tooltip';
 
-export function TestCasesStep() {
+interface TestCasesStepProps {
+  isEditMode?: boolean;
+  problemId?: number;
+}
+
+export function TestCasesStep({ isEditMode, problemId }: TestCasesStepProps) {
   const t = useTranslations('CreateProblemForm.testCases');
   const {
     watch,
     setValue,
     formState: { errors },
   } = useFormContext<CreateProblemFormValues>();
+  const { confirm } = useDialog();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileRemove = async () => {
+    if (isEditMode && problemId) {
+      const confirmed = await confirm({
+        title: t('removeFileConfirmTitle'),
+        message: t('removeFileConfirmMessage'),
+        confirmText: t('removeFileConfirmYes'),
+        cancelText: t('removeFileConfirmNo'),
+        color: 'red',
+      });
+
+      if (!confirmed) return;
+
+      setIsUploading(true);
+      try {
+        await ProblemsService.removeTestcaseFile(problemId);
+        setValue('testcaseFileUrl', undefined, { shouldValidate: true });
+        toastService.success(t('fileRemovedSuccess'));
+      } catch (error) {
+        console.error('Remove failed', error);
+        toastService.error(t('fileRemoveError'));
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      setValue('testcaseFile', null, { shouldValidate: true });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -45,7 +84,7 @@ export function TestCasesStep() {
           </span>
         </div>
 
-        {!watch('testcaseFile') ? (
+        {!(watch('testcaseFile') || (isEditMode && watch('testcaseFileUrl'))) ? (
           <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-8 flex flex-col items-center justify-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors cursor-pointer relative group">
             <Input
               type="file"
@@ -71,27 +110,50 @@ export function TestCasesStep() {
                   return;
                 }
 
-                setValue('testcaseFile', file, { shouldValidate: true });
-                toastService.success(
-                  t('validFileLoaded', { count: contentValidation.testcaseCount })
-                );
+                if (isEditMode && problemId) {
+                  setIsUploading(true);
+                  try {
+                    await ProblemsService.uploadTestcaseFile(problemId, file);
+                    setValue('testcaseFileUrl', 'uploaded', { shouldValidate: true });
+                    toastService.success(t('validFileLoaded', { count: contentValidation.testcaseCount || 0 }));
+                  } catch (error) {
+                    toastService.error('Upload failed');
+                  } finally {
+                    setIsUploading(false);
+                  }
+                } else {
+                  setValue('testcaseFile', file, { shouldValidate: true });
+                  toastService.success(
+                    t('validFileLoaded', { count: contentValidation.testcaseCount || 0 })
+                  );
+                }
               }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              disabled={isUploading}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
             />
-            <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
-              <CloudUpload className="w-6 h-6" />
-            </div>
-            <div className="text-center space-y-1">
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                <span className="text-green-600 dark:text-green-500">
-                  {t('uploadClick')}
-                </span>{' '}
-                {t('uploadDrag')}
-              </p>
-              <p className="text-xs text-slate-500">
-                {t('uploadFormat')}
-              </p>
-            </div>
+            {isUploading ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                <p className="text-sm text-slate-500">Uploading...</p>
+              </div>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
+                  <CloudUpload className="w-6 h-6" />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <span className="text-green-600 dark:text-green-500">
+                      {t('uploadClick')}
+                    </span>{' '}
+                    {t('uploadDrag')}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {t('uploadFormat')}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center justify-between bg-white dark:bg-slate-950 animate-in fade-in slide-in-from-top-2">
@@ -101,24 +163,40 @@ export function TestCasesStep() {
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {watch('testcaseFile').name}
+                  {watch('testcaseFile')?.name || (watch('testcaseFileUrl') ? 'Testcase File' : '')}
                 </p>
                 <p className="text-xs text-slate-500">
-                  {(watch('testcaseFile').size / 1024 / 1024).toFixed(2)} MB •
-                  {t('uploadedJustNow')}
+                  {watch('testcaseFile') ? `${(watch('testcaseFile').size / 1024 / 1024).toFixed(2)} MB •` : ''}
+                  {watch('testcaseFile') && t('uploadedJustNow')}
                 </p>
+                {isEditMode && watch('testcaseFileUrl') && !watch('testcaseFile') && (
+                  <Tooltip content={t('rightClickToSave')}>
+                    <a
+                      href={watch('testcaseFileUrl')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-auto p-0 text-xs text-blue-600 hover:underline flex items-center gap-1"
+                      download={`testcase-${problemId || 'file'}.json`}
+                    >
+                      Download
+                    </a>
+                  </Tooltip>
+                )}
               </div>
             </div>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() =>
-                setValue('testcaseFile', null, { shouldValidate: true })
-              }
+              onClick={handleFileRemove}
+              disabled={isUploading}
               className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
             >
-              <X className="w-5 h-5" />
+              {isUploading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <X className="w-5 h-5" />
+              )}
             </Button>
           </div>
         )}
@@ -241,11 +319,13 @@ export function TestCasesStep() {
           </div>
         ))}
       </div>
-      {errors.sampleTestcases && (
-        <p className="text-sm text-red-500">
-          {errors.sampleTestcases.message as string}
-        </p>
-      )}
-    </div>
+      {
+        errors.sampleTestcases && (
+          <p className="text-sm text-red-500">
+            {errors.sampleTestcases.message as string}
+          </p>
+        )
+      }
+    </div >
   );
 }

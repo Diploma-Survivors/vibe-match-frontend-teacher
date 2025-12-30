@@ -95,6 +95,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                     sampleTestcases: formValues.sampleTestcases || [],
                     hints: formValues.hints || [],
                     testcaseFile: null, // File input cannot be pre-populated
+                    testcaseFileUrl: problem.testcaseFileUrl,
                 });
             } catch (err) {
                 console.error('Failed to fetch problem data', err);
@@ -132,6 +133,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
     };
 
     const onError = (errors: any) => {
+        console.log(errors);
         const newErrorSteps: number[] = [];
 
         // Step 1: General Info
@@ -177,7 +179,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                 id: originalProblem.id,
                 tagIds: data.tags.map((t: any) => t.id),
                 topicIds: data.topics.map((t: any) => t.id),
-                testcaseFile: data.testcaseFile,
+                testcaseFile: null, // Handled separately in edit mode
                 sampleTestcases:
                     data.sampleTestcases?.map((tc) => ({
                         input: tc.input,
@@ -188,7 +190,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
             };
 
 
-            await ProblemsService.updateProblem(updatedProblem);
+            await ProblemsService.updateProblem(originalProblem.id, updatedProblem);
 
             toastService.success(tEdit('messages.updateSuccess'));
             router.push('/problems');
@@ -306,7 +308,7 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
                             {currentStep === 2 && <ConstraintsStep />}
 
                             {/* Step 4: Test Cases */}
-                            {currentStep === 3 && <TestCasesStep />}
+                            {currentStep === 3 && <TestCasesStep isEditMode={true} problemId={problemId} />}
 
                             {/* Step 5: Solution & Hints */}
                             {currentStep === 4 && <SolutionHintsStep />}

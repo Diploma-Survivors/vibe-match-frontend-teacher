@@ -4,6 +4,7 @@ import type { UserProfile } from './user';
 import type { UserInfo } from './states';
 import type { Tag } from './tags';
 import type { SampleTestCase } from './testcases';
+export type { SampleTestCase };
 import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
@@ -81,6 +82,7 @@ export interface CreateProblemRequest {
   isPublished?: boolean;
   hints?: Hint[];
   officialSolutionContent?: string;
+  hasOfficialSolution?: boolean;
   similarProblems?: number[];
 }
 
@@ -137,7 +139,7 @@ export interface Problem {
   visibility?: ProblemVisibility;
   testcase?: File | null;
   testcaseSamples?: SampleTestCase[]; // Alias for sampleTestcases?
-  testcaseResponse?: TestcaseFileResponse;
+  testcaseFileUrl?: string;
   quickStats?: ProblemQuickStats;
 }
 
@@ -158,7 +160,7 @@ export interface ProblemDataResponse {
   author: UserInfo;
   tags: Tag[];
   topics: Topic[];
-  testcase: TestcaseFileResponse;
+  testcaseFileUrl: string;
   testcaseSamples: SampleTestCase[];
   quickStats: ProblemQuickStats;
 }

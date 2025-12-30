@@ -133,7 +133,8 @@
         "deactivate": "Hủy kích hoạt",
         "activate": "Kích hoạt",
         "delete": "Xóa",
-        "entityName": "bài tập"
+        "entityName": "bài tập",
+        "premium": "Premium"
     },
     "SubmissionTable": {
         "id": "ID",
@@ -443,7 +444,14 @@
             "explanationPlaceholder": "Vì nums[0] + nums[1] == 9, chúng ta trả về [0, 1].",
             "invalidFormat": "Định dạng file không hợp lệ",
             "invalidContent": "Nội dung file không hợp lệ",
-            "validFileLoaded": "File testcase hợp lệ với {count} test case."
+            "validFileLoaded": "File testcase hợp lệ với {count} test case.",
+            "rightClickToSave": "Nhấn chuột phải, sau đó chọn 'Save Link As' để tải file.",
+            "removeFileConfirmTitle": "Bạn có chắc để xóa file này?",
+            "removeFileConfirmMessage": "Hành động này không thể được hoàn tác.",
+            "removeFileConfirmYes": "Có",
+            "removeFileConfirmNo": "Không",
+            "fileRemovedSuccess": "File đã được xóa thành công.",
+            "fileRemovedError": "Xóa file thất bại. Vui lòng thử lại."
         },
         "solutionHints": {
             "officialSolutionLabel": "Lời giải chính thức",

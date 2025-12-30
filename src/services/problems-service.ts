@@ -10,6 +10,7 @@ import {
   type ProblemListResponse,
   ProblemType,
   ProblemVisibility,
+  type SampleTestCase,
 } from '@/types/problems';
 import type { ProblemStatistics } from '@/types/problem-statistics';
 import type { AxiosResponse } from 'axios';
@@ -36,10 +37,57 @@ async function getProblemList(
 async function createProblem(
   problemRequest: CreateProblemRequest
 ): Promise<AxiosResponse<ApiResponse<Problem>>> {
-  const formData = serialize(problemRequest, {
-    indices: true,
-    nullsAsUndefineds: true,
-  });
+  const formData = new FormData();
+
+  formData.append('title', problemRequest.title);
+  formData.append('description', problemRequest.description);
+  formData.append('constraints', problemRequest.constraints);
+  formData.append('difficulty', problemRequest.difficulty);
+  formData.append('isPremium', String(problemRequest.isPremium));
+  // formData.append('isActive', String(problemRequest.isActive ?? true)); // Default to true if not provided
+  formData.append('timeLimitMs', String(problemRequest.timeLimitMs));
+  formData.append('memoryLimitKb', String(problemRequest.memoryLimitKb));
+
+  if (problemRequest.sampleTestcases) {
+    formData.append(
+      'sampleTestcases',
+      JSON.stringify(problemRequest.sampleTestcases)
+    );
+  }
+
+  if (problemRequest.hints) {
+    formData.append('hints', JSON.stringify(problemRequest.hints));
+  }
+
+  if (problemRequest.hasOfficialSolution !== undefined) {
+    formData.append('hasOfficialSolution', String(problemRequest.hasOfficialSolution));
+  }
+
+  if (problemRequest.hasOfficialSolution && problemRequest.officialSolutionContent) {
+    formData.append(
+      'officialSolutionContent',
+      problemRequest.officialSolutionContent
+    );
+  }
+
+  if (problemRequest.similarProblems) {
+    formData.append(
+      'similarProblems',
+      JSON.stringify(problemRequest.similarProblems)
+    );
+  }
+
+  if (problemRequest.topicIds) {
+    formData.append('topicIds', JSON.stringify(problemRequest.topicIds));
+  }
+
+  if (problemRequest.tagIds) {
+    formData.append('tagIds', JSON.stringify(problemRequest.tagIds));
+  }
+
+  if (problemRequest.testcaseFile) {
+    formData.append('testcaseFile', problemRequest.testcaseFile);
+  }
 
   return await clientApi.post('/problems', formData, {
     headers: {
@@ -103,11 +151,27 @@ async function createProblem(
   // };
 }
 
+async function getProblemSamples(id: number): Promise<AxiosResponse<ApiResponse<SampleTestCase[]>>> {
+  return await clientApi.get(`/problems/${id}/samples`);
+}
+
 async function getProblemById(
   problemId: number
 ): Promise<AxiosResponse<ApiResponse<Problem>>> {
 
-  return await clientApi.get(`/problems/${problemId}`);
+  const [problemResponse, samplesResponse] = await Promise.all([
+    clientApi.get<ApiResponse<Problem>>(`/problems/${problemId}`),
+    clientApi.get<ApiResponse<SampleTestCase[]>>(`/problems/${problemId}/samples`).catch(() => null),
+  ]);
+
+  if (problemResponse.data?.data && samplesResponse?.data?.data) {
+    problemResponse.data.data.sampleTestcases = samplesResponse.data.data;
+  }
+  if(problemResponse.data?.data){
+    problemResponse.data.data.hasOfficialSolution = !!problemResponse.data.data.officialSolutionContent;
+  }
+
+  return problemResponse;
 
   // Mock API call
 //   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -224,81 +288,24 @@ async function getProblemById(
 //   };
 }
 
-async function updateProblem(problemRequest: CreateProblemRequest) {
-  const formData = serialize(problemRequest, {
-    indices: true,
-    nullsAsUndefineds: true,
-  });
-
-  // Mock API call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Mock response data
-  const mockProblem: Problem = {
-    id: Math.floor(Math.random() * 1000),
-    title: problemRequest.title,
-    difficulty: problemRequest.difficulty,
-    timeLimitMs: problemRequest.timeLimitMs,
-    memoryLimitKb: problemRequest.memoryLimitKb,
-    topics: [], // In a real mock, we'd map these from IDs
-    tags: [], // In a real mock, we'd map these from IDs
-    description: problemRequest.description,
-    constraints: problemRequest.constraints,
-    sampleTestcases: problemRequest.sampleTestcases,
-    hints: [],
-    isPremium: problemRequest.isPremium,
-    isPublished: problemRequest.isPublished,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    // authorId: 'mock-author-id', // Removed as it's not in Problem interface
-    slug: problemRequest.title.toLowerCase().replace(/\s+/g, '-'),
-    // averageRating: 0,
-    // ratingCount: 0,
-    acceptanceRate: '0',
-    // submissionCount: 0,
-    // acceptedCount: 0,
-    testcase: null,
-    testcaseResponse: undefined,
-    isActive: true,
-    totalSubmissions: 0,
-    totalAccepted: 0,
-    totalAttempts: 0,
-    totalSolved: 0,
-    averageTimeToSolve: 0,
-    difficultyRating: 0,
-    testcaseCount: 0,
-    similarProblems: [],
+async function updateProblem(id: number, problemRequest: CreateProblemRequest) {
+  const { testcaseFile, sampleTestcases, ...data } = problemRequest;
+  
+  const payload = {
+    ...data,
+    sampleTestcases: sampleTestcases ? JSON.stringify(sampleTestcases) : undefined,
+    hints: data.hints ? JSON.stringify(data.hints) : undefined,
+    similarProblems: data.similarProblems ? JSON.stringify(data.similarProblems) : undefined,
+    tagIds: data.tagIds ? JSON.stringify(data.tagIds) : undefined,
+    topicIds: data.topicIds ? JSON.stringify(data.topicIds) : undefined,
+    officialSolutionContent: data.hasOfficialSolution ? data.officialSolutionContent : undefined,
   };
 
-  return {
-    data: {
-      data: mockProblem,
-      status: HttpStatus.OK,
-      apiVersion: '1.0',
-    },
-    status: 200,
-    statusText: 'OK',
-    headers: {},
-    config: {} as any,
-  };
+  return await clientApi.put(`/problems/${id}`, payload);
 }
 
-async function updateProblemStatus(id: number, status: boolean) {
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    return {
-      data: {
-        data: id,
-        statusCode: 200,
-        timestamp: new Date().toISOString(),
-        path: `/problems/${id}/status`,
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as any,
-    };
+async function updateProblemStatus(id: number) {
+    return await clientApi.post(`/problems/${id}/toggle`);
 }
 
 async function getProblemStatistics(
@@ -389,6 +396,22 @@ async function getProblemStatistics(
   };
 }
 
+async function uploadTestcaseFile(problemId: number, file: File) {
+  const formData = new FormData();
+  formData.append('problemId', String(problemId));
+  formData.append('testcaseFile', file);
+
+  return await clientApi.post('/problems/testcases/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
+
+async function removeTestcaseFile(problemId: number) {
+  return await clientApi.delete(`/problems/${problemId}/testcases`);
+}
+
 function mapProblemToDTO(problem: Problem): CreateProblemRequest {
   const { tags, topics, testcase, ...rest } = problem;
   return {
@@ -400,12 +423,15 @@ function mapProblemToDTO(problem: Problem): CreateProblemRequest {
     tagIds: tags.map((tag) => tag.id),
     topicIds: topics.map((topic) => topic.id),
     testcaseFile: testcase || null,
-    sampleTestcases: problem.sampleTestcases || [],
+    sampleTestcases: problem.sampleTestcases?.map((tc) => ({
+      ...tc,
+      explanation: tc.explanation ?? undefined,
+    })) || [],
     constraints: problem.constraints,
     isPremium: problem.isPremium,
     isPublished: problem.isPublished,
-    hints: problem.hints,
-    officialSolutionContent: problem.officialSolutionContent,
+    hints: problem.hints?.map((h, i) => ({ ...h, order: h.order ?? i + 1 })) || [],
+    officialSolutionContent: problem.officialSolutionContent ?? undefined,
   };
 }
 
@@ -434,4 +460,7 @@ export const ProblemsService = {
   updateProblem,
   updateProblemStatus,
   getProblemStatistics,
+  uploadTestcaseFile,
+  removeTestcaseFile,
+  getProblemSamples,
 };

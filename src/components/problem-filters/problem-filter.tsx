@@ -67,8 +67,6 @@ export default function ProblemFilter({
   tags,
   topics,
 }: ProblemFilterProps) {
-  console.log('topics', topics);
-  console.log('tags', tags);
   const t = useTranslations('ProblemFilter');
   // Search states for dropdowns
   const [topicSearch, setTopicSearch] = useState('');

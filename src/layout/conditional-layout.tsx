@@ -7,15 +7,17 @@ import { SidebarProvider, useSidebar } from '@/contexts/sidebar-context';
 import { cn } from '@/lib/utils';
 import { signOut } from 'next-auth/react';
 import LanguageSwitcher from '@/components/language-switcher';
+import { useLocale } from 'next-intl';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isOpen, isMobile } = useSidebar();
   const { clearUserData, user } = useApp();
+  const locale = useLocale();
 
   const handleLogout = async () => {
     clearUserData();
     await signOut({
-      callbackUrl: '/login', // Where to go after logout
+      callbackUrl: `/${locale}/login`, // Where to go after logout
       redirect: true,
     });
   };
