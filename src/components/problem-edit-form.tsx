@@ -175,7 +175,6 @@ export default function ProblemEditForm({ problemId }: ProblemEditFormProps) {
             const updatedProblem: CreateProblemRequest = {
                 ...data,
                 id: originalProblem.id,
-                maxScore: data.maxScore || 100,
                 tagIds: data.tags.map((t: any) => t.id),
                 topicIds: data.topics.map((t: any) => t.id),
                 testcaseFile: data.testcaseFile,

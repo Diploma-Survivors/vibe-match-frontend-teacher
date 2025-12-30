@@ -1,3 +1,5 @@
+import { SortOrder } from "./problems";
+
 export interface CreateTagRequest {
   name: string;
   slug?: string;
@@ -24,9 +26,7 @@ export interface Tag {
 
 export enum TagSortBy {
   ID = 'id',
-  NAME = 'name',
-  POST_COUNT = 'post_count',
-  CREATED_AT = 'created_at',
+  CREATED_AT = 'createdAt',
 }
 
 export interface TagFilters {
@@ -37,7 +37,7 @@ export interface TagFilters {
 export interface GetTagListRequest {
   page?: number;
   limit?: number;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: SortOrder;
   sortBy?: TagSortBy;
   filters?: TagFilters;
   search?: string;

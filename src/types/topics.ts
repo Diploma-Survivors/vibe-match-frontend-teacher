@@ -1,3 +1,5 @@
+import { SortOrder } from "./problems";
+
 export interface CreateTopicRequest {
   name: string;
   slug?: string;
@@ -30,9 +32,7 @@ export interface Topic {
 
 export enum TopicSortBy {
   ID = 'id',
-  NAME = 'name',
-  POST_COUNT = 'post_count',
-  CREATED_AT = 'created_at',
+  CREATED_AT = 'createdAt',
 }
 
 export interface TopicFilters {
@@ -43,7 +43,7 @@ export interface TopicFilters {
 export interface GetTopicListRequest {
   page?: number;
   limit?: number;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: SortOrder;
   sortBy?: TopicSortBy;
   filters?: TopicFilters;
   search?: string;

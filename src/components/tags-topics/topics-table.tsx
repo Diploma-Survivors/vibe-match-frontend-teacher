@@ -58,7 +58,6 @@ export function TopicsTable({
                             <TableHead className="w-[80px] text-center">{t('topicId')}</TableHead>
                             <TableHead className="text-center">{t('topicName')}</TableHead>
                             <TableHead className="text-center">{t('slug')}</TableHead>
-                            <TableHead className="text-center">{t('postCount')}</TableHead>
                             <TableHead className="text-center">{t('status')}</TableHead>
                             <TableHead className="text-center">{t('createdDate')}</TableHead>
                             <TableHead className="text-center">{t('actions')}</TableHead>
@@ -81,7 +80,6 @@ export function TopicsTable({
                                             {topic.slug}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="font-bold text-center">{topic.postCount?.toLocaleString() || 0}</TableCell>
                                     <TableCell className="text-center">
                                         <Badge
                                             variant={topic.isActive ? 'default' : 'secondary'}

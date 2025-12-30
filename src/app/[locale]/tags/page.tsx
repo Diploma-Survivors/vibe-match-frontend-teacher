@@ -27,6 +27,7 @@ import { Topic, TopicSortBy } from '@/types/topics';
 import useTags from '@/hooks/use-tags';
 import useTopics from '@/hooks/use-topics';
 import { useTranslations } from 'next-intl';
+import { SortOrder } from '@/types/problems';
 
 export default function TagsPage() {
     const t = useTranslations('TagsPage');
@@ -132,9 +133,14 @@ export default function TagsPage() {
         });
 
         if (confirmed) {
-            // Mock delete for now as service doesn't have delete
-            toastService.success(t('deleteTopicSuccess'));
-            handleTopicRefresh();
+            try {
+                await TopicsService.deleteTopic(topic.id);
+                toastService.success(t('deleteTopicSuccess'));
+                handleTopicRefresh();
+            } catch (error) {
+                console.error('Failed to delete topic:', error);
+                toastService.error(t('deleteTopicError'));
+            }
         }
     };
 
@@ -268,7 +274,6 @@ export default function TagsPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value={TagSortBy.ID} className="cursor-pointer">{t('id')}</SelectItem>
-                                        <SelectItem value={TagSortBy.POST_COUNT} className="cursor-pointer">{t('postCount')}</SelectItem>
                                         <SelectItem value={TagSortBy.CREATED_AT} className="cursor-pointer">{t('createdAt')}</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -277,12 +282,12 @@ export default function TagsPage() {
                                     size="icon"
                                     onClick={() =>
                                         handleTagSortOrderChange(
-                                            tagSortOrder === 'asc' ? 'desc' : 'asc'
+                                            tagSortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
                                         )
                                     }
                                     className="h-10 w-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                                 >
-                                    {tagSortOrder === 'asc' ? (
+                                    {tagSortOrder === SortOrder.ASC ? (
                                         <ArrowDown className="h-4 w-4" />
                                     ) : (
                                         <ArrowUp className="h-4 w-4" />
@@ -353,7 +358,6 @@ export default function TagsPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value={TopicSortBy.ID} className="cursor-pointer">{t('id')}</SelectItem>
-                                        <SelectItem value={TopicSortBy.POST_COUNT} className="cursor-pointer">{t('postCount')}</SelectItem>
                                         <SelectItem value={TopicSortBy.CREATED_AT} className="cursor-pointer">{t('createdAt')}</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -362,12 +366,12 @@ export default function TagsPage() {
                                     size="icon"
                                     onClick={() =>
                                         handleTopicSortOrderChange(
-                                            topicSortOrder === 'asc' ? 'desc' : 'asc'
+                                            topicSortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
                                         )
                                     }
                                     className="h-10 w-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                                 >
-                                    {topicSortOrder === 'asc' ? (
+                                    {topicSortOrder === SortOrder.ASC ? (
                                         <ArrowDown className="h-4 w-4" />
                                     ) : (
                                         <ArrowUp className="h-4 w-4" />

@@ -1,6 +1,7 @@
 export interface ApiResponse<T> {
-  status: HttpStatus;
-  apiVersion: string;
+  statusCode: number;
+  timestamp: string;
+  path: string;
   data: T;
 }
 

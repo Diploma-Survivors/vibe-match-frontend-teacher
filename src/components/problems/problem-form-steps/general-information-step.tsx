@@ -128,60 +128,6 @@ export function GeneralInformationStep({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="maxScore">{t('maxScoreLabel')}</Label>
-          <Controller
-            name="maxScore"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                onChange={(e) =>
-                  field.onChange(Number.parseInt(e.target.value))
-                }
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            )}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="timeLimitMs">{t('timeLimitLabel')}</Label>
-          <Controller
-            name="timeLimitMs"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                onChange={(e) =>
-                  field.onChange(Number.parseInt(e.target.value))
-                }
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            )}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="memoryLimitKb">{t('memoryLimitLabel')}</Label>
-          <Controller
-            name="memoryLimitKb"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                onChange={(e) =>
-                  field.onChange(Number.parseInt(e.target.value))
-                }
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            )}
-          />
-        </div>
-      </div>
-
       <div className="space-y-2">
         <Label>{t('topicsLabel')}</Label>
         <MultiSelect

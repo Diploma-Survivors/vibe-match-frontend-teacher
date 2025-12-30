@@ -194,7 +194,11 @@
             "easy": "Dễ",
             "medium": "Trung bình",
             "hard": "Khó"
-        }
+        },
+        "allTypes": "Tất cả",
+        "allDifficulties": "Tất cả",
+        "premium": "Premium",
+        "free": "Free"
     },
     "SubmissionFilter": {
         "searchPlaceholder": "Tìm kiếm...",
@@ -242,8 +246,8 @@
         "createdAt": "Ngày tạo",
         "resetFilters": "Đặt lại bộ lọc",
         "confirmDeleteTitle": "Bạn có chắc chắn không?",
-        "confirmDeleteTagMessage": "Hành động này không thể hoàn tác. Thẻ <span className=\"font-semibold text-foreground\"> \"{name}\" </span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
-        "confirmDeleteTopicMessage": "Hành động này không thể hoàn tác. Chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\" </span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
+        "confirmDeleteTagMessage": "Hành động này không thể hoàn tác. Thẻ <span>{name}</span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
+        "confirmDeleteTopicMessage": "Hành động này không thể hoàn tác. Chủ đề <span>{name}</span> sẽ bị xóa vĩnh viễn khỏi tất cả các bài tập liên quan.",
         "delete": "Xóa",
         "cancel": "Hủy",
         "deleteTagSuccess": "Xóa thẻ thành công",
@@ -252,10 +256,10 @@
         "deleteTopicError": "Xóa chủ đề thất bại",
         "confirmActivateTitle": "Xác nhận kích hoạt",
         "confirmDeactivateTitle": "Xác nhận hủy kích hoạt",
-        "confirmActivateTagMessage": "Bạn có chắc chắn muốn kích hoạt thẻ <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmDeactivateTagMessage": "Bạn có chắc chắn muốn hủy kích hoạt thẻ <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmActivateTopicMessage": "Bạn có chắc chắn muốn kích hoạt chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmDeactivateTopicMessage": "Bạn có chắc chắn muốn hủy kích hoạt chủ đề <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "confirmActivateTagMessage": "Bạn có chắc chắn muốn kích hoạt thẻ <span>{name}</span>?",
+        "confirmDeactivateTagMessage": "Bạn có chắc chắn muốn hủy kích hoạt thẻ <span>{name}</span>?",
+        "confirmActivateTopicMessage": "Bạn có chắc chắn muốn kích hoạt chủ đề <span>{name}</span>?",
+        "confirmDeactivateTopicMessage": "Bạn có chắc chắn muốn hủy kích hoạt chủ đề <span>{name}</span>?",
         "activate": "Kích hoạt",
         "deactivate": "Hủy kích hoạt",
         "activateTagSuccess": "Kích hoạt thẻ thành công",

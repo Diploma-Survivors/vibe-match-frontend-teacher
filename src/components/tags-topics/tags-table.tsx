@@ -58,7 +58,6 @@ export function TagsTable({
                             <TableHead className="w-[80px] text-center">{t('tagId')}</TableHead>
                             <TableHead className="text-center">{t('tagName')}</TableHead>
                             <TableHead className="text-center">{t('slug')}</TableHead>
-                            <TableHead className="text-center">{t('postCount')}</TableHead>
                             <TableHead className="text-center">{t('status')}</TableHead>
                             <TableHead className="text-center">{t('createdDate')}</TableHead>
                             <TableHead className="text-center">{t('actions')}</TableHead>
@@ -81,7 +80,6 @@ export function TagsTable({
                                             {tag.slug}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="font-bold text-center">{tag.postCount?.toLocaleString() || 0}</TableCell>
                                     <TableCell className="text-center">
                                         <Badge
                                             variant={tag.status === 'active' ? 'default' : 'secondary'}

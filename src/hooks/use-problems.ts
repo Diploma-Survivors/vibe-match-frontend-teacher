@@ -10,6 +10,7 @@ import {
   SortBy,
   SortOrder,
 } from '@/types/problems';
+import { HttpStatus } from '@/types/api';
 import { useCallback, useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = 20;
@@ -77,69 +78,15 @@ export default function useProblems(
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
         
-        // Mock API call since endpoint is not available
-        // In a real scenario, we would call ProblemsService.getProblemList(requestParams, endpointType)
-        
-        // Simulating API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Mock data generation (replace with actual service call when available)
-        // For now, we'll try to use the service if it exists, otherwise fallback or mock
-        // Since the user asked to mock, we will implement a mock fetch here or in the service.
-        // Let's assume we need to mock it here for now as the service might not be updated.
-        
-        // However, to keep it clean, let's try to call the service and if it fails or we want to force mock:
-        // But the user explicitly said "this endpoint is not available, so please mock them"
-        
-        // Let's generate some mock data based on the request
-        const mockProblems: Problem[] = Array.from({ length: requestParams.limit || 20 }).map((_, i) => ({
-          id: (requestParams.page || 1) * 100 + i,
-          title: `Problem ${((requestParams.page || 1) - 1) * 20 + i + 1} - ${requestParams.search || 'Random'}`,
-          slug: `problem-${((requestParams.page || 1) - 1) * 20 + i + 1}`,
-          description: 'Description',
-          difficulty: ['easy', 'medium', 'hard'][Math.floor(Math.random() * 3)] as any,
-          isPremium: Math.random() > 0.8,
-          isPublished: true,
-          isActive: true,
-          totalSubmissions: Math.floor(Math.random() * 1000),
-          totalAccepted: Math.floor(Math.random() * 500),
-          acceptanceRate: Math.random() * 100,
-          tags: [
-            { id: 1, name: 'Array', slug: 'array', color: 'blue', type: 'default', description: '', createdAt: '', updatedAt: '' },
-            { id: 2, name: 'Easy', slug: 'easy', color: 'green', type: 'default', description: '', createdAt: '', updatedAt: '' }
-          ],
-          topics: [
-             { id: 1, name: 'Algorithms', slug: 'algorithms', description: 'Algorithmic problems', iconUrl: '', orderIndex: 1, isActive: true, createdAt: '', updatedAt: '' }
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          constraints: '',
-          timeLimitMs: 1000,
-          memoryLimitKb: 256,
-          sampleTestcases: [],
-          hints: [],
-          hasOfficialSolution: false,
-          testcaseCount: 0,
-        }));
-
-        const mockResponse: ProblemListResponse = {
-          data: mockProblems,
-          meta: {
-            page: requestParams.page || 1,
-            limit: requestParams.limit || 20,
-            total: 100, // Mock total
-            totalPages: 5,
-            hasPreviousPage: (requestParams.page || 1) > 1,
-            hasNextPage: (requestParams.page || 1) < 5,
-          },
-        };
-
+        const response = await ProblemsService.getProblemList(
+          requestParams,
+        );
         setState((prev) => ({
-          ...prev,
-          problems: mockResponse.data,
-          meta: mockResponse.meta,
-          isLoading: false,
-        }));
+            ...prev,
+            problems: response?.data?.data?.data,
+            meta: response?.data?.data?.meta,
+            isLoading: false,
+          }));
       } catch (err) {
         console.error('Error fetching problems:', err);
         setState((prev) => ({
@@ -149,7 +96,7 @@ export default function useProblems(
         }));
       }
     },
-    [endpointType]
+    []
   );
 
   // Effect to fetch problems when request changes

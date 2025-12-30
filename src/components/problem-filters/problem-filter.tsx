@@ -67,6 +67,8 @@ export default function ProblemFilter({
   tags,
   topics,
 }: ProblemFilterProps) {
+  console.log('topics', topics);
+  console.log('tags', tags);
   const t = useTranslations('ProblemFilter');
   // Search states for dropdowns
   const [topicSearch, setTopicSearch] = useState('');
@@ -74,7 +76,7 @@ export default function ProblemFilter({
 
   // Helper to handle multi-select changes
   const handleMultiSelectChange = (
-    key: 'difficulty' | 'topicIds' | 'tagIds',
+    key: 'topicIds' | 'tagIds',
     value: any
   ) => {
     const currentValues = (filters[key] as any[]) || [];
@@ -88,6 +90,16 @@ export default function ProblemFilter({
   const handleStatusChange = (value: string) => {
     const isActive = value === 'active' ? true : value === 'inactive' ? false : undefined;
     onFiltersChange({ ...filters, isActive });
+  };
+
+  const handleDifficultyChange = (value: string) => {
+    const difficulty = value === 'all' ? undefined : (value as any);
+    onFiltersChange({ ...filters, difficulty });
+  };
+
+  const handlePremiumChange = (value: string) => {
+    const isPremium = value === 'premium' ? true : value === 'free' ? false : undefined;
+    onFiltersChange({ ...filters, isPremium });
   };
 
   // Filtered lists based on search
@@ -149,44 +161,22 @@ export default function ProblemFilter({
       {/* Row 2: Filters */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Difficulty Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
-            >
-              {t('difficulty')}
-              {filters.difficulty && filters.difficulty.length > 0 && (
-                <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                  {filters.difficulty.length}
-                </Badge>
-              )}
-              <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuLabel>{t('selectDifficulty')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {DIFFICULTY_OPTIONS.map((option) => {
-              const isChecked = filters.difficulty?.includes(option.value as any);
-              return (
-                <div
-                  key={option.value}
-                  className="flex items-center px-2 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleMultiSelectChange('difficulty', option.value as any);
-                  }}
-                >
-                  <div className={`flex items-center justify-center w-4 h-4 mr-2 border rounded ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-slate-300'}`}>
-                    {isChecked && <Check className="h-3 w-3" />}
-                  </div>
-                  <span className="text-sm">{t(`difficultyOptions.${option.value}`)}</span>
-                </div>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Select
+          value={filters.difficulty || 'all'}
+          onValueChange={handleDifficultyChange}
+        >
+          <SelectTrigger className="w-[150px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
+            <SelectValue placeholder={t('difficulty')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="cursor-pointer">{t('allDifficulties')}</SelectItem>
+            {DIFFICULTY_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value} className="cursor-pointer">
+                {t(`difficultyOptions.${option.value}`)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {/* Status Filter */}
         <Select
@@ -206,6 +196,27 @@ export default function ProblemFilter({
             <SelectItem value="all" className="cursor-pointer">{t('allStatus')}</SelectItem>
             <SelectItem value="active" className="cursor-pointer">{t('active')}</SelectItem>
             <SelectItem value="inactive" className="cursor-pointer">{t('inactive')}</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Premium Filter */}
+        <Select
+          value={
+            filters.isPremium === true
+              ? 'premium'
+              : filters.isPremium === false
+                ? 'free'
+                : 'all'
+          }
+          onValueChange={handlePremiumChange}
+        >
+          <SelectTrigger className="w-[150px] h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-0 focus:ring-offset-0 cursor-pointer">
+            <SelectValue placeholder={t('allTypes')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="cursor-pointer">{t('allTypes')}</SelectItem>
+            <SelectItem value="premium" className="cursor-pointer">{t('premium')}</SelectItem>
+            <SelectItem value="free" className="cursor-pointer">{t('free')}</SelectItem>
           </SelectContent>
         </Select>
 

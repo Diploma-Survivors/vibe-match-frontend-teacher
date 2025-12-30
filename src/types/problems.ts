@@ -21,12 +21,12 @@ export enum SortBy {
   ID = 'id',
   TITLE = 'title',
   DIFFICULTY = 'difficulty',
-  ACCEPTANCE_RATE = 'acceptance_rate',
+  ACCEPTANCE_RATE = 'acceptanceRate',
 }
 
 export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 export enum ProblemType {
@@ -69,7 +69,6 @@ export interface CreateProblemRequest {
   id?: number;
   title: string;
   description: string;
-  maxScore: number;
   timeLimitMs: number;
   memoryLimitKb: number;
   difficulty: ProblemDifficulty;
@@ -110,7 +109,7 @@ export interface Problem {
   isActive: boolean;
   totalSubmissions?: number;
   totalAccepted?: number;
-  acceptanceRate?: number;
+  acceptanceRate?: string;
   totalAttempts?: number;
   totalSolved?: number;
   averageTimeToSolve?: number;
@@ -134,12 +133,10 @@ export interface Problem {
   // Legacy/Form fields (optional to avoid breaking UI immediately)
   inputDescription?: string;
   outputDescription?: string;
-  maxScore?: number;
   type?: ProblemType;
   visibility?: ProblemVisibility;
   testcase?: File | null;
   testcaseSamples?: SampleTestCase[]; // Alias for sampleTestcases?
-  score?: number;
   testcaseResponse?: TestcaseFileResponse;
   quickStats?: ProblemQuickStats;
 }
@@ -178,7 +175,7 @@ export const initialProblemData: Problem = {
   isActive: true,
   totalSubmissions: 0,
   totalAccepted: 0,
-  acceptanceRate: 0,
+  acceptanceRate: '0',
   totalAttempts: 0,
   totalSolved: 0,
   averageTimeToSolve: 0,
@@ -202,7 +199,6 @@ export const initialProblemData: Problem = {
   // Legacy
   inputDescription: '',
   outputDescription: '',
-  maxScore: 100,
   type: ProblemType.CONTEST,
   visibility: ProblemVisibility.PUBLIC,
   testcase: null,
@@ -210,8 +206,9 @@ export const initialProblemData: Problem = {
 };
 
 export interface ProblemFilters {
-  difficulty?: ProblemDifficulty[];
+  difficulty?: ProblemDifficulty;
   isActive?: boolean;
+  isPremium?: boolean;
   topicIds?: number[];
   tagIds?: number[];
 }
@@ -342,10 +339,6 @@ acceptanceRate: z.number().optional(),
 
   inputDescription: z.string().optional(),
   outputDescription: z.string().optional(),
-
-  maxScore: z
-    .number('Max score must be a number')
-    .positive('Max score must be a positive number'),
 
   timeLimitMs: z
     .number('Time limit must be a number')

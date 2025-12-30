@@ -36,22 +36,13 @@ const persistedCreateContestReducer = persistReducer(
   createContestReducer
 );
 
-const metadataPersistConfig = {
-  key: 'metadata',
-  storage,
-};
-
-const persistedMetadataReducer = persistReducer(
-  metadataPersistConfig,
-  metadataReducer
-);
 
 export const store = configureStore({
   reducer: {
     aiReview: aiReviewReducer,
     createProblem: persistedCreateProblemReducer,
     createContest: persistedCreateContestReducer,
-    metadata: persistedMetadataReducer,
+    metadata: metadataReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

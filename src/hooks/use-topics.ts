@@ -1,6 +1,7 @@
 'use client';
 
 import { TopicsService } from '@/services/topics-service';
+import { SortOrder } from '@/types/problems';
 import {
   type GetTopicListRequest,
   type Topic,
@@ -23,7 +24,7 @@ interface UseTopicsActions {
   handleFiltersChange: (newFilters: TopicFilters) => void;
   handleKeywordChange: (newKeyword: string) => void;
   handleSortByChange: (newSortBy: TopicSortBy) => void;
-  handleSortOrderChange: (newSortOrder: 'asc' | 'desc') => void;
+  handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handleSearch: () => void;
   handleReset: () => void;
   handlePageChange: (page: number) => void;
@@ -36,7 +37,7 @@ interface UseTopicsReturn extends UseTopicsState, UseTopicsActions {
   filters: TopicFilters;
   keyword: string;
   sortBy: TopicSortBy;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 }
 
 export default function useTopics(): UseTopicsReturn {
@@ -54,14 +55,14 @@ export default function useTopics(): UseTopicsReturn {
 
   // state for sorting
   const [sortBy, setSortBy] = useState<TopicSortBy>(TopicSortBy.ID);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetTopicListRequest>({
     page: 1,
     limit: ITEMS_PER_PAGE,
     sortBy: sortBy || TopicSortBy.ID,
-    sortOrder: sortOrder || 'asc',
+    sortOrder: sortOrder || SortOrder.ASC,
     filters: {
       ...filters,
     },
@@ -73,7 +74,7 @@ export default function useTopics(): UseTopicsReturn {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const response = await TopicsService.getAllTopics(requestParams);
+        const response = await TopicsService.getAllTopicsWithPagination(requestParams);
 
         setState((prev) => ({
           ...prev,
@@ -145,7 +146,7 @@ export default function useTopics(): UseTopicsReturn {
   );
 
   const handleSortOrderChange = useCallback(
-    (newSortOrder: 'asc' | 'desc') => {
+    (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
       updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
@@ -175,14 +176,14 @@ export default function useTopics(): UseTopicsReturn {
     setFilters({});
     setKeyword('');
     setSortBy(TopicSortBy.ID);
-    setSortOrder('asc');
+    setSortOrder(SortOrder.ASC);
 
     updateRequest({
       search: undefined,
       filters: {},
       page: 1,
       sortBy: TopicSortBy.ID,
-      sortOrder: 'asc',
+      sortOrder: SortOrder.ASC,
     });
   }, [updateRequest]);
 

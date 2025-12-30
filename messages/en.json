@@ -194,7 +194,11 @@
             "easy": "Easy",
             "medium": "Medium",
             "hard": "Hard"
-        }
+        },
+        "allTypes": "All Types",
+        "allDifficulties": "All Difficulties",
+        "premium": "Premium",
+        "free": "Free"
     },
     "SubmissionFilter": {
         "searchPlaceholder": "Find ...",
@@ -242,8 +246,8 @@
         "createdAt": "Created At",
         "resetFilters": "Reset Filters",
         "confirmDeleteTitle": "Are you sure?",
-        "confirmDeleteTagMessage": "This action cannot be undone. This will permanently delete the tag <span className=\"font-semibold text-foreground\"> \"{name}\" </span> and remove it from all associated problems.",
-        "confirmDeleteTopicMessage": "This action cannot be undone. This will permanently delete the topic <span className=\"font-semibold text-foreground\"> \"{name}\" </span> and remove it from all associated problems.",
+        "confirmDeleteTagMessage": "This action cannot be undone. This will permanently delete the tag <span>{name}</span> and remove it from all associated problems.",
+        "confirmDeleteTopicMessage": "This action cannot be undone. This will permanently delete the topic <span>{name}</span> and remove it from all associated problems.",
         "delete": "Delete",
         "cancel": "Cancel",
         "deleteTagSuccess": "Tag deleted successfully",
@@ -252,10 +256,10 @@
         "deleteTopicError": "Failed to delete topic",
         "confirmActivateTitle": "Confirm Activate",
         "confirmDeactivateTitle": "Confirm Deactivate",
-        "confirmActivateTagMessage": "Are you sure you want to activate the tag <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmDeactivateTagMessage": "Are you sure you want to deactivate the tag <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmActivateTopicMessage": "Are you sure you want to activate the topic <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
-        "confirmDeactivateTopicMessage": "Are you sure you want to deactivate the topic <span className=\"font-semibold text-foreground\"> \"{name}\"</span>?",
+        "confirmActivateTagMessage": "Are you sure you want to activate the tag <span>{name}</span>?",
+        "confirmDeactivateTagMessage": "Are you sure you want to deactivate the tag <span>{name}</span>?",
+        "confirmActivateTopicMessage": "Are you sure you want to activate the topic <span>{name}</span>?",
+        "confirmDeactivateTopicMessage": "Are you sure you want to deactivate the topic <span>{name}</span>?",
         "activate": "Activate",
         "deactivate": "Deactivate",
         "activateTagSuccess": "Tag activated successfully",

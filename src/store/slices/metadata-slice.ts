@@ -25,13 +25,13 @@ const initialState: MetadataState = {
 };
 
 export const fetchTags = createAsyncThunk('metadata/fetchTags', async () => {
-  const response = await TagsService.getAllTags({ limit: 1000 }); // Fetch all tags
-  return response.data.data.data;
+  const response = await TagsService.getAllTags(); // Fetch all tags
+  return response.data.data;
 });
 
 export const fetchTopics = createAsyncThunk('metadata/fetchTopics', async () => {
-  const response = await TopicsService.getAllTopics({ limit: 1000 }); // Fetch all topics
-  return response.data.data.data;
+  const response = await TopicsService.getAllTopics(); // Fetch all topics
+  return response.data.data;
 });
 
 export const fetchLanguages = createAsyncThunk('metadata/fetchLanguages', async () => {

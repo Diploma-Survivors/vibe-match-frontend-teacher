@@ -19,6 +19,7 @@ import {
   Trash2,
   Unlock,
   BarChart2,
+  Crown,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -302,12 +303,19 @@ export default function ProblemTable({
                             {problem.title}
                           </span>
                         ) : (
-                          <Link
-                            href={`/problems/${problem.id}`}
-                            className="font-bold text-slate-800 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
-                          >
-                            {problem.title}
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/problems/${problem.id}`}
+                              className="font-bold text-slate-800 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                            >
+                              {problem.title}
+                            </Link>
+                            {problem.isPremium && (
+                              <Tooltip content={t('premium')}>
+                                <Crown className="h-4 w-4 text-yellow-500" />
+                              </Tooltip>
+                            )}
+                          </div>
                         )}
                         <span className="text-xs text-slate-500 mt-1">
                           {t('lastUpdated')}{' '}
@@ -341,12 +349,12 @@ export default function ProblemTable({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress
-                          value={problem.acceptanceRate || 0}
+                          value={Number(problem.acceptanceRate) || 0}
                           className="h-2 w-24"
                           indicatorClassName="bg-green-500"
                         />
                         <span className="text-xs text-slate-600 dark:text-slate-400">
-                          {problem.acceptanceRate?.toFixed(1)}%
+                          {Number(problem.acceptanceRate)?.toFixed(1)}%
                         </span>
                       </div>
                     </TableCell>

@@ -145,6 +145,7 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = data.accessToken;
         token.refreshToken = data.refreshToken;
       }
+      console.log(token.accessToken)
       return token;
     },
     async session({ session, token }) {

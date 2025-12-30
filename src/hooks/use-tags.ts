@@ -1,6 +1,7 @@
 'use client';
 
 import { TagsService } from '@/services/tags-service';
+import { SortOrder } from '@/types/problems';
 import {
   type GetTagListRequest,
   type Tag,
@@ -23,7 +24,7 @@ interface UseTagsActions {
   handleFiltersChange: (newFilters: TagFilters) => void;
   handleKeywordChange: (newKeyword: string) => void;
   handleSortByChange: (newSortBy: TagSortBy) => void;
-  handleSortOrderChange: (newSortOrder: 'asc' | 'desc') => void;
+  handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handleSearch: () => void;
   handleReset: () => void;
   handlePageChange: (page: number) => void;
@@ -36,7 +37,7 @@ interface UseTagsReturn extends UseTagsState, UseTagsActions {
   filters: TagFilters;
   keyword: string;
   sortBy: TagSortBy;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 }
 
 export default function useTags(): UseTagsReturn {
@@ -54,14 +55,14 @@ export default function useTags(): UseTagsReturn {
 
   // state for sorting
   const [sortBy, setSortBy] = useState<TagSortBy>(TagSortBy.ID);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetTagListRequest>({
     page: 1,
     limit: ITEMS_PER_PAGE,
     sortBy: sortBy || TagSortBy.ID,
-    sortOrder: sortOrder || 'asc',
+    sortOrder: sortOrder || SortOrder.ASC,
     filters: {
       ...filters,
     },
@@ -72,7 +73,7 @@ export default function useTags(): UseTagsReturn {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      const response = await TagsService.getAllTags(requestParams);
+      const response = await TagsService.getAllTagsWithPagination(requestParams);
 
       setState((prev) => ({
         ...prev,
@@ -142,7 +143,7 @@ export default function useTags(): UseTagsReturn {
   );
 
   const handleSortOrderChange = useCallback(
-    (newSortOrder: 'asc' | 'desc') => {
+    (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
       updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
@@ -172,14 +173,14 @@ export default function useTags(): UseTagsReturn {
     setFilters({});
     setKeyword('');
     setSortBy(TagSortBy.ID);
-    setSortOrder('asc');
+    setSortOrder(SortOrder.ASC);
 
     updateRequest({
       search: undefined,
       filters: {},
       page: 1,
       sortBy: TagSortBy.ID,
-      sortOrder: 'asc',
+      sortOrder: SortOrder.ASC,
     });
   }, [updateRequest]);
 
