@@ -146,32 +146,32 @@ export default function TagsPage() {
 
 
     const handleTagStatusChange = async (tag: Tag) => {
-        const newStatus = tag.status === 'active' ? 'inactive' : 'active';
-        const action = newStatus === 'active' ? 'activate' : 'deactivate';
+        const newStatus = tag.isActive === true ? false : true;
+        const action = newStatus === true ? 'activate' : 'deactivate';
 
         const confirmed = await confirm({
-            title: newStatus === 'active' ? t('confirmActivateTitle') : t('confirmDeactivateTitle'),
+            title: newStatus === true ? t('confirmActivateTitle') : t('confirmDeactivateTitle'),
             message: (
                 <span>
-                    {t.rich(newStatus === 'active' ? 'confirmActivateTagMessage' : 'confirmDeactivateTagMessage', {
+                    {t.rich(newStatus === true ? 'confirmActivateTagMessage' : 'confirmDeactivateTagMessage', {
                         name: tag.name,
                         span: (chunks) => <span className="font-semibold text-foreground"> "{chunks}"</span>
                     })}
                 </span>
             ),
-            confirmText: newStatus === 'active' ? t('activate') : t('deactivate'),
+            confirmText: newStatus === true ? t('activate') : t('deactivate'),
             cancelText: t('cancel'),
-            color: newStatus === 'active' ? 'green' : 'red',
+            color: newStatus === true ? 'green' : 'red',
         });
 
         if (confirmed) {
             try {
-                await TagsService.updateTag(tag.id, { status: newStatus });
-                toastService.success(newStatus === 'active' ? t('activateTagSuccess') : t('deactivateTagSuccess'));
+                await TagsService.updateTagStatus(tag.id);
+                toastService.success(newStatus === true ? t('activateTagSuccess') : t('deactivateTagSuccess'));
                 handleTagRefresh();
             } catch (error) {
                 console.error(`Failed to ${action} tag:`, error);
-                toastService.error(newStatus === 'active' ? t('activateTagError') : t('deactivateTagError'));
+                toastService.error(newStatus === true ? t('activateTagError') : t('deactivateTagError'));
             }
         }
     };
@@ -197,7 +197,7 @@ export default function TagsPage() {
 
         if (confirmed) {
             try {
-                await TopicsService.updateTopic(topic.id, { isActive: newStatus });
+                await TopicsService.updateTopicStatus(topic.id);
                 toastService.success(newStatus ? t('activateTopicSuccess') : t('deactivateTopicSuccess'));
                 handleTopicRefresh();
             } catch (error) {
@@ -250,8 +250,8 @@ export default function TagsPage() {
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                             <Select
-                                value={tagFilters.status || 'all'}
-                                onValueChange={(value: any) => handleTagFiltersChange({ ...tagFilters, status: value === 'all' ? undefined : value })}
+                                value={tagFilters.isActive === undefined ? 'all' : tagFilters.isActive ? 'active' : 'inactive'}
+                                onValueChange={(value: any) => handleTagFiltersChange({ ...tagFilters, isActive: value === 'all' ? undefined : value === 'active' })}
                             >
                                 <SelectTrigger className="w-full sm:w-[140px] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus:ring-0 focus:ring-offset-0 cursor-pointer">
                                     <SelectValue placeholder={t('allStatuses')} />

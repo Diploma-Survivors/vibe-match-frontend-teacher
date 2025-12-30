@@ -305,7 +305,7 @@ export default function ProblemTable({
                         ) : (
                           <div className="flex items-center gap-2">
                             <Link
-                              href={`/problems/${problem.id}`}
+                              href={`/problems/${problem.id}/edit`}
                               className="font-bold text-slate-800 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
                             >
                               {problem.title}

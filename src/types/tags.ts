@@ -21,7 +21,7 @@ export interface Tag {
   createdAt: string;
   updatedAt?: string;
   postCount?: number; // Added for UI
-  status?: 'active' | 'inactive'; // Added for UI
+  isActive?: boolean; // Added for UI
 }
 
 export enum TagSortBy {
@@ -30,7 +30,7 @@ export enum TagSortBy {
 }
 
 export interface TagFilters {
-  status?: 'active' | 'inactive';
+  isActive?: boolean;
   search?: string;
 }
 

@@ -135,30 +135,6 @@ async function createTopic(
 ): Promise<AxiosResponse<ApiResponse<Topic>>> {
   const response = await clientApi.post<ApiResponse<Topic>>('/topics', data);
   return response;
-  // Mock create
-  // console.log('Mock creating topic:', data);
-  // await new Promise((resolve) => setTimeout(resolve, 500));
-  // return {
-  //   data: {
-  //     data: {
-  //       id: Math.floor(Math.random() * 1000),
-  //       name: data.name,
-  //       slug: data.name.toLowerCase().replace(/\s+/g, '-'),
-  //       description: data.description,
-  //       iconUrl: '',
-  //       orderIndex: 0,
-  //       isActive: true,
-  //       createdAt: new Date().toISOString(),
-  //       postCount: 0,
-  //     } as Topic,
-  //     status: HttpStatus.OK,
-  //     apiVersion: '1.0',
-  //   },
-  //   status: 201,
-  //   statusText: 'Created',
-  //   headers: {},
-  //   config: {} as any,
-  // };
 }
 
 async function updateTopic(
@@ -167,34 +143,15 @@ async function updateTopic(
 ): Promise<AxiosResponse<ApiResponse<Topic>>> {
   const response = await clientApi.put<ApiResponse<Topic>>(`/topics/${id}`, data);
   return response;
-  // Mock update
-  // console.log('Mock updating topic:', id, data);
-  // await new Promise((resolve) => setTimeout(resolve, 500));
-  // return {
-  //   data: {
-  //     data: {
-  //       id,
-  //       name: data.name || 'Updated Topic',
-  //       slug: (data.name || 'updated-topic').toLowerCase().replace(/\s+/g, '-'),
-  //       description: data.description || '',
-  //       iconUrl: '',
-  //       orderIndex: 0,
-  //       isActive: true,
-  //       createdAt: new Date().toISOString(),
-  //       postCount: 0,
-  //     } as Topic,
-  //     status: HttpStatus.OK,
-  //     apiVersion: '1.0',
-  //   },
-  //   status: 200,
-  //   statusText: 'OK',
-  //   headers: {},
-  //   config: {} as any,
-  // };
 }
 
 async function deleteTopic(id: number): Promise<AxiosResponse<ApiResponse<Topic>>> {
   const response = await clientApi.delete<ApiResponse<Topic>>(`/topics/${id}`);
+  return response;
+}
+
+async function updateTopicStatus(id: number): Promise<AxiosResponse<ApiResponse<any>>> {
+  const response = await clientApi.post<ApiResponse<any>>(`/topics/${id}/toggle`);
   return response;
 }
 
@@ -205,4 +162,5 @@ export const TopicsService = {
   createTopic,
   updateTopic,
   deleteTopic,
+  updateTopicStatus,
 };

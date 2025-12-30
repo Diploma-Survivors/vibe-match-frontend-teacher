@@ -82,14 +82,14 @@ export function TagsTable({
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge
-                                            variant={tag.status === 'active' ? 'default' : 'secondary'}
+                                            variant={tag.isActive === true ? 'default' : 'secondary'}
                                             className={
-                                                tag.status === 'active'
+                                                tag.isActive === true
                                                     ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200'
                                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
                                             }
                                         >
-                                            {tag.status === 'active' ? t('active') : t('inactive')}
+                                            {tag.isActive === true ? t('active') : t('inactive')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
@@ -109,19 +109,19 @@ export function TagsTable({
                                             </Tooltip>
                                             <Tooltip
                                                 content={
-                                                    tag.status === 'active' ? t('deactivate') : t('activate')
+                                                    tag.isActive === true ? t('deactivate') : t('activate')
                                                 }
                                             >
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className={`h-8 w-8 ${tag.status === 'active'
+                                                    className={`h-8 w-8 ${tag.isActive === true
                                                         ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20'
                                                         : 'text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
                                                         }`}
                                                     onClick={() => onStatusChange?.(tag)}
                                                 >
-                                                    {tag.status === 'active' ? (
+                                                    {tag.isActive === true ? (
                                                         <Lock className="h-4 w-4" />
                                                     ) : (
                                                         <Unlock className="h-4 w-4" />
