@@ -1,3 +1,5 @@
+import { ProgrammingLanguage } from "./languages";
+
 export interface VerdictCount {
   verdict: string; // 'Accepted', 'Wrong Answer', 'Time Limit Exceeded', etc.
   count: number;
@@ -12,7 +14,7 @@ export interface DistributionBucket {
 }
 
 export interface LanguageStat {
-  language: string;
+  language: ProgrammingLanguage;
   submissions: number;
   acceptedSubmissions: number;
   acceptanceRate: number;

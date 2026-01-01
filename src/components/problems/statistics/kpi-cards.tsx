@@ -67,10 +67,7 @@ export function KPICards({ stats }: KPICardsProps) {
 
                     <div className="h-px bg-border w-full" />
 
-                    <div className="flex items-center justify-between pt-2">
-                        <span className="text-sm text-muted-foreground">{t('avgTime')}</span>
-                        <span className="text-xl font-bold">{Math.round(stats.averageTimeToSolve / 1000 / 60)}m</span>
-                    </div>
+
                 </CardContent>
             </Card>
         </div>

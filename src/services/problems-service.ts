@@ -313,87 +313,12 @@ async function getProblemStatistics(
   from?: string,
   to?: string
 ): Promise<AxiosResponse<ApiResponse<ProblemStatistics>>> {
-  // Mock API call
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  const mockStats: ProblemStatistics = {
-    problemId,
-    totalSubmissions: 12500,
-    totalAccepted: 4500,
-    acceptanceRate: 36,
-    totalAttempts: 8000,
-    totalSolved: 3500,
-    averageTimeToSolve: 45 * 60 * 1000, // 45 mins
-    verdicts: [
-      { verdict: 'Accepted', count: 4500, percentage: 36 },
-      { verdict: 'Wrong Answer', count: 5000, percentage: 40 },
-      { verdict: 'Time Limit Exceeded', count: 2000, percentage: 16 },
-      { verdict: 'Runtime Error', count: 500, percentage: 4 },
-      { verdict: 'Compilation Error', count: 500, percentage: 4 },
-    ],
-    runtimeDistribution: [
-      { range: '0-10ms', value: 0, count: 150, percentile: 99 },
-      { range: '10-20ms', value: 10, count: 300, percentile: 95 },
-      { range: '20-50ms', value: 20, count: 800, percentile: 80 },
-      { range: '50-100ms', value: 50, count: 1200, percentile: 60 },
-      { range: '100-200ms', value: 100, count: 1000, percentile: 40 },
-      { range: '200ms+', value: 200, count: 1050, percentile: 20 },
-    ],
-    memoryDistribution: [
-      { range: '0-5MB', value: 0, count: 200, percentile: 98 },
-      { range: '5-10MB', value: 5, count: 500, percentile: 90 },
-      { range: '10-20MB', value: 10, count: 1500, percentile: 70 },
-      { range: '20-50MB', value: 20, count: 1800, percentile: 40 },
-      { range: '50MB+', value: 50, count: 500, percentile: 10 },
-    ],
-    languageStats: [
-      {
-        language: 'C++',
-        submissions: 5000,
-        acceptedSubmissions: 2000,
-        acceptanceRate: 40,
-        averageRuntime: 15,
-        averageMemory: 5.2,
-      },
-      {
-        language: 'Java',
-        submissions: 3000,
-        acceptedSubmissions: 1000,
-        acceptanceRate: 33.3,
-        averageRuntime: 45,
-        averageMemory: 25.5,
-      },
-      {
-        language: 'Python',
-        submissions: 3500,
-        acceptedSubmissions: 1200,
-        acceptanceRate: 34.2,
-        averageRuntime: 85,
-        averageMemory: 12.4,
-      },
-      {
-        language: 'JavaScript',
-        submissions: 1000,
-        acceptedSubmissions: 300,
-        acceptanceRate: 30,
-        averageRuntime: 60,
-        averageMemory: 18.1,
-      },
-    ],
-  };
-
-  return {
-    data: {
-      data: mockStats,
-      statusCode: 200,
-      timestamp: new Date().toISOString(),
-      path: `/problems/${problemId}/statistics`,
+  return await clientApi.get(`/problems/${problemId}/statistics`, {
+    params: {
+      from,
+      to,
     },
-    status: 200,
-    statusText: 'OK',
-    headers: {},
-    config: {} as any,
-  };
+  });
 }
 
 async function uploadTestcaseFile(problemId: number, file: File) {

@@ -25,7 +25,7 @@ export function LanguageTable({ languages }: LanguageTableProps) {
     const [search, setSearch] = useState('');
 
     const filteredLanguages = languages.filter((lang) =>
-        lang.language.toLowerCase().includes(search.toLowerCase())
+        lang.language.name.toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -55,8 +55,8 @@ export function LanguageTable({ languages }: LanguageTableProps) {
                     </TableHeader>
                     <TableBody>
                         {filteredLanguages.map((lang) => (
-                            <TableRow key={lang.language}>
-                                <TableCell className="font-bold">{lang.language}</TableCell>
+                            <TableRow key={lang.language.id}>
+                                <TableCell className="font-bold">{lang.language.name}</TableCell>
                                 <TableCell className="text-right">{lang.submissions.toLocaleString()}</TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-2">

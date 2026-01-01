@@ -20,11 +20,22 @@ export enum SubmissionStatus {
 export interface TestCaseResult {
   testcaseId: number;
   status: string;
+  input: string;
   actualOutput: string;
   expectedOutput: string;
   executionTime: number;
   memoryUsed: number;
   error: string;
+  stderr: string;
+}
+
+export interface FailedResult {
+  message: string;
+  input: string;
+  expectedOutput: string;
+  actualOutput: string;
+  stderr: string;
+  compileOutput: string;
 }
 
 export interface Submission {
@@ -35,6 +46,7 @@ export interface Submission {
   testcasesPassed: number;
   totalTestcases: number;
   testcaseResults: TestCaseResult[];
+  failedResult: FailedResult;
   user: Partial<UserProfile>;
   problem: Partial<Problem>;
   compileError: string;
