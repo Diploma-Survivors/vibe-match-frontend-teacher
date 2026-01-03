@@ -11,7 +11,10 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
 } from 'react';
+import { Permission, PermissionEnum } from '@/types/permission';
+import { getAllCurrentUserPermission } from '@/services/permission-service';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -20,6 +23,8 @@ interface AppProviderProps {
 
 interface AppContextType {
   user?: UserProfile;
+  permissions: Permission[];
+  hasPermission: (permissionId: PermissionEnum) => boolean;
   shouldHideNavigation: boolean;
   isLoading: boolean;
   clearUserData: () => void;
@@ -35,6 +40,7 @@ export function AppProvider({
   decodedAccessToken,
 }: AppProviderProps) {
   const [user, setUser] = useState<UserProfile>();
+  const [permissions, setPermissions] = useState<Permission[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const pathname = usePathname();
@@ -42,19 +48,32 @@ export function AppProvider({
 
   const clearUserData = () => {
     setUser(undefined);
+    setPermissions([]);
   };
+
+  const hasPermission = useCallback(
+    (permissionId: PermissionEnum) => {
+      return permissions.some((p) => p.id === permissionId);
+    },
+    [permissions]
+  );
 
   useEffect(() => {
     if (decodedAccessToken) {
       setIsLoading(true);
-      clientApi
-        .get('/auth/me')
-        .then((response) => {
-          setUser(response.data.data);
+
+      // Fetch user and permissions in parallel
+      Promise.all([
+        clientApi.get('/auth/me'),
+        getAllCurrentUserPermission()
+      ])
+        .then(([userResponse, permissionsResponse]) => {
+          setUser(userResponse.data.data);
+          setPermissions(permissionsResponse);
           setIsLoading(false);
         })
         .catch((error) => {
-          console.error('Failed to fetch user data:', error);
+          console.error('Failed to fetch user data or permissions:', error);
           setIsLoading(false);
         });
     }
@@ -62,6 +81,8 @@ export function AppProvider({
 
   const value: AppContextType = {
     user,
+    permissions,
+    hasPermission,
     shouldHideNavigation,
     isLoading,
     clearUserData,

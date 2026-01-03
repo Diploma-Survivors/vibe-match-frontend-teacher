@@ -13,9 +13,12 @@ import { toastService } from '@/services/toasts-service';
 import { ProblemsService } from '@/services/problems-service';
 import { useAppSelector } from '@/store/hooks';
 import { useTranslations } from 'next-intl';
+import { useApp } from '@/contexts/app-context';
+import { PermissionEnum } from '@/types/permission';
 
 export default function ProblemsPage() {
   const t = useTranslations('ProblemsPage');
+  const { hasPermission } = useApp();
   const {
     // State
     problems,
@@ -93,15 +96,17 @@ export default function ProblemsPage() {
                 </p>
               </div>
 
-              <Button
-                asChild
-                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Link href="/problems/create">
-                  <Plus className="w-5 h-5 mr-2" />
-                  {t('createProblem')}
-                </Link>
-              </Button>
+              {hasPermission(PermissionEnum.PROBLEM_CREATE) && (
+                <Button
+                  asChild
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Link href="/problems/create">
+                    <Plus className="w-5 h-5 mr-2" />
+                    {t('createProblem')}
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>

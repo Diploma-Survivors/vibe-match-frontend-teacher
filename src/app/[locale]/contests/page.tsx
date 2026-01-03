@@ -11,8 +11,12 @@ import { toastService } from '@/services/toasts-service';
 import { Contest } from '@/types/contest';
 import { useTranslations } from 'next-intl';
 
+import { useApp } from '@/contexts/app-context';
+import { PermissionEnum } from '@/types/permission';
+
 export default function ContestsPage() {
     const t = useTranslations('ContestsPage');
+    const { hasPermission } = useApp();
     const {
         // State
         contests,
@@ -125,15 +129,17 @@ export default function ContestsPage() {
                                 </p>
                             </div>
 
-                            <Button
-                                asChild
-                                className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                <Link href="/contests/create">
-                                    <Plus className="w-5 h-5 mr-2" />
-                                    {t('createContest')}
-                                </Link>
-                            </Button>
+                            {hasPermission(PermissionEnum.CONTEST_CREATE) && (
+                                <Button
+                                    asChild
+                                    className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                    <Link href="/contests/create">
+                                        <Plus className="w-5 h-5 mr-2" />
+                                        {t('createContest')}
+                                    </Link>
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

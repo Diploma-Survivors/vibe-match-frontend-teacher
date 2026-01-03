@@ -44,6 +44,9 @@ import { Tooltip } from './ui/tooltip';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 
+import { useApp } from '@/contexts/app-context';
+import { PermissionEnum } from '@/types/permission';
+
 interface ContestTableProps {
     contests: Contest[];
     meta: ContestMeta | null;
@@ -72,6 +75,7 @@ export default function ContestTable({
     onStatusChange,
 }: ContestTableProps) {
     const t = useTranslations('ContestTable');
+    const { hasPermission } = useApp();
 
     const handleSort = (column: ContestSortBy) => {
         if (sortBy === column) {
@@ -216,12 +220,14 @@ export default function ContestTable({
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 {contest.status === ContestStatus.UPCOMING ? (
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/contests/${contest.id}/edit`} className="cursor-pointer">
-                                                            <Edit className="mr-2 h-4 w-4" />
-                                                            {t('edit')}
-                                                        </Link>
-                                                    </DropdownMenuItem>
+                                                    hasPermission(PermissionEnum.CONTEST_UPDATE) && (
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}/edit`} className="cursor-pointer">
+                                                                <Edit className="mr-2 h-4 w-4" />
+                                                                {t('edit')}
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    )
                                                 ) : (
                                                     <>
                                                         <DropdownMenuItem asChild>
@@ -239,30 +245,34 @@ export default function ContestTable({
                                                     </>
                                                 )}
 
-                                                <DropdownMenuItem
-                                                    onClick={() => onStatusChange?.(contest)}
-                                                    className="cursor-pointer"
-                                                >
-                                                    {contest.isActive ? (
-                                                        <>
-                                                            <Lock className="mr-2 h-4 w-4" />
-                                                            {t('deactivate')}
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Unlock className="mr-2 h-4 w-4" />
-                                                            {t('activate')}
-                                                        </>
-                                                    )}
-                                                </DropdownMenuItem>
+                                                {hasPermission(PermissionEnum.CONTEST_UPDATE) && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => onStatusChange?.(contest)}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        {contest.isActive ? (
+                                                            <>
+                                                                <Lock className="mr-2 h-4 w-4" />
+                                                                {t('deactivate')}
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Unlock className="mr-2 h-4 w-4" />
+                                                                {t('activate')}
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuItem>
+                                                )}
 
-                                                <DropdownMenuItem
-                                                    className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
-                                                    onClick={() => onDelete?.(contest)}
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    {t('delete')}
-                                                </DropdownMenuItem>
+                                                {hasPermission(PermissionEnum.CONTEST_DELETE) && (
+                                                    <DropdownMenuItem
+                                                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
+                                                        onClick={() => onDelete?.(contest)}
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        {t('delete')}
+                                                    </DropdownMenuItem>
+                                                )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

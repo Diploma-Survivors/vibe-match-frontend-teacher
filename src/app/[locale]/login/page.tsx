@@ -11,11 +11,13 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import clientApi from '@/lib/apis/axios-client';
+import { ForgotPasswordDialog } from '@/components/auth/forgot-password-dialog';
+import LanguageSwitcher from '@/components/language-switcher';
 import { toastService } from '@/services/toasts-service';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { FcGoogle } from 'react-icons/fc';
+import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
@@ -26,6 +28,8 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
@@ -43,6 +47,12 @@ export default function LoginPage() {
     if (isSignUp) {
       if (password !== confirmPassword) {
         toastService.error(t('passwordsDoNotMatch'));
+        return;
+      }
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+      if (!passwordRegex.test(password)) {
+        toastService.error(t('passwordComplexity')); // Need to make sure this key exists or use hardcoded if t fails? I added it to en.json
         return;
       }
 
@@ -93,7 +103,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 relative">
+      <div className="absolute right-4 top-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold tracking-tight text-green-600">
@@ -151,30 +164,53 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <Input
                 id="password"
                 name="password" // 4. Add 'name' attribute
                 placeholder={t('password')}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete={isSignUp ? 'new-password' : 'current-password'} // 5. Help browser
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
+            {!isSignUp && (
+              <div className="flex justify-end">
+                <ForgotPasswordDialog />
+              </div>
+            )}
             {isSignUp && (
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <Input
                   id="confirm-password"
                   name="confirmPassword"
                   placeholder={t('confirmPassword')}
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             )}
 
@@ -187,26 +223,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="relative mt-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t('orLoginWith')}
-              </span>
-            </div>
-          </div>
 
-          <Button
-            onClick={() => handleGoogleLogin()}
-            variant="outline"
-            className="w-full mt-4"
-            type="button"
-          >
-            <FcGoogle className="mr-2 h-4 w-4" />
-            {t('google')}
-          </Button>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">

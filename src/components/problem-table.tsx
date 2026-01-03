@@ -38,6 +38,8 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { useTranslations } from 'next-intl';
+import { useApp } from '@/contexts/app-context';
+import { PermissionEnum } from '@/types/permission';
 
 export enum ProblemTableMode {
   VIEW = 'view',
@@ -81,6 +83,7 @@ export default function ProblemTable({
   onStatusChange,
 }: ProblemTableProps) {
   const t = useTranslations('ProblemTable');
+  const { hasPermission } = useApp();
   const selectionMode =
     mode === ProblemTableMode.SELECT ||
     mode === ProblemTableMode.MULTIPLE_SELECT;
@@ -404,42 +407,54 @@ export default function ProblemTable({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                              <DropdownMenuItem asChild>
-                                <Link href={`/problems/${problem.id}/edit`}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  {t('edit')}
-                                </Link>
-                              </DropdownMenuItem>
+
+                              {hasPermission(PermissionEnum.PROBLEM_UPDATE) && (
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/problems/${problem.id}/edit`}>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    {t('edit')}
+                                  </Link>
+                                </DropdownMenuItem>
+                              )}
+
                               <DropdownMenuItem asChild>
                                 <Link href={`/problems/${problem.id}/statistics`}>
                                   <BarChart2 className="mr-2 h-4 w-4" />
                                   {t('statistics')}
                                 </Link>
                               </DropdownMenuItem>
+
                               <DropdownMenuItem asChild>
                                 <Link href={`/submissions?problemIds=${problem.id}`}>
                                   <FaList className="mr-2 h-4 w-4" />
                                   {t('viewSubmissions')}
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => onStatusChange?.(problem)}>
-                                {problem.isActive ? (
-                                  <>
-                                    <Lock className="mr-2 h-4 w-4" />
-                                    {t('deactivate')}
-                                  </>
-                                ) : (
-                                  <>
-                                    <Unlock className="mr-2 h-4 w-4" />
-                                    {t('activate')}
-                                  </>
-                                )}
-                              </DropdownMenuItem>
+
+                              {hasPermission(PermissionEnum.PROBLEM_UPDATE) && (
+                                <DropdownMenuItem onClick={() => onStatusChange?.(problem)}>
+                                  {problem.isActive ? (
+                                    <>
+                                      <Lock className="mr-2 h-4 w-4" />
+                                      {t('deactivate')}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Unlock className="mr-2 h-4 w-4" />
+                                      {t('activate')}
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              )}
+
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('delete')}
-                              </DropdownMenuItem>
+
+                              {hasPermission(PermissionEnum.PROBLEM_DELETE) && (
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {t('delete')}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>

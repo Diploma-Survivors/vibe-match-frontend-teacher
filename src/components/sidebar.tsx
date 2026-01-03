@@ -20,15 +20,18 @@ import {
   Plus,
   PlusCircle,
   Settings,
+  Shield,
   Sparkles,
   Tag,
   Trophy,
   Users,
   X,
 } from 'lucide-react';
-import { Link, usePathname } from '@/i18n/routing';
-import { useState } from 'react';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { UserSettingsDialog } from './user/user-settings-dialog';
+import { PermissionEnum } from '@/types/permission';
 
 interface SideBarProps {
   onLogout: () => void;
@@ -37,11 +40,24 @@ interface SideBarProps {
 export default function Sidebar({ onLogout }: SideBarProps) {
   const { isOpen, setIsOpen, toggle, isMobile } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations('Sidebar');
 
-  const { user } = useApp();
+  const { user, hasPermission } = useApp();
 
-  const navSections = [
+  interface NavItem {
+    name: string;
+    href: string;
+    icon: React.ElementType;
+    permissions?: PermissionEnum[];
+  }
+
+  interface NavSection {
+    title: string;
+    items: NavItem[];
+  }
+
+  const navSections: NavSection[] = [
     {
       title: t('overview'),
       items: [{ name: t('dashboard'), href: '/', icon: LayoutDashboard }],
@@ -49,43 +65,104 @@ export default function Sidebar({ onLogout }: SideBarProps) {
     {
       title: t('problemManagement'),
       items: [
-        { name: t('problemList'), href: '/problems', icon: FileCode },
+        {
+          name: t('problemList'),
+          href: '/problems',
+          icon: FileCode,
+          permissions: [PermissionEnum.PROBLEM_READ]
+        },
         {
           name: t('createNewProblem'),
           href: '/problems/create',
           icon: PlusCircle,
+          permissions: [PermissionEnum.PROBLEM_CREATE]
         },
-        { name: t('manageTagsTopics'), href: '/tags', icon: Tag },
+        {
+          name: t('manageTagsTopics'),
+          href: '/tags',
+          icon: Tag,
+          permissions: [PermissionEnum.PROBLEM_UPDATE] // Assumption: Editors can manage tags
+        },
       ],
     },
     {
       title: t('contestManagement'),
       items: [
-        { name: t('contestList'), href: '/contests', icon: Trophy },
-        { name: t('createNewContest'), href: '/contests/create', icon: Plus },
+        {
+          name: t('contestList'),
+          href: '/contests',
+          icon: Trophy,
+          permissions: [PermissionEnum.CONTEST_READ]
+        },
+        {
+          name: t('createNewContest'),
+          href: '/contests/create',
+          icon: Plus,
+          permissions: [PermissionEnum.CONTEST_CREATE]
+        },
       ],
     },
     {
       title: t('submissionManagement'),
       items: [
-        { name: t('manageSubmissions'), href: '/submissions', icon: CheckSquare },
+        {
+          name: t('manageSubmissions'),
+          href: '/submissions',
+          icon: CheckSquare,
+          permissions: [PermissionEnum.SUBMISSION_READ]
+        },
       ],
     },
     {
       title: t('userManagement'),
       items: [
-        { name: t('userList'), href: '/users', icon: Users },
-        { name: t('feedbackReports'), href: '/reports', icon: Flag },
+        {
+          name: t('userList'),
+          href: '/users',
+          icon: Users,
+          permissions: [PermissionEnum.USER_READ]
+        },
+        {
+          name: t('feedbackReports'),
+          href: '/reports',
+          icon: Flag,
+          permissions: [PermissionEnum.COMMENT_REPORT_READ]
+        },
+        {
+          name: t('rolesAndPermissions'),
+          href: '/admin/roles',
+          icon: Shield,
+          permissions: [PermissionEnum.ROLE_READ]
+        },
       ],
     },
     {
       title: t('systemAi'),
       items: [
-        { name: t('manageAiPrompts'), href: '/ai-prompts', icon: Sparkles },
-        { name: t('generalSettings'), href: '/settings', icon: Settings },
+        {
+          name: t('manageAiPrompts'),
+          href: '/ai-prompts',
+          icon: Sparkles,
+          permissions: [PermissionEnum.ADMIN_ACCESS]
+        },
+        {
+          name: t('generalSettings'),
+          href: '/settings',
+          icon: Settings,
+          permissions: [PermissionEnum.ADMIN_ACCESS]
+        },
       ],
     },
   ];
+
+  const filteredNavSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.permissions || item.permissions.length === 0 || item.permissions.some(hasPermission)
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   const sidebarVariants = {
     expanded: { width: '240px' },
@@ -179,7 +256,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
 
         {/* Navigation Items */}
         <nav className="flex-1 py-6 px-3 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
-          {navSections.map((section, index) => (
+          {filteredNavSections.map((section, index) => (
             <div key={index}>
               {/* Section Header */}
               <motion.div
@@ -266,6 +343,8 @@ export default function Sidebar({ onLogout }: SideBarProps) {
                 {user?.email || t('noEmail')}
               </p>
             </motion.div>
+
+            {isOpen && <UserSettingsDialog />}
           </div>
 
           <motion.div
