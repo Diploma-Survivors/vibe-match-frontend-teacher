@@ -748,5 +748,61 @@
         "verifyEmailError": "Xác thực email thất bại",
         "verifying": "Đang xác thực...",
         "backToLogin": "Quay lại Trang Đăng Nhập"
+    },
+    "admin": {
+        "dashboard": {
+            "title": "Bảng điều khiển",
+            "kpi": {
+                "userBase": "Người dùng",
+                "activeUsers": "{count} Hoạt động",
+                "problems": "Bài tập",
+                "activeProblems": "{count} Đang hoạt động",
+                "monthlyRevenue": "Doanh thu tháng",
+                "revenueToday": "+${amount} Hôm nay",
+                "premiumHealth": "Sức khỏe Premium",
+                "conversionRate": "Tỷ lệ chuyển đổi {rate}%"
+            },
+            "chart": {
+                "title": "Xu hướng nền tảng",
+                "metrics": {
+                    "users": "Người dùng",
+                    "submissions": "Bài nộp",
+                    "activeUsers": "Người dùng hoạt động"
+                },
+                "range": {
+                    "placeholder": "Chọn khoảng thời gian",
+                    "last7Days": "7 ngày qua",
+                    "last30Days": "30 ngày qua",
+                    "thisMonth": "Tháng này",
+                    "last1Year": "1 năm qua",
+                    "custom": "Tùy chỉnh",
+                    "pickDate": "Chọn khoảng thời gian",
+                    "startDate": "Ngày bắt đầu",
+                    "endDate": "Ngày kết thúc"
+                }
+            },
+            "growth": {
+                "title": "Tăng trưởng người dùng",
+                "newUsersToday": "Người dùng mới hôm nay",
+                "newUsersThisWeek": "Người dùng mới tuần này",
+                "newUsersThisMonth": "Người dùng mới tháng này"
+            },
+            "engagement": {
+                "title": "Chỉ số tương tác",
+                "dau": "Hoạt động hàng ngày",
+                "wau": "Hoạt động hàng tuần",
+                "mau": "Hoạt động hàng tháng",
+                "avgSubmissionsPerUser": "TB Bài nộp/Người dùng"
+            },
+            "revenue": {
+                "newPremiumToday": "Premium mới hôm nay",
+                "thisWeek": "tuần này",
+                "arpu": "Doanh thu TB/Người dùng",
+                "premiumConversion": "Chuyển đổi Premium"
+            },
+            "error": {
+                "failedToLoad": "Không thể tải dữ liệu bảng điều khiển"
+            }
+        }
     }
 }

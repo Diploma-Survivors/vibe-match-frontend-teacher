@@ -60,7 +60,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
   const navSections: NavSection[] = [
     {
       title: t('overview'),
-      items: [{ name: t('dashboard'), href: '/', icon: LayoutDashboard }],
+      items: [{ name: t('dashboard'), href: '/dashboard', icon: LayoutDashboard }],
     },
     {
       title: t('problemManagement'),
@@ -130,7 +130,7 @@ export default function Sidebar({ onLogout }: SideBarProps) {
         },
         {
           name: t('rolesAndPermissions'),
-          href: '/admin/roles',
+          href: '/roles',
           icon: Shield,
           permissions: [PermissionEnum.ROLE_READ]
         },

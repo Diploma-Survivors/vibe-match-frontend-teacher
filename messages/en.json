@@ -752,5 +752,61 @@
         "verifyEmailError": "Failed to verify email",
         "verifying": "Verifying...",
         "backToLogin": "Back to login"
+    },
+    "admin": {
+        "dashboard": {
+            "title": "Dashboard",
+            "kpi": {
+                "userBase": "User Base",
+                "activeUsers": "{count} Active",
+                "problems": "Problems",
+                "activeProblems": "{count} Active",
+                "monthlyRevenue": "Monthly Revenue",
+                "revenueToday": "+${amount} Today",
+                "premiumHealth": "Premium Health",
+                "conversionRate": "{rate}% Conversion Rate"
+            },
+            "chart": {
+                "title": "Platform Trends",
+                "metrics": {
+                    "users": "Users",
+                    "submissions": "Submissions",
+                    "activeUsers": "Active Users"
+                },
+                "range": {
+                    "placeholder": "Select Range",
+                    "last7Days": "Last 7 Days",
+                    "last30Days": "Last 30 Days",
+                    "thisMonth": "This Month",
+                    "last1Year": "Last 1 Year",
+                    "custom": "Custom Range",
+                    "pickDate": "Pick a date range",
+                    "startDate": "Start Date",
+                    "endDate": "End Date"
+                }
+            },
+            "growth": {
+                "title": "User Growth",
+                "newUsersToday": "New Users Today",
+                "newUsersThisWeek": "New Users This Week",
+                "newUsersThisMonth": "New Users This Month"
+            },
+            "engagement": {
+                "title": "Engagement Metrics",
+                "dau": "Daily Active",
+                "wau": "Weekly Active",
+                "mau": "Monthly Active",
+                "avgSubmissionsPerUser": "Avg Submissions/User"
+            },
+            "revenue": {
+                "newPremiumToday": "New Premium Today",
+                "thisWeek": "this week",
+                "arpu": "Avg Revenue Per User",
+                "premiumConversion": "Premium Conversion"
+            },
+            "error": {
+                "failedToLoad": "Failed to load dashboard data"
+            }
+        }
     }
 }

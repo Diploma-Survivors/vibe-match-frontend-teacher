@@ -18,10 +18,11 @@ import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function LoginPage() {
   const t = useTranslations('LoginPage');
+  const locale = useLocale();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -31,7 +32,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = searchParams.get('callbackUrl') || `/${locale}/dashboard`;
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
