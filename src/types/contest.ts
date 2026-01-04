@@ -342,11 +342,3 @@ export interface SubmissionDetailsResponse {
   pageInfos: PageInfo;
   totalCount: number;
 }
-
-export const initialContestData: Contest = {
-  title: '',
-  description: '',
-  startTime: '',
-  durationMinutes: 0,
-  problems: [],
-};
