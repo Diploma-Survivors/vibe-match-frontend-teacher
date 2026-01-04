@@ -1,5 +1,6 @@
 'use client';
 
+import { ContestsService } from '@/services/contests-service';
 import {
   type Contest,
   type ContestFilters,
@@ -64,9 +65,7 @@ export default function useContest(): UseContestReturn {
     limit: ITEMS_PER_PAGE,
     sortBy: sortBy || ContestSortBy.ID,
     sortOrder: sortOrder || SortOrder.ASC,
-    filters: {
-      ...filters,
-    },
+    ...filters,
   });
 
   // Fetch contests function
@@ -74,78 +73,15 @@ export default function useContest(): UseContestReturn {
     async (requestParams: GetContestListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-        // Simulating API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Mock data generation
-        const mockContests: Contest[] = Array.from({
-          length: requestParams.limit || 20,
-        }).map((_, i) => {
-          const id = (requestParams.page || 1) * 100 + i;
-          const now = new Date();
-          let startTime = new Date(now);
-          let status = ContestStatus.UPCOMING;
-
-          // Randomize status for mock data
-          const rand = Math.random();
-          if (rand < 0.33) {
-            status = ContestStatus.UPCOMING;
-            startTime.setDate(now.getDate() + Math.floor(Math.random() * 10) + 1);
-          } else if (rand < 0.66) {
-            status = ContestStatus.ONGOING;
-            startTime.setHours(now.getHours() - 1);
-          } else {
-            status = ContestStatus.FINISHED;
-            startTime.setDate(now.getDate() - Math.floor(Math.random() * 10) - 1);
-          }
-
-          return {
-            id,
-            name: `Contest ${id} - ${requestParams.search || 'Global Round'}`,
-            description: 'This is a mock contest description.',
-            startTime: startTime.toISOString(),
-            durationMinutes: 120,
-            problemIds: [1, 2, 3],
-            createdBy: 'Admin',
-            createdAt: new Date().toISOString(),
-            status: status,
-          };
-        });
-
-        // Apply client-side filtering for mock data if needed (simplified)
-        let filteredContests = mockContests;
-        if (requestParams.filters?.statuses?.length) {
-           // In a real API this would be handled by backend. 
-           // For mock, we just generated random statuses, so we might not get what we asked for if we filter strictly here.
-           // But let's just pretend the backend returns what matches.
-           // To make the mock feel real, let's filter the generated list if we want, 
-           // OR just force the generated items to match the filter if present.
-           
-           if (requestParams.filters.statuses.length > 0) {
-             filteredContests = mockContests.map(c => ({
-               ...c,
-               status: requestParams.filters!.statuses![Math.floor(Math.random() * requestParams.filters!.statuses!.length)]
-             }));
-           }
-        }
-
-        const mockResponse: ContestListResponse = {
-          data: filteredContests,
-          meta: {
-            page: requestParams.page || 1,
-            limit: requestParams.limit || 20,
-            total: 100, // Mock total
-            totalPages: 5,
-            hasPreviousPage: (requestParams.page || 1) > 1,
-            hasNextPage: (requestParams.page || 1) < 5,
-          },
-        };
-
+        
+        const response = await ContestsService.getContests(requestParams);
+        const data = response.data.data.data;
+        const meta = response.data.data.meta;
+        
         setState((prev) => ({
           ...prev,
-          contests: mockResponse.data,
-          meta: mockResponse.meta,
+          contests: data,
+          meta: meta,
           isLoading: false,
         }));
       } catch (err) {
@@ -181,7 +117,7 @@ export default function useContest(): UseContestReturn {
     (newFilters: ContestFilters) => {
       setFilters(newFilters);
       // When filters change, reset to page 1
-      updateRequest({ filters: newFilters, page: 1 });
+      updateRequest({ ...newFilters, page: 1 });
     },
     [updateRequest]
   );
@@ -232,7 +168,7 @@ export default function useContest(): UseContestReturn {
     const trimmedKeyword = keyword.trim();
     updateRequest({
       search: trimmedKeyword || undefined,
-      filters: { ...filters },
+      ...filters,
       page: 1,
     });
   }, [keyword, filters, updateRequest]);
@@ -245,7 +181,9 @@ export default function useContest(): UseContestReturn {
 
     updateRequest({
       search: undefined,
-      filters: {},
+      status: undefined,
+      startAfter: undefined,
+      startBefore: undefined,
       page: 1,
       sortBy: ContestSortBy.ID,
       sortOrder: SortOrder.ASC,

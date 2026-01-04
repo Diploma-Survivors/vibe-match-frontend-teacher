@@ -59,7 +59,7 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
 
     // Polling for live updates
     useEffect(() => {
-        if (contestStatus !== ContestStatus.ONGOING || search) return;
+        if (contestStatus !== ContestStatus.RUNNING || search) return;
 
         const interval = setInterval(() => {
             fetchLeaderboard(false); // Don't show loading spinner for background updates

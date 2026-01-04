@@ -12,7 +12,7 @@ import {
     ContestCreateRequest,
     Contest,
 } from '@/types/contest';
-import { Problem } from '@/types/problems';
+import { SelectedProblem } from '@/components/contests/problem-selection-section';
 import { formatISO } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -23,7 +23,7 @@ export default function EditContestPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [contest, setContest] = useState<Contest | null>(null);
-    const [selectedProblems, setSelectedProblems] = useState<Problem[]>([]);
+    const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>([]);
     const t = useTranslations('EditContestPage');
 
     useEffect(() => {
@@ -37,7 +37,11 @@ export default function EditContestPage() {
 
                 // Map API response to Contest interface
                 setContest(contestData);
-                setSelectedProblems(contestData.problems.map((p) => p.problem));
+                setSelectedProblems(contestData.problems.map((p) => ({
+                    ...p.problem,
+                    points: p.points || 0,
+                    orderIndex: p.orderIndex
+                })));
             } catch (error) {
                 console.error('Failed to fetch contest:', error);
                 toastService.error(t('form.loadError'));
@@ -54,15 +58,17 @@ export default function EditContestPage() {
         setIsSubmitting(true);
         try {
             if (!contest || !id) return;
+            const startTimeDate = new Date(data.startTime);
+            const endTimeDate = new Date(startTimeDate.getTime() + data.durationMinutes * 60000);
+
             const contestCreateRequest: ContestCreateRequest = {
                 id: contest.id,
-                name: data.name,
+                title: data.title,
                 description: data.description,
-                startTime: formatISO(data.startTime),
-                durationMinutes: data.durationMinutes,
+                startTime: formatISO(startTimeDate),
+                endTime: formatISO(endTimeDate),
                 problems: data.problems,
             };
-            console.log("update contest")
             await ContestsService.updateContest(id, contestCreateRequest);
 
             toastService.success(t('form.success'));

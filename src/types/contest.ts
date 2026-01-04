@@ -53,7 +53,7 @@ export interface LeaderboardRequest {
   after?: string;
   last?: number;
   before?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: 'ASC' | 'DESC ';
 }
 
 export interface LeaderboardResponse {
@@ -63,47 +63,59 @@ export interface LeaderboardResponse {
 
 export interface Contest {
   id?: number;
-  name: string;
+  title: string;
   description: string;
   startTime: string;
-  durationMinutes: number;
+  endTime: string;
+  participantCount?: number;
+  maxParticipant?: number;
+  durationMinutes?: number;
   problems: {
     problem: Problem;
-    order: number;
+    orderIndex: number;
+    points?: number;
   }[];
   createdBy?: string;
   createdAt?: string;
-  status?: ContestStatus; // derived field for UI convenience
-  isActive?: boolean;
+  status: ContestStatus; // derived field for UI convenience
+  contestProblems?: {
+    problem: Problem;
+    orderIndex: number;
+    points?: number;
+  }[];
 }
 
 export enum ContestStatus {
-  UPCOMING = 'UPCOMING',
-  ONGOING = 'ONGOING',
-  FINISHED = 'FINISHED',
+  DRAFT = 'Draft',
+  SCHEDULED = 'Scheduled',
+  RUNNING = 'Running',
+  ENDED = 'Ended',
+  CANCELLED = 'Cancelled',
 }
 
 export enum ContestSortBy {
   ID = 'id',
   START_TIME = 'startTime',
-  DURATION = 'durationMinutes',
+  CREATED_AT = 'createdAt',
+  PARTICIPANT_COUNT = 'participantCount',
+  TITLE = 'title',
 }
 
 export interface ContestFilters {
-  statuses?: ContestStatus[];
-  startTimeRange?: {
-    from?: string;
-    to?: string;
-  };
+  status?: ContestStatus;
+  startAfter?: string;
+  startBefore?: string;
 }
 
 export interface GetContestListRequest {
   page?: number;
   limit?: number;
   search?: string;
-  filters?: ContestFilters;
   sortBy?: ContestSortBy;
   sortOrder?: SortOrder;
+  status?: ContestStatus;
+  startAfter?: string;
+  startBefore?: string;
 }
 
 export interface ContestMeta {
@@ -128,16 +140,18 @@ export interface ContestListResponse {
 
 export interface ContestCreateRequest {
   id?: number;
-  name: string;
+  title: string;
   description: string;
   startTime: string;
-  durationMinutes: number;
+  endTime: string;
   problems: {
     problemId: number;
-    order: number;
+    orderIndex: number;
+    points: number;
   }[];
   createdBy?: string;
   createdAt?: string;
+  status?: ContestStatus;
 }
 
 export enum ContestDeadlineEnforcement {
@@ -153,15 +167,19 @@ export enum ContestSubmissionStrategy {
 }
 
 export const CONTEST_STATUS_COLORS = {
-  [ContestStatus.UPCOMING]: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-  [ContestStatus.ONGOING]: 'bg-green-100 text-green-800 hover:bg-green-100',
-  [ContestStatus.FINISHED]: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
+  [ContestStatus.DRAFT]: 'bg-slate-100 text-slate-800 hover:bg-slate-100',
+  [ContestStatus.SCHEDULED]: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
+  [ContestStatus.RUNNING]: 'bg-green-100 text-green-800 hover:bg-green-100',
+  [ContestStatus.ENDED]: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
+  [ContestStatus.CANCELLED]: 'bg-red-100 text-red-800 hover:bg-red-100',
 };
 
 export const CONTEST_STATUS_LABELS = {
-  [ContestStatus.UPCOMING]: 'Upcoming',
-  [ContestStatus.ONGOING]: 'Ongoing',
-  [ContestStatus.FINISHED]: 'Finished',
+  [ContestStatus.DRAFT]: 'Draft',
+  [ContestStatus.SCHEDULED]: 'Scheduled',
+  [ContestStatus.RUNNING]: 'Running',
+  [ContestStatus.ENDED]: 'Ended',
+  [ContestStatus.CANCELLED]: 'Cancelled',
 };
 
 export const SUBMISSION_STRATEGY_OPTIONS = [
@@ -326,7 +344,7 @@ export interface SubmissionDetailsResponse {
 }
 
 export const initialContestData: Contest = {
-  name: '',
+  title: '',
   description: '',
   startTime: '',
   durationMinutes: 0,

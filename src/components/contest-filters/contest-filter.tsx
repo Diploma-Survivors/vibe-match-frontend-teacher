@@ -67,29 +67,14 @@ export default function ContestFilter({
     const t = useTranslations('ContestFilter');
 
     const handleStatusChange = (status: ContestStatus) => {
-        const currentStatuses = filters.statuses || [];
-        const newStatuses = currentStatuses.includes(status)
-            ? currentStatuses.filter((s) => s !== status)
-            : [...currentStatuses, status];
-
-        onFiltersChange({ ...filters, statuses: newStatuses });
+        // Single select: if clicking the same status, deselect it (undefined), otherwise select it
+        const newStatus = filters.status === status ? undefined : status;
+        onFiltersChange({ ...filters, status: newStatus });
     };
 
-    const handleDateChange = (type: 'from' | 'to', value: string) => {
-        const currentRange = filters.startTimeRange || {};
-        const newRange = { ...currentRange, [type]: value };
-        // If value is empty, remove the key
-        if (!value) {
-            delete newRange[type];
-        }
-
-        // If both empty, remove the range object
-        if (!newRange.from && !newRange.to) {
-            const { startTimeRange, ...rest } = filters;
-            onFiltersChange(rest);
-        } else {
-            onFiltersChange({ ...filters, startTimeRange: newRange });
-        }
+    const handleDateChange = (type: 'startAfter' | 'startBefore', value: string) => {
+        const newFilters = { ...filters, [type]: value || undefined };
+        onFiltersChange(newFilters);
     };
 
     return (
@@ -117,7 +102,7 @@ export default function ContestFilter({
                         <SelectContent>
                             <SelectItem value={ContestSortBy.ID} className="cursor-pointer">{t('id')}</SelectItem>
                             <SelectItem value={ContestSortBy.START_TIME} className="cursor-pointer">{t('startTime')}</SelectItem>
-                            <SelectItem value={ContestSortBy.DURATION} className="cursor-pointer">{t('duration')}</SelectItem>
+                            <SelectItem value={ContestSortBy.PARTICIPANT_COUNT} className="cursor-pointer">{t('participantCount')}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Button
@@ -149,9 +134,9 @@ export default function ContestFilter({
                             className="h-10 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-pointer"
                         >
                             {t('status')}
-                            {filters.statuses && filters.statuses.length > 0 && (
+                            {filters.status && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                                    {filters.statuses.length}
+                                    1
                                 </Badge>
                             )}
                             <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -161,7 +146,7 @@ export default function ContestFilter({
                         <DropdownMenuLabel>{t('selectStatus')}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {Object.values(ContestStatus).map((status) => {
-                            const isChecked = filters.statuses?.includes(status);
+                            const isChecked = filters.status === status;
                             return (
                                 <div
                                     key={status}
@@ -171,8 +156,8 @@ export default function ContestFilter({
                                         handleStatusChange(status);
                                     }}
                                 >
-                                    <div className={`flex items-center justify-center w-4 h-4 mr-2 border rounded ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-slate-300'}`}>
-                                        {isChecked && <Check className="h-3 w-3" />}
+                                    <div className={`flex items-center justify-center w-4 h-4 mr-2 border rounded-full ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-slate-300'}`}>
+                                        {isChecked && <div className="w-2 h-2 bg-white rounded-full" />}
                                     </div>
                                     <span className="text-sm">{t(`statusOptions.${status}`)}</span>
                                 </div>
@@ -190,7 +175,7 @@ export default function ContestFilter({
                         >
                             <Calendar className="mr-2 h-4 w-4 opacity-50" />
                             {t('startTime')}
-                            {(filters.startTimeRange?.from || filters.startTimeRange?.to) && (
+                            {(filters.startAfter || filters.startBefore) && (
                                 <Badge variant="secondary" className="ml-2 h-5 px-1.5">
                                     {t('active')}
                                 </Badge>
@@ -208,8 +193,8 @@ export default function ContestFilter({
                                         id="from"
                                         type="date"
                                         className="col-span-2 h-8"
-                                        value={filters.startTimeRange?.from || ''}
-                                        onChange={(e) => handleDateChange('from', e.target.value)}
+                                        value={filters.startAfter || ''}
+                                        onChange={(e) => handleDateChange('startAfter', e.target.value)}
                                     />
                                 </div>
                                 <div className="grid grid-cols-3 items-center gap-4">
@@ -218,8 +203,8 @@ export default function ContestFilter({
                                         id="to"
                                         type="date"
                                         className="col-span-2 h-8"
-                                        value={filters.startTimeRange?.to || ''}
-                                        onChange={(e) => handleDateChange('to', e.target.value)}
+                                        value={filters.startBefore || ''}
+                                        onChange={(e) => handleDateChange('startBefore', e.target.value)}
                                     />
                                 </div>
                             </div>

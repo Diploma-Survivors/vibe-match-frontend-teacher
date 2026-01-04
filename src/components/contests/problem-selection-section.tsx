@@ -21,9 +21,11 @@ import { FieldErrors } from 'react-hook-form';
 import { ContestFormValues } from './schema';
 import { SortableRow } from './sortable-row';
 
+export type SelectedProblem = Problem & { points: number; orderIndex: number };
+
 interface ProblemSelectionSectionProps {
-    selectedProblems: Problem[];
-    onProblemsChange: (problems: Problem[]) => void;
+    selectedProblems: SelectedProblem[];
+    onProblemsChange: (problems: SelectedProblem[]) => void;
     errors: FieldErrors<ContestFormValues>;
 }
 
@@ -43,14 +45,23 @@ export function ProblemSelectionSection({
         const newProblems = [...selectedProblems];
         problems.forEach((p) => {
             if (!newProblems.find((existing) => existing.id === p.id)) {
-                newProblems.push(p);
+                newProblems.push({ ...p, points: 10, orderIndex: newProblems.length }); // Default score and order
             }
         });
         onProblemsChange(newProblems);
     };
 
     const handleRemoveProblem = (problemId: number) => {
-        const newProblems = selectedProblems.filter((p) => p.id !== problemId);
+        const newProblems = selectedProblems
+            .filter((p) => p.id !== problemId)
+            .map((p, index) => ({ ...p, orderIndex: index }));
+        onProblemsChange(newProblems);
+    };
+
+    const handleScoreChange = (problemId: number, score: number) => {
+        const newProblems = selectedProblems.map((p) =>
+            p.id === problemId ? { ...p, points: score } : p
+        );
         onProblemsChange(newProblems);
     };
 
@@ -62,7 +73,8 @@ export function ProblemSelectionSection({
             const newIndex = selectedProblems.findIndex((p) => p.id === over.id);
 
             const newProblems = arrayMove(selectedProblems, oldIndex, newIndex);
-            onProblemsChange(newProblems);
+            const reordered = newProblems.map((p, index) => ({ ...p, orderIndex: index }));
+            onProblemsChange(reordered);
         }
     };
 
@@ -90,6 +102,7 @@ export function ProblemSelectionSection({
                                     <TableHead className="w-[50px]"></TableHead>
                                     <TableHead>Problem</TableHead>
                                     <TableHead>Difficulty</TableHead>
+                                    <TableHead>Score</TableHead>
                                     <TableHead className="w-[100px]"></TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -101,20 +114,24 @@ export function ProblemSelectionSection({
                                     {selectedProblems.length === 0 ? (
                                         <TableRow>
                                             <TableCell
-                                                colSpan={4}
+                                                colSpan={5}
                                                 className="h-24 text-center text-slate-500"
                                             >
                                                 No problems selected.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        selectedProblems.map((problem) => (
-                                            <SortableRow
-                                                key={problem.id}
-                                                problem={problem}
-                                                onRemove={handleRemoveProblem}
-                                            />
-                                        ))
+                                        [...selectedProblems]
+                                            .sort((a, b) => a.orderIndex - b.orderIndex)
+                                            .map((problem) => (
+                                                <SortableRow
+                                                    key={problem.id}
+                                                    problem={problem}
+                                                    score={problem.points}
+                                                    onRemove={handleRemoveProblem}
+                                                    onScoreChange={handleScoreChange}
+                                                />
+                                            ))
                                     )}
                                 </SortableContext>
                             </TableBody>

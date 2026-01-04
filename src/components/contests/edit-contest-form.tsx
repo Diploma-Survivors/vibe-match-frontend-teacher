@@ -11,11 +11,11 @@ import { Contest } from '@/types/contest';
 import { format } from 'date-fns';
 import { ContestSchema, ContestFormValues } from './schema';
 import { GeneralInfoSection } from './general-info-section';
-import { ProblemSelectionSection } from './problem-selection-section';
+import { SelectedProblem, ProblemSelectionSection } from './problem-selection-section';
 
 interface EditContestFormProps {
     initialData: Contest;
-    initialSelectedProblems: Problem[];
+    initialSelectedProblems: SelectedProblem[];
     onSubmit: (data: ContestFormValues) => Promise<void>;
     isSubmitting: boolean;
 }
@@ -30,19 +30,21 @@ export default function EditContestForm({
     const t = useTranslations('EditContestPage.form');
 
     const defaultValues = {
-        name: initialData.name,
+        title: initialData.title,
         description: initialData.description,
         startTime: initialData.startTime
             ? format(new Date(initialData.startTime), "yyyy-MM-dd'T'HH:mm")
             : '',
         durationMinutes: initialData.durationMinutes,
+        status: initialData.status,
         problems: initialData.problems?.map((p) => ({
             problemId: p.problem.id,
-            order: p.order,
+            orderIndex: p.orderIndex,
+            points: p.points || 0,
         })) || [],
     };
 
-    const [selectedProblems, setSelectedProblems] = useState<Problem[]>(initialSelectedProblems);
+    const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>(initialSelectedProblems);
 
     const form = useForm<ContestFormValues>({
         resolver: zodResolver(ContestSchema) as any,
@@ -58,11 +60,12 @@ export default function EditContestForm({
         formState: { errors },
     } = form;
 
-    const handleProblemsChange = (problems: Problem[]) => {
+    const handleProblemsChange = (problems: SelectedProblem[]) => {
         setSelectedProblems(problems);
         const formProblems = problems.map((p, index) => ({
             problemId: p.id,
-            order: index,
+            orderIndex: index,
+            points: p.points,
         }));
         setValue('problems', formProblems, { shouldValidate: true, shouldDirty: true });
     };

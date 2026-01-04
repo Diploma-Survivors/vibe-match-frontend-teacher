@@ -2,6 +2,14 @@ import { Control, Controller, FieldErrors, UseFormRegister } from 'react-hook-fo
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { ContestStatus } from '@/types/contest';
 import MarkdownEditor from '@/components/markdown-editor/markdown-editor';
 import { cn } from '@/lib/utils';
 import { ContestFormValues } from './schema';
@@ -20,15 +28,15 @@ export function GeneralInfoSection({ register, control, errors }: GeneralInfoSec
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="name">Contest Name</Label>
+                    <Label htmlFor="title">Contest Name</Label>
                     <Input
-                        id="name"
+                        id="title"
                         placeholder="Enter contest name"
-                        {...register('name')}
-                        className={errors.name ? 'border-red-500' : ''}
+                        {...register('title')}
+                        className={errors.title ? 'border-red-500' : ''}
                     />
-                    {errors.name && (
-                        <p className="text-sm text-red-500">{errors.name.message}</p>
+                    {errors.title && (
+                        <p className="text-sm text-red-500">{errors.title.message}</p>
                     )}
                 </div>
 
@@ -85,6 +93,47 @@ export function GeneralInfoSection({ register, control, errors }: GeneralInfoSec
                         {errors.durationMinutes && (
                             <p className="text-sm text-red-500">
                                 {errors.durationMinutes.message}
+                            </p>
+                        )}
+                        {/* Display calculated end time */}
+                        {(() => {
+                            const startTime = control._formValues.startTime || control._defaultValues.startTime;
+                            const duration = control._formValues.durationMinutes || control._defaultValues.durationMinutes;
+                            if (startTime && duration) {
+                                const start = new Date(startTime);
+                                if (!isNaN(start.getTime())) {
+                                    const end = new Date(start.getTime() + duration * 60000);
+                                    return (
+                                        <p className="text-sm text-slate-500 mt-1">
+                                            Ends at: {end.toLocaleString()}
+                                        </p>
+                                    );
+                                }
+                            }
+                            return null;
+                        })()}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Controller
+                            name="status"
+                            control={control}
+                            render={({ field }) => (
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger className={errors.status ? 'border-red-500' : ''}>
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={ContestStatus.DRAFT}>Draft</SelectItem>
+                                        <SelectItem value={ContestStatus.SCHEDULED}>Scheduled</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        />
+                        {errors.status && (
+                            <p className="text-sm text-red-500">
+                                {errors.status.message}
                             </p>
                         )}
                     </div>

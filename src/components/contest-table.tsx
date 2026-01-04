@@ -146,23 +146,19 @@ export default function ContestTable({
                             </TableHead>
                             <TableHead>{t('name')}</TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                className="cursor-pointer hover:text-primary transition-colors"
                                 onClick={() => handleSort(ContestSortBy.START_TIME)}
                             >
-                                <div className="flex items-center">
-                                    {t('startTime')}
-                                </div>
+                                {t('startTime')}
+                                {sortBy === ContestSortBy.START_TIME && (
+                                    <span className="ml-1">{sortOrder === SortOrder.ASC ? '↑' : '↓'}</span>
+                                )}
                             </TableHead>
-                            <TableHead
-                                className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                onClick={() => handleSort(ContestSortBy.DURATION)}
-                            >
-                                <div className="flex items-center">
-                                    {t('duration')}
-                                </div>
+                            <TableHead>
+                                {t('duration')}
                             </TableHead>
                             <TableHead>{t('status')}</TableHead>
-                            <TableHead>{t('visibility')}</TableHead>
+                            <TableHead>{t('participationCount')}</TableHead>
                             <TableHead className="text-right">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -179,7 +175,7 @@ export default function ContestTable({
                                     <TableCell className="font-medium">{contest.id}</TableCell>
                                     <TableCell>
                                         <div className="font-medium text-slate-900 dark:text-slate-100">
-                                            {contest.name}
+                                            {contest.title}
                                         </div>
                                         <div className="text-xs text-slate-500 truncate max-w-[300px]">
                                             {contest.description}
@@ -194,22 +190,14 @@ export default function ContestTable({
                                     <TableCell>
                                         <Badge
                                             variant="secondary"
-                                            className={`${CONTEST_STATUS_COLORS[contest.status || ContestStatus.UPCOMING]
+                                            className={`${CONTEST_STATUS_COLORS[contest.status || ContestStatus.SCHEDULED]
                                                 } border-0`}
                                         >
-                                            {CONTEST_STATUS_LABELS[contest.status || ContestStatus.UPCOMING]}
+                                            {CONTEST_STATUS_LABELS[contest.status || ContestStatus.SCHEDULED]}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge
-                                            variant="outline"
-                                            className={`${contest.isActive
-                                                ? 'bg-green-50 text-green-700 border-green-200'
-                                                : 'bg-slate-50 text-slate-500 border-slate-200'
-                                                }`}
-                                        >
-                                            {contest.isActive ? t('active') : t('inactive')}
-                                        </Badge>
+                                        {contest.participantCount || 0}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
@@ -219,7 +207,7 @@ export default function ContestTable({
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                {contest.status === ContestStatus.UPCOMING ? (
+                                                {contest.status === ContestStatus.SCHEDULED || contest.status === ContestStatus.DRAFT ? (
                                                     hasPermission(PermissionEnum.CONTEST_UPDATE) && (
                                                         <DropdownMenuItem asChild>
                                                             <Link href={`/contests/${contest.id}/edit`} className="cursor-pointer">
@@ -246,22 +234,35 @@ export default function ContestTable({
                                                 )}
 
                                                 {hasPermission(PermissionEnum.CONTEST_UPDATE) && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => onStatusChange?.(contest)}
-                                                        className="cursor-pointer"
-                                                    >
-                                                        {contest.isActive ? (
-                                                            <>
+                                                    <>
+                                                        {contest.status === ContestStatus.SCHEDULED && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.DRAFT })}
+                                                                className="cursor-pointer"
+                                                            >
                                                                 <Lock className="mr-2 h-4 w-4" />
-                                                                {t('deactivate')}
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Unlock className="mr-2 h-4 w-4" />
-                                                                {t('activate')}
-                                                            </>
+                                                                {t('draft')}
+                                                            </DropdownMenuItem>
                                                         )}
-                                                    </DropdownMenuItem>
+                                                        {contest.status === ContestStatus.DRAFT && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.SCHEDULED })}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <Unlock className="mr-2 h-4 w-4" />
+                                                                {t('scheduled')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {contest.status === ContestStatus.RUNNING && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.CANCELLED })}
+                                                                className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                {t('cancel')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                    </>
                                                 )}
 
                                                 {hasPermission(PermissionEnum.CONTEST_DELETE) && (

@@ -18,7 +18,7 @@ export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
     const t = useTranslations('ContestStatistics.header');
 
     useEffect(() => {
-        if (stats.status !== ContestStatus.ONGOING) return;
+        if (stats.status !== ContestStatus.RUNNING) return;
 
         const interval = setInterval(() => {
             const now = new Date().getTime();
@@ -54,14 +54,14 @@ export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
                     </h1>
                     <Badge
                         variant={
-                            stats.status === ContestStatus.ONGOING
+                            stats.status === ContestStatus.RUNNING
                                 ? 'default'
-                                : stats.status === ContestStatus.UPCOMING
+                                : stats.status === ContestStatus.SCHEDULED
                                     ? 'secondary'
                                     : 'outline'
                         }
                         className={
-                            stats.status === ContestStatus.ONGOING
+                            stats.status === ContestStatus.RUNNING
                                 ? 'bg-green-100 text-green-700 hover:bg-green-100 border-green-200'
                                 : ''
                         }
@@ -74,7 +74,7 @@ export function ContestHeader({ stats, onBroadcast }: ContestHeaderProps) {
                 </div>
             </div>
 
-            {stats.status === ContestStatus.ONGOING && (
+            {stats.status === ContestStatus.RUNNING && (
                 <div className="flex items-center gap-3 px-6 py-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
                     <Timer className="w-5 h-5 text-green-600 dark:text-green-400 animate-pulse" />
                     <span className="text-2xl font-mono font-bold text-green-700 dark:text-green-400">

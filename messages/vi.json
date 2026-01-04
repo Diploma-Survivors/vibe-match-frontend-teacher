@@ -68,7 +68,21 @@
         "activateSuccess": "Kích hoạt cuộc thi thành công",
         "deactivateSuccess": "Hủy kích hoạt cuộc thi thành công",
         "activateError": "Kích hoạt cuộc thi thất bại",
-        "deactivateError": "Hủy kích hoạt cuộc thi thất bại"
+        "deactivateError": "Hủy kích hoạt cuộc thi thất bại",
+        "confirmScheduleTitle": "Xác nhận lên lịch",
+        "confirmDraftTitle": "Xác nhận chuyển về nháp",
+        "confirmCancelTitle": "Xác nhận hủy",
+        "confirmScheduleMessage": "Bạn có chắc chắn muốn lên lịch cho cuộc thi \"{name}\"?",
+        "confirmDraftMessage": "Bạn có chắc chắn muốn chuyển cuộc thi \"{name}\" về nháp?",
+        "confirmCancelMessage": "Bạn có chắc chắn muốn hủy cuộc thi \"{name}\"?",
+        "schedule": "Lên lịch",
+        "draft": "Nháp",
+        "scheduleSuccess": "Lên lịch cuộc thi thành công",
+        "draftSuccess": "Chuyển cuộc thi về nháp thành công",
+        "cancelSuccess": "Hủy cuộc thi thành công",
+        "scheduleError": "Lên lịch cuộc thi thất bại",
+        "draftError": "Chuyển cuộc thi về nháp thất bại",
+        "cancelError": "Hủy cuộc thi thất bại"
     },
     "ProblemsPage": {
         "title": "Danh sách bài tập",
@@ -108,7 +122,11 @@
         "deactivate": "Hủy kích hoạt",
         "activate": "Kích hoạt",
         "delete": "Xóa",
-        "entityName": "cuộc thi"
+        "entityName": "cuộc thi",
+        "participationCount": "Số lượng tham gia",
+        "draft": "Draft",
+        "scheduled": "Schedule",
+        "cancel": "Cancel"
     },
     "ProblemTable": {
         "selectMultiple": "Chọn nhiều bài tập",
@@ -168,10 +186,13 @@
         "reset": "Đặt lại",
         "active": "Đang chọn",
         "statusOptions": {
-            "UPCOMING": "Sắp diễn ra",
-            "ONGOING": "Đang diễn ra",
-            "FINISHED": "Đã kết thúc"
-        }
+            "Draft": "Draft",
+            "Scheduled": "Scheduled",
+            "Running": "Running",
+            "Ended": "Ended",
+            "Cancelled": "Cancelled"
+        },
+        "participantCount": "Số lượng tham gia"
     },
     "ProblemFilter": {
         "searchPlaceholder": "Tìm kiếm...",

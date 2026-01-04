@@ -1,9 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { ContestFormValues } from '@/components/contests/schema';
 import { Problem } from '@/types/problems';
+import { ContestStatus } from '@/types/contest';
 
 interface CreateContestState extends ContestFormValues {
-  selectedProblems: Problem[];
+  selectedProblems: (Problem & { points: number, orderIndex: number })[];
 }
 
 const initialState: CreateContestState = {
@@ -11,6 +12,7 @@ const initialState: CreateContestState = {
   description: '',
   startTime: '',
   durationMinutes: 60,
+  status: ContestStatus.DRAFT,
   problems: [],
   selectedProblems: [],
 };

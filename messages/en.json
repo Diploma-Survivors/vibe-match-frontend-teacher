@@ -68,7 +68,21 @@
         "activateSuccess": "Contest activated successfully",
         "deactivateSuccess": "Contest deactivated successfully",
         "activateError": "Failed to activate contest",
-        "deactivateError": "Failed to deactivate contest"
+        "deactivateError": "Failed to deactivate contest",
+        "confirmScheduleTitle": "Confirm Schedule",
+        "confirmDraftTitle": "Confirm Draft",
+        "confirmCancelTitle": "Confirm Cancel",
+        "confirmScheduleMessage": "Are you sure you want to schedule the contest \"{name}\"?",
+        "confirmDraftMessage": "Are you sure you want to move the contest \"{name}\" to draft?",
+        "confirmCancelMessage": "Are you sure you want to cancel the contest \"{name}\"?",
+        "schedule": "Schedule",
+        "draft": "Draft",
+        "scheduleSuccess": "Contest scheduled successfully",
+        "draftSuccess": "Contest moved to draft successfully",
+        "cancelSuccess": "Contest cancelled successfully",
+        "scheduleError": "Failed to schedule contest",
+        "draftError": "Failed to move contest to draft",
+        "cancelError": "Failed to cancel contest"
     },
     "ProblemsPage": {
         "title": "Problem List",
@@ -108,7 +122,11 @@
         "deactivate": "Deactivate",
         "activate": "Activate",
         "delete": "Delete",
-        "entityName": "contests"
+        "entityName": "contests",
+        "participationCount": "Participation Count",
+        "draft": "Draft",
+        "scheduled": "Schedule",
+        "cancel": "Cancel"
     },
     "ProblemTable": {
         "selectMultiple": "Select multiple problems",
@@ -168,10 +186,13 @@
         "reset": "Reset",
         "active": "Active",
         "statusOptions": {
-            "UPCOMING": "Upcoming",
-            "ONGOING": "Ongoing",
-            "FINISHED": "Finished"
-        }
+            "Draft": "Draft",
+            "Scheduled": "Scheduled",
+            "Running": "Running",
+            "Ended": "Ended",
+            "Cancelled": "Cancelled"
+        },
+        "participantCount": "Participant Count"
     },
     "ProblemFilter": {
         "searchPlaceholder": "Find ...",

@@ -8,7 +8,8 @@ import ContestFilter from '@/components/contest-filters/contest-filter';
 import ContestTable from '@/components/contest-table';
 import { useDialog } from '@/components/providers/dialog-provider';
 import { toastService } from '@/services/toasts-service';
-import { Contest } from '@/types/contest';
+import { Contest, ContestStatus } from '@/types/contest';
+import { ContestsService } from '@/services/contests-service';
 import { useTranslations } from 'next-intl';
 
 import { useApp } from '@/contexts/app-context';
@@ -50,7 +51,7 @@ export default function ContestsPage() {
             message: (
                 <span>
                     {t.rich('deleteMessage', {
-                        name: contest.name,
+                        name: contest.title,
                         span: (chunks) => <span className="font-semibold text-foreground"> "{chunks}"</span>
                     })}
                 </span>
@@ -77,38 +78,38 @@ export default function ContestsPage() {
         }
     };
 
-    const handleStatusChange = async (contest: Contest) => {
-        const newStatus = !contest.isActive;
-        const action = newStatus ? 'activate' : 'deactivate';
+    const handleStatusChange = async (updatedContest: Contest) => {
+        const newStatus = updatedContest.status;
+        const action = newStatus === ContestStatus.SCHEDULED ? 'schedule' :
+            newStatus === ContestStatus.DRAFT ? 'draft' :
+                newStatus === ContestStatus.CANCELLED ? 'cancel' : 'update';
 
         const confirmed = await confirm({
-            title: newStatus ? t('confirmActivateTitle') : t('confirmDeactivateTitle'),
+            title: t(`confirm${action.charAt(0).toUpperCase() + action.slice(1)}Title`),
             message: (
                 <span>
-                    {t.rich(newStatus ? 'confirmActivateMessage' : 'confirmDeactivateMessage', {
-                        name: contest.name,
+                    {t.rich(`confirm${action.charAt(0).toUpperCase() + action.slice(1)}Message`, {
+                        name: updatedContest.title,
                         span: (chunks) => <span className="font-semibold text-foreground"> "{chunks}"</span>
                     })}
                 </span>
             ),
-            confirmText: newStatus ? t('activate') : t('deactivate'),
+            confirmText: t(action),
             cancelText: t('cancel'),
-            color: newStatus ? 'green' : 'red',
+            color: newStatus === ContestStatus.CANCELLED ? 'red' : 'blue',
         });
 
         if (confirmed) {
             try {
-                // Mock API call
-                // await ContestsService.updateContestStatus(contest.id, newStatus);
+                await ContestsService.updateContest(updatedContest.id!.toString(), {
+                    status: newStatus
+                });
 
-                // Simulate delay
-                await new Promise((resolve) => setTimeout(resolve, 500));
-
-                toastService.success(newStatus ? t('activateSuccess') : t('deactivateSuccess'));
+                toastService.success(t(`${action}Success`));
                 refresh();
             } catch (error) {
                 console.error(`Failed to ${action} contest:`, error);
-                toastService.error(newStatus ? t('activateError') : t('deactivateError'));
+                toastService.error(t(`${action}Error`));
             }
         }
     };

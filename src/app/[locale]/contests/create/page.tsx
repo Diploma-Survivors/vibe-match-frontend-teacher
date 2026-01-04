@@ -19,12 +19,16 @@ export default function CreateContestPage() {
         setIsSubmitting(true);
         try {
             if (!data) return;
+            const startTimeDate = new Date(data.startTime);
+            const endTimeDate = new Date(startTimeDate.getTime() + data.durationMinutes * 60000);
+
             const contestCreateRequest: ContestCreateRequest = {
-                name: data.name,
+                title: data.title,
                 description: data.description,
-                startTime: formatISO(data.startTime),
-                durationMinutes: data.durationMinutes,
+                startTime: formatISO(startTimeDate),
+                endTime: formatISO(endTimeDate),
                 problems: data.problems,
+                status: data.status,
             };
             await ContestsService.createContest(contestCreateRequest);
 

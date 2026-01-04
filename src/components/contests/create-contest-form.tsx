@@ -11,7 +11,7 @@ import { useDialog } from '@/components/providers/dialog-provider';
 import { Problem } from '@/types/problems';
 import { ContestSchema, ContestFormValues } from './schema';
 import { GeneralInfoSection } from './general-info-section';
-import { ProblemSelectionSection } from './problem-selection-section';
+import { ProblemSelectionSection, SelectedProblem } from './problem-selection-section';
 
 interface CreateContestFormProps {
     onSubmit: (data: ContestFormValues) => Promise<void>;
@@ -29,10 +29,16 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
         description: draft.description,
         startTime: draft.startTime,
         durationMinutes: draft.durationMinutes,
-        problems: draft.problems,
+        problems: (draft.problems || []).map((p, index) => ({
+            problemId: p.problemId,
+            point: p.points,
+            orderIndex: (p as any).orderIndex ?? (p as any).order ?? index,
+        })),
     };
 
-    const [selectedProblems, setSelectedProblems] = useState<Problem[]>(draft.selectedProblems || []);
+    const [selectedProblems, setSelectedProblems] = useState<SelectedProblem[]>(
+        (draft.selectedProblems || []).map((p, i) => ({ ...p, points: (p as any).points || 10, orderIndex: (p as any).orderIndex ?? i }))
+    );
 
     const form = useForm<ContestFormValues>({
         resolver: zodResolver(ContestSchema) as any,
@@ -57,11 +63,12 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
         return () => subscription.unsubscribe();
     }, [watch, dispatch]);
 
-    const handleProblemsChange = (problems: Problem[]) => {
+    const handleProblemsChange = (problems: SelectedProblem[]) => {
         setSelectedProblems(problems);
         const formProblems = problems.map((p, index) => ({
             problemId: p.id,
-            order: index,
+            orderIndex: index,
+            points: p.points,
         }));
         setValue('problems', formProblems, { shouldValidate: true, shouldDirty: true });
 
@@ -95,8 +102,12 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
         dispatch(clearContestDraft());
     };
 
+    const onError = (error: any) => {
+        console.error('Form submission error:', error);
+    };
+
     return (
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(handleFormSubmit, onError)} className="space-y-8">
             <div className="flex flex-col gap-8">
                 <GeneralInfoSection
                     register={register}

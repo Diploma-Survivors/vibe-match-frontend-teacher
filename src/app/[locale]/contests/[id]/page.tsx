@@ -134,12 +134,12 @@ export default function ViewContestPage() {
                                 </TableRow>
                             ) : (
                                 contest.problems
-                                    .sort((a, b) => a.order - b.order)
+                                    .sort((a, b) => a.orderIndex - b.orderIndex)
                                     .map((p) => (
                                         <TableRow key={p.problem.id}>
                                             <TableCell className="font-medium">
                                                 <Badge variant="outline" className="font-mono">
-                                                    {p.order + 1}
+                                                    {p.orderIndex + 1}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
