@@ -468,13 +468,9 @@ const MOCK_PERMISSIONS: Permission[] = [
   },
 ];
 
-export const getAllCurrentUserPermission = async (): Promise<Permission[]> => {
-  // Simulate API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(MOCK_PERMISSIONS);
-    }, 500);
-  });
+export const getAllCurrentUserPermission = async (userId: number): Promise<Permission[]> => {
+  const response = await axiosInstance.get(`/users/permissions?userId=${userId}`);
+  return response.data.data;
 };
 
 export const getAllPermissions = async (): Promise<Permission[]> => {

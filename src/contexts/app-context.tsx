@@ -65,7 +65,7 @@ export function AppProvider({
       // Fetch user and permissions in parallel
       Promise.all([
         clientApi.get('/auth/me'),
-        getAllCurrentUserPermission()
+        getAllCurrentUserPermission(decodedAccessToken.sub)
       ])
         .then(([userResponse, permissionsResponse]) => {
           setUser(userResponse.data.data);

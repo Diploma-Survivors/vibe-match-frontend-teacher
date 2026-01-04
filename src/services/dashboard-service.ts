@@ -14,9 +14,9 @@ async function getTimeSeriesMetrics(
 ): Promise<AxiosResponse<ApiResponse<DashboardTimeSeriesResponse>>> {
   return await clientApi.get<ApiResponse<DashboardTimeSeriesResponse>>('/admin/dashboard/time-series', {
     params: {
-      // metric,
-      // from,
-      // to,
+      metric,
+      from,
+      to,
     },
   });
 }
