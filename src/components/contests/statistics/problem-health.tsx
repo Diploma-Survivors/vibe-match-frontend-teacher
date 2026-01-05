@@ -7,18 +7,21 @@ import { ProblemHealth } from '@/types/contest-statistics';
 import { ProblemDifficulty } from '@/types/problems';
 import { Activity } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ProblemHealthWidgetProps {
     contestId: number;
 }
 
 export function ProblemHealthWidget({ contestId }: ProblemHealthWidgetProps) {
+    const t = useTranslations('ContestStatistics.problemHealth');
     const [problems, setProblems] = useState<ProblemHealth[]>([]);
 
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const data = await ContestsService.getProblemHealth(contestId);
+                const response = await ContestsService.getProblemHealth(contestId);
+                const data = response.data.data;
                 setProblems(data);
             } catch (error) {
                 console.error('Failed to fetch problem health:', error);
@@ -45,7 +48,7 @@ export function ProblemHealthWidget({ contestId }: ProblemHealthWidgetProps) {
             <div className="flex items-center gap-2 mb-6">
                 <Activity className="w-5 h-5 text-indigo-500" />
                 <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                    Problem Health
+                    {t('title')}
                 </h2>
             </div>
 
@@ -69,13 +72,13 @@ export function ProblemHealthWidget({ contestId }: ProblemHealthWidgetProps) {
                                     problem.difficulty
                                 )}`}
                             >
-                                {problem.difficulty}
+                                {t(`difficulty.${problem.difficulty}`)}
                             </Badge>
                         </div>
 
                         <div className="space-y-1">
                             <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-                                <span>{problem.solvedPercentage}% Solved</span>
+                                <span>{problem.solvedPercentage}{t('solved')}</span>
                                 <span>
                                     {problem.solvedCount} / {problem.totalParticipants}
                                 </span>

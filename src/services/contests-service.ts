@@ -5,19 +5,17 @@ import {
   type Contest,
   type ContestCreateRequest,
   type ContestProblemDTO,
-  type LeaderboardRequest,
-  type LeaderboardResponse,
-  type SubmissionDetailsResponse,
   type SubmissionsOverviewRequest,
-  type SubmissionsOverviewResponse,
   type ContestListResponse,
 } from '@/types/contest';
 import type { AxiosResponse } from 'axios';
-import { ContestProblemStatus, ContestStatistics, LeaderboardEntry, ProblemHealth, RecentSubmission } from '@/types/contest-statistics';
+import { ContestProblemStatus, ContestStatistics, LeaderboardEntry, LeaderboardResponse, ProblemHealth, RecentSubmission } from '@/types/contest-statistics';
 import { SubmissionStatus } from '@/types/submissions';
 
 import { ProblemDifficulty } from '@/types/problems';
 import { addMinutes, differenceInMinutes } from 'date-fns';
+import qs from 'qs';
+
 
 async function createContest(
   contestDTO: ContestCreateRequest
@@ -126,61 +124,30 @@ async function getContests(params?: any) {
   return response;
 }
 
-async function getContestStatistics(contestId: number): Promise<ContestStatistics> {
+async function getContestStatistics(contestId: number): Promise<AxiosResponse<ApiResponse<ContestStatistics>>> {
     const url = `/contests/${contestId}/statistics`;
     const response = await clientApi.get<ApiResponse<ContestStatistics>>(url);
-    return response.data.data;
+    return response;
 }
 
-async function getLiveLeaderboard(contestId: number, page: number = 1, limit: number = 20, search?: string): Promise<{ data: LeaderboardEntry[], meta: { page: number, limit: number, total: number, totalPages: number } }> {
-    const url = `/contests/${contestId}/leaderboard`;
-    const params: any = { page, limit };
-    if (search) params.search = search;
-
-    // We might need to adapt the response if the API returns LeaderboardResponse (Graphql style)
-    // But for now assuming the API might have been updated or we map it.
-    // Let's try to fetch and map if possible, or assume the API returns what we need.
-    // Given the previous code had getContestLeaderboard returning LeaderboardResponse, let's use that and map it.
-    
-    const response = await clientApi.get<ApiResponse<LeaderboardResponse>>(url, { params });
-    const leaderboardData = response.data.data;
-
-    // Map LeaderboardResponse to LeaderboardEntry[]
-    const mappedData: LeaderboardEntry[] = leaderboardData.rankings.edges.map(edge => ({
-        rank: edge.node.rank,
-        user: {
-            id: edge.node.user.id,
-            username: edge.node.user.email, // Using email as username fallback or if that's what's available
-            fullName: `${edge.node.user.firstName} ${edge.node.user.lastName}`,
-        },
-        totalScore: edge.node.finalScore,
-        totalTime: edge.node.totalTime,
-        problemStatus: edge.node.problemResults.map(pr => ({
-            problemId: pr.problemId,
-            problemOrder: 0, // We might need to look up order from contest problems if available, or just use 0
-            status: pr.status === 'SOLVED' ? ContestProblemStatus.SOLVED : 
-                    pr.status === 'UNSOLVED' ? ContestProblemStatus.ATTEMPTED : 
-                    ContestProblemStatus.NOT_ATTEMPTED,
-            score: pr.score,
-            time: pr.time
-        }))
-    }));
-
-    return {
-        data: mappedData,
-        meta: {
-            page: leaderboardData.rankings.pageInfos.hasNextPage ? page : page, // Approximation
-            limit,
-            total: leaderboardData.rankings.totalCount,
-            totalPages: Math.ceil(leaderboardData.rankings.totalCount / limit)
-        }
-    };
+async function getContestLeaderboard(
+  id: string,
+  params?: { page?: number; limit?: number; search?: string }
+): Promise<AxiosResponse<ApiResponse<LeaderboardResponse>>> {
+  const queryString = qs.stringify(params, {
+    allowDots: true,
+    skipNulls: true,
+  });
+  const url = queryString
+    ? `/contests/${id}/leaderboard?${queryString}`
+    : `/contests/${id}/leaderboard`;
+  return await clientApi.get(url);
 }
 
-async function getProblemHealth(contestId: number): Promise<ProblemHealth[]> {
-    const url = `/contests/${contestId}/problems/health`;
+async function getProblemHealth(contestId: number): Promise<AxiosResponse<ApiResponse<ProblemHealth[]>>> {
+    const url = `/contests/${contestId}/problems-health`;
     const response = await clientApi.get<ApiResponse<ProblemHealth[]>>(url);
-    return response.data.data;
+    return response;
 }
 
 export const ContestsService = {
@@ -192,6 +159,6 @@ export const ContestsService = {
   getSubmissionDetails,
   getContests,
   getContestStatistics,
-  getLiveLeaderboard,
+  getContestLeaderboard,
   getProblemHealth,
 };

@@ -17,45 +17,45 @@ export function KeyMetrics({ stats }: KeyMetricsProps) {
     const t = useTranslations('ContestStatistics.metrics');
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
             {/* Active Users Card */}
-            <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="border-slate-200 dark:border-slate-700 shadow-sm py-3">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
                     <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
                         {t('activeParticipants')}
                     </CardTitle>
                     <Users className="h-4 w-4 text-slate-400" />
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                        {stats.activeUsers.toLocaleString()}
+                <CardContent className="p-3 pt-0 flex items-center justify-center h-[calc(100%-3rem)]">
+                    <div className="text-[56px] font-bold text-slate-900 dark:text-slate-100">
+                        {stats.totalParticipants.toLocaleString()}
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {/* <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         / {stats.totalRegistered.toLocaleString()} {t('registered')}
-                    </p>
-                    <div className="mt-4 h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    </p> */}
+                    {/* <div className="mt-4 h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-blue-500 rounded-full"
                             style={{
                                 width: `${(stats.activeUsers / stats.totalRegistered) * 100}%`,
                             }}
                         />
-                    </div>
+                    </div> */}
                 </CardContent>
             </Card>
 
             {/* Submission Rate Card */}
-            <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Card className="border-slate-200 dark:border-slate-700 shadow-sm py-3">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
                     <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-400">
                         {t('submissionRate')}
                     </CardTitle>
                     <Activity className="h-4 w-4 text-slate-400" />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-3 pt-0">
                     <div className="flex justify-between items-end">
                         <div>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
                                 {stats.totalSubmissions.toLocaleString()}
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -63,7 +63,7 @@ export function KeyMetrics({ stats }: KeyMetricsProps) {
                             </p>
                         </div>
                         <div className="text-right">
-                            <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                            <div className="text-lg font-bold text-green-600 dark:text-green-400">
                                 {stats.acceptanceRate}%
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">

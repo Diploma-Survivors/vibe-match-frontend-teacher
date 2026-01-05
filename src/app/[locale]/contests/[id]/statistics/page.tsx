@@ -24,7 +24,8 @@ export default function ContestStatisticsPage() {
         const fetchStats = async () => {
             setLoading(true);
             try {
-                const data = await ContestsService.getContestStatistics(contestId);
+                const response = await ContestsService.getContestStatistics(contestId);
+                const data = response.data.data;
                 setStats(data);
             } catch (error) {
                 console.error('Failed to fetch contest statistics:', error);

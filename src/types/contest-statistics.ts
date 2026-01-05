@@ -12,6 +12,7 @@ export interface ContestStatistics {
   activeUsers: number;
   totalRegistered: number;
   totalSubmissions: number;
+  totalParticipants: number;
   totalAccepted: number;
   acceptanceRate: number;
   verdicts: VerdictCount[];
@@ -20,7 +21,13 @@ export interface ContestStatistics {
 export enum ContestProblemStatus {
   SOLVED = 'SOLVED',
   ATTEMPTED = 'ATTEMPTED',
-  NOT_ATTEMPTED = 'NOT_ATTEMPTED',
+  NOT_STARTED = 'NOT_STARTED',
+}
+
+export const ContestProblemStatusLabel : Record<ContestProblemStatus, string> = {
+  [ContestProblemStatus.SOLVED]: 'Solved',
+  [ContestProblemStatus.ATTEMPTED]: 'Attempted',
+  [ContestProblemStatus.NOT_STARTED]: 'Not Started',
 }
 
 export interface ProblemStatus {
@@ -31,6 +38,7 @@ export interface ProblemStatus {
   time?: string; // Time of submission or time taken
   attempts?: number;
 }
+
 
 export interface LeaderboardEntry {
   rank: number;
@@ -50,6 +58,7 @@ export interface ProblemHealth {
   problemOrder: number;
   title: string;
   difficulty: ProblemDifficulty;
+  totalSubmissions: number;
   solvedCount: number;
   totalParticipants: number;
   solvedPercentage: number;
@@ -64,8 +73,26 @@ export interface RecentSubmission {
   };
   problemOrder: number;
   submittedAt: string; // ISO string
-  timeAgo: string; // e.g., "10s ago" - computed or provided
   status: SubmissionStatus;
   runtime: number; // ms
   memory: number; // MB
+}
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
+export interface LeaderboardResponse {
+  data: LeaderboardEntry[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 }

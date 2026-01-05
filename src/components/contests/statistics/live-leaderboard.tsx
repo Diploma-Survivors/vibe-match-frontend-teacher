@@ -14,11 +14,12 @@ import {
 } from '@/components/ui/table';
 import { ContestsService } from '@/services/contests-service';
 import { ParticipantDetailSheet } from './participant-detail-sheet';
-import { LeaderboardEntry } from '@/types/contest-statistics';
+import { ContestProblemStatus, ContestProblemStatusLabel, LeaderboardEntry } from '@/types/contest-statistics';
 import { Eye, Search, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { ContestStatus } from '@/types/contest';
+import { useTranslations } from 'next-intl';
 
 interface LiveLeaderboardProps {
     contestId: number;
@@ -26,6 +27,7 @@ interface LiveLeaderboardProps {
 }
 
 export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardProps) {
+    const t = useTranslations('ContestStatistics.liveLeaderboard');
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -37,14 +39,18 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
     const fetchLeaderboard = async (showLoading = true) => {
         if (showLoading) setLoading(true);
         try {
-            const response = await ContestsService.getLiveLeaderboard(
-                contestId,
-                page,
-                20,
-                search
+            const response = await ContestsService.getContestLeaderboard(
+                contestId.toString(),
+                {
+                    page,
+                    limit: 20,
+                    search
+                }
             );
-            setEntries(response.data);
-            setTotalPages(response.meta.totalPages);
+            const { data, meta } = response.data.data;
+
+            setEntries(data);
+            setTotalPages(meta.totalPages);
         } catch (error) {
             console.error('Failed to fetch leaderboard:', error);
         } finally {
@@ -68,16 +74,13 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
         return () => clearInterval(interval);
     }, [contestId, contestStatus, search, page]);
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: ContestProblemStatus) => {
         switch (status) {
-            case 'ACCEPTED':
-            case 'SOLVED':
+            case ContestProblemStatus.SOLVED:
                 return 'bg-green-500 hover:bg-green-600';
-            case 'REJECTED':
-            case 'ATTEMPTED':
+            case ContestProblemStatus.ATTEMPTED:
                 return 'bg-red-500 hover:bg-red-600';
-            case 'PENDING':
-                return 'bg-yellow-500 hover:bg-yellow-600';
+            case ContestProblemStatus.NOT_STARTED:
             default:
                 return 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600';
         }
@@ -89,13 +92,13 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
                 <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-500" />
                     <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                        Live Leaderboard
+                        {t('title')}
                     </h2>
                 </div>
                 <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
-                        placeholder="Search user..."
+                        placeholder={t('searchPlaceholder')}
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
@@ -110,31 +113,29 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/50">
-                            <TableHead className="w-16 text-center">Rank</TableHead>
-                            <TableHead>User</TableHead>
-                            <TableHead className="text-right">Score</TableHead>
-                            <TableHead className="text-center">Progress</TableHead>
-                            <TableHead className="text-right">Time</TableHead>
-                            <TableHead className="w-16 text-center">Action</TableHead>
+                            <TableHead className="w-16 text-center">{t('table.rank')}</TableHead>
+                            <TableHead>{t('table.user')}</TableHead>
+                            <TableHead className="text-right">{t('table.score')}</TableHead>
+                            <TableHead className="text-center">{t('table.progress')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-32 text-center text-slate-500">
-                                    Loading leaderboard...
+                                <TableCell colSpan={4} className="h-32 text-center text-slate-500">
+                                    {t('table.loading')}
                                 </TableCell>
                             </TableRow>
                         ) : entries.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-32 text-center text-slate-500">
-                                    No participants found
+                                <TableCell colSpan={4} className="h-32 text-center text-slate-500">
+                                    {t('table.empty')}
                                 </TableCell>
                             </TableRow>
                         ) : (
                             entries.map((entry) => (
                                 <TableRow
-                                    key={entry.rank}
+                                    key={entry.user.id}
                                     className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50"
                                     onClick={() => {
                                         setSelectedParticipant(entry);
@@ -180,22 +181,10 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
                                                     className={`w-6 h-6 rounded-sm ${getStatusColor(
                                                         status.status
                                                     )} transition-all duration-300`}
-                                                    title={`Q${status.problemOrder}: ${status.status}`}
+                                                    title={`Q${status.problemOrder}: ${ContestProblemStatusLabel[status.status]}`}
                                                 />
                                             ))}
                                         </div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono text-slate-600 dark:text-slate-400">
-                                        {entry.totalTime}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <Eye className="w-4 h-4 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100" />
-                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -206,7 +195,7 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
 
             <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                 <div className="text-sm text-slate-500 dark:text-slate-400">
-                    Page {page} of {totalPages}
+                    {t('pagination.page', { page, totalPages })}
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -215,7 +204,7 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1 || loading}
                     >
-                        Previous
+                        {t('pagination.previous')}
                     </Button>
                     <Button
                         variant="outline"
@@ -223,7 +212,7 @@ export function LiveLeaderboard({ contestId, contestStatus }: LiveLeaderboardPro
                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                         disabled={page === totalPages || loading}
                     >
-                        Next
+                        {t('pagination.next')}
                     </Button>
                 </div>
             </div>

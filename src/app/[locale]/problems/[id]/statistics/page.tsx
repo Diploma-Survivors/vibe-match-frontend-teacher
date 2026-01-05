@@ -161,7 +161,7 @@ export default function ProblemStatisticsPage() {
                         </Button>
                     </Link>
 
-                    <Link href={`/submissions?problemIds=${id}`}>
+                    <Link href={`/submissions?problemId=${id}`}>
                         <Button variant="ghost" className="cursor-pointer">
                             {t('buttons.allSubmissions')}
                             <ChevronRight className="ml-2 h-4 w-4" />

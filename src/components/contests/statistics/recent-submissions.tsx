@@ -11,6 +11,7 @@ import { ChevronRight, Clock, History } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { SortOrder } from '@/types/problems';
+import { useTranslations } from 'next-intl';
 
 interface RecentSubmissionsWidgetProps {
     contestId: number;
@@ -19,6 +20,7 @@ interface RecentSubmissionsWidgetProps {
 export function RecentSubmissionsWidget({
     contestId,
 }: RecentSubmissionsWidgetProps) {
+    const t = useTranslations('ContestStatistics.recentSubmissions');
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
     const [submissionDetail, setSubmissionDetail] = useState<any>(null);
@@ -28,9 +30,7 @@ export function RecentSubmissionsWidget({
         const fetchSubmissions = async () => {
             try {
                 const response = await SubmissionsService.getSubmissions({
-                    filters: {
-                        contestIds: [contestId],
-                    },
+                    contestId: contestId,
                     limit: 10,
                     sortBy: SubmissionSortBy.SUBMITTED_AT,
                     sortOrder: SortOrder.DESC,
@@ -88,20 +88,18 @@ export function RecentSubmissionsWidget({
     const getTimeAgo = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
-        const diffInSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
+        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-        const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-
-        if (Math.abs(diffInSeconds) < 60) return rtf.format(diffInSeconds, 'second');
+        if (diffInSeconds < 60) return t('timeAgo.second', { count: diffInSeconds });
 
         const diffInMinutes = Math.floor(diffInSeconds / 60);
-        if (Math.abs(diffInMinutes) < 60) return rtf.format(diffInMinutes, 'minute');
+        if (diffInMinutes < 60) return t('timeAgo.minute', { count: diffInMinutes });
 
         const diffInHours = Math.floor(diffInMinutes / 60);
-        if (Math.abs(diffInHours) < 24) return rtf.format(diffInHours, 'hour');
+        if (diffInHours < 24) return t('timeAgo.hour', { count: diffInHours });
 
         const diffInDays = Math.floor(diffInHours / 24);
-        return rtf.format(diffInDays, 'day');
+        return t('timeAgo.day', { count: diffInDays });
     };
 
     return (
@@ -111,12 +109,12 @@ export function RecentSubmissionsWidget({
                     <div className="flex items-center gap-2">
                         <History className="w-5 h-5 text-blue-500" />
                         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                            Submissions
+                            {t('title')}
                         </h2>
                     </div>
-                    <Link href={`/submissions?contestIds=${contestId}`}>
+                    <Link href={`/submissions?contestId=${contestId}`}>
                         <Button variant="ghost" size="sm" className="h-8 text-xs">
-                            View All
+                            {t('viewAll')}
                             <ChevronRight className="ml-1 w-3 h-3" />
                         </Button>
                     </Link>

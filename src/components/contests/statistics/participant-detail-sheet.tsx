@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
     Sheet,
     SheetContent,
@@ -21,7 +21,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { LeaderboardEntry, ContestProblemStatus } from '@/types/contest-statistics';
+import { LeaderboardEntry, ContestProblemStatus, ContestProblemStatusLabel } from '@/types/contest-statistics';
 import { Submission, SubmissionSortBy, SubmissionStatus } from '@/types/submissions';
 import { getLanguageName, getStatusColor, getStatusLabel, SubmissionsService } from '@/services/submissions-service';
 import { ContestsService } from '@/services/contests-service';
@@ -30,6 +30,9 @@ import SubmissionDetail from '@/components/submission-detail';
 import { SortOrder } from '@/types/problems';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/store/hooks';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useInfiniteSubmissions } from '@/hooks/use-infinite-submissions';
 
 interface ParticipantDetailSheetProps {
     isOpen: boolean;
@@ -44,82 +47,35 @@ export function ParticipantDetailSheet({
     participant,
     contestId,
 }: ParticipantDetailSheetProps) {
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
-    const [loadingSubmissions, setLoadingSubmissions] = useState(false);
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
     const [isSubmissionModalOpen, setIsSubmissionModalOpen] = useState(false);
     const [submissionDetailLoading, setSubmissionDetailLoading] = useState(false);
 
-    // Pagination state
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [isFetchingMore, setIsFetchingMore] = useState(false);
-
     const { languages } = useAppSelector((state) => state.metadata);
+    const t = useTranslations('ContestStatistics.participantDetail');
+    const filters = useMemo(() => ({
+        contestId,
+        userId: participant?.user.id,
+    }), [contestId, participant?.user.id]);
 
-    // Reset state when participant changes
-    useEffect(() => {
-        if (isOpen) {
-            setSubmissions([]);
-            setPage(1);
-            setHasMore(true);
-        }
-    }, [participant?.user.id, isOpen]);
-
-    useEffect(() => {
-        const fetchSubmissions = async () => {
-            if (!participant || !isOpen) return;
-
-            // Prevent duplicate fetches
-            if (page === 1 && loadingSubmissions) return;
-            if (page > 1 && isFetchingMore) return;
-
-            if (page === 1) {
-                setLoadingSubmissions(true);
-            } else {
-                setIsFetchingMore(true);
-            }
-
-            try {
-                const response = await SubmissionsService.getSubmissions({
-                    filters: {
-                        // TODO: Add contestIds and userId when apis is available
-                        // contestIds: [contestId],
-                        // userId: participant.user.id,
-                    },
-                    page: page,
-                    limit: 20, // Smaller limit for smoother infinite scroll
-                    sortOrder: SortOrder.DESC,
-                    sortBy: SubmissionSortBy.SUBMITTED_AT,
-                });
-
-                const newSubmissions = response.data.data.data;
-                const meta = response.data.data.meta;
-
-                if (page === 1) {
-                    setSubmissions(newSubmissions);
-                } else {
-                    setSubmissions(prev => [...prev, ...newSubmissions]);
-                }
-
-                setHasMore(meta.hasNextPage);
-            } catch (error) {
-                console.error('Failed to fetch participant submissions:', error);
-            } finally {
-                setLoadingSubmissions(false);
-                setIsFetchingMore(false);
-            }
-        };
-
-        fetchSubmissions();
-    }, [participant, contestId, isOpen, page]);
+    const {
+        submissions,
+        isLoading,
+        hasMore,
+        loadMore,
+    } = useInfiniteSubmissions({
+        initialFilters: filters,
+        initialSortBy: SubmissionSortBy.SUBMITTED_AT,
+        initialSortOrder: SortOrder.DESC,
+        enabled: !!participant && isOpen,
+    });
 
     // Intersection Observer for infinite scroll
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isFetchingMore && !loadingSubmissions) {
-                    setPage((prev) => prev + 1);
+                if (entries[0].isIntersecting && hasMore && !isLoading) {
+                    loadMore();
                 }
             },
             { threshold: 0.1 }
@@ -135,14 +91,14 @@ export function ParticipantDetailSheet({
                 observer.unobserve(sentinel);
             }
         };
-    }, [hasMore, isFetchingMore, loadingSubmissions, submissions.length]);
+    }, [hasMore, isLoading, loadMore]);
 
     const handleSubmissionClick = async (submissionId: number) => {
         setSubmissionDetailLoading(true);
         setIsSubmissionModalOpen(true);
         try {
             const response = await SubmissionsService.getSubmissionById(submissionId);
-            setSelectedSubmission(response.data);
+            setSelectedSubmission(response.data.data);
         } catch (error) {
             console.error('Failed to fetch submission details:', error);
         } finally {
@@ -189,12 +145,14 @@ export function ParticipantDetailSheet({
                     <SheetHeader className="space-y-4 pb-6 border-b border-slate-200 dark:border-slate-700">
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-4">
-                                <Avatar className="w-16 h-16 border-2 border-slate-200 dark:border-slate-700">
-                                    <AvatarImage src={participant.user.avatarUrl} />
-                                    <AvatarFallback className="text-xl">
-                                        {participant.user.username.substring(0, 2).toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <Link href={`/users/${participant.user.id}`}>
+                                    <Avatar className="w-16 h-16 border-2 border-slate-200 dark:border-slate-700">
+                                        <AvatarImage src={participant.user.avatarUrl} />
+                                        <AvatarFallback className="text-xl">
+                                            {participant.user.username.substring(0, 2).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Link>
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
@@ -209,38 +167,20 @@ export function ParticipantDetailSheet({
                                     </p>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" asChild>
-                                <a href={`/profile/${participant.user.username}`} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="w-5 h-5 text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" />
-                                </a>
-                            </Button>
                         </div>
                     </SheetHeader>
 
                     <div className="py-6 space-y-8">
                         {/* Key Metrics */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                             <Card>
                                 <CardContent className="p-4 flex items-center gap-3">
                                     <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
                                         <Trophy className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">Total Score</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">{t('totalScore')}</p>
                                         <p className="text-xl font-bold text-slate-900 dark:text-slate-100">{participant.totalScore}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardContent className="p-4 flex items-center gap-3">
-                                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                                        <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase">Total Time</p>
-                                        <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                                            {participant.totalTime}
-                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -248,7 +188,7 @@ export function ParticipantDetailSheet({
 
                         {/* Problem Status Grid */}
                         <div className="space-y-3">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">Problem Status</h3>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">{t('problemStatus')}</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 {participant.problemStatus.map((status) => (
                                     <div
@@ -258,12 +198,17 @@ export function ParticipantDetailSheet({
                                         <div className="flex justify-between items-start">
                                             <span className="font-bold text-sm">Q{status.problemOrder}</span>
                                             <Badge variant="secondary" className="bg-white/50 dark:bg-black/20 text-xs backdrop-blur-sm border-0">
-                                                {status.status}
+                                                {ContestProblemStatusLabel[status.status]}
                                             </Badge>
                                         </div>
                                         <div className="flex justify-between items-end text-xs opacity-80">
                                             <span>
-                                                {status.attempts}
+                                                {t('attempts', { count: status.attempts || 0 })}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-end text-xs opacity-80">
+                                            <span>
+                                                {t('points', { count: status.score || 0 })}
                                             </span>
                                         </div>
                                     </div>
@@ -273,27 +218,27 @@ export function ParticipantDetailSheet({
 
                         {/* Submission History */}
                         <div className="space-y-3">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">Submission History</h3>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">{t('submissionHistory')}</h3>
                             <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50 dark:bg-slate-900/50">
-                                            <TableHead>Problem</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead className="text-right">Language</TableHead>
+                                            <TableHead>{t('table.problem')}</TableHead>
+                                            <TableHead>{t('table.status')}</TableHead>
+                                            <TableHead className="text-right">{t('table.language')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {loadingSubmissions ? (
+                                        {isLoading && submissions.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={3} className="h-24 text-center text-slate-500">
-                                                    Loading history...
+                                                    {t('table.loading')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : submissions.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={3} className="h-24 text-center text-slate-500">
-                                                    No submissions found
+                                                    {t('table.empty')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
@@ -324,10 +269,10 @@ export function ParticipantDetailSheet({
                                         <TableRow id="submission-scroll-sentinel">
                                             <TableCell colSpan={3} className="p-0 border-0" />
                                         </TableRow>
-                                        {isFetchingMore && (
+                                        {isLoading && submissions.length > 0 && (
                                             <TableRow>
                                                 <TableCell colSpan={3} className="h-12 text-center text-slate-500 text-xs">
-                                                    Loading more...
+                                                    {t('table.loadingMore')}
                                                 </TableCell>
                                             </TableRow>
                                         )}

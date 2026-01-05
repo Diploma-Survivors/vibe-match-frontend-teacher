@@ -3,63 +3,7 @@ import { z } from 'zod';
 import type { Problem } from './problems';
 import { SortOrder } from './problems';
 
-// Leaderboard Types
-export interface LeaderboardUser {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
 
-export interface ProblemResult {
-  problemId: number;
-  score: number;
-  time: string;
-  status: 'SOLVED' | 'UNSOLVED' | 'UNATTEMPTED';
-}
-
-export interface RankingNode {
-  rank: number;
-  user: LeaderboardUser;
-  finalScore: number;
-  totalTime: string;
-  problemResults: ProblemResult[];
-}
-
-export interface RankingEdge {
-  node: RankingNode;
-  cursor: string;
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
-export interface Rankings {
-  edges: RankingEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
-}
-
-export interface LeaderboardRequest {
-  contestId: string;
-  filters?: {
-    name?: string;
-  };
-  first?: number;
-  after?: string;
-  last?: number;
-  before?: string;
-  sortOrder?: 'ASC' | 'DESC ';
-}
-
-export interface LeaderboardResponse {
-  problems: Problem[];
-  rankings: Rankings;
-}
 
 export interface Contest {
   id?: number;
@@ -308,11 +252,6 @@ export interface SubmissionsOverviewRequest {
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface SubmissionsOverviewResponse {
-  edges: SubmissionEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
-}
 
 // Submission Details Types
 export interface SubmissionLanguage {
@@ -335,10 +274,4 @@ export interface SubmissionDetailNode {
 export interface SubmissionDetailEdge {
   node: SubmissionDetailNode;
   cursor: string;
-}
-
-export interface SubmissionDetailsResponse {
-  edges: SubmissionDetailEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
 }

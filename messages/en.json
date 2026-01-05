@@ -628,6 +628,68 @@
             "ac": "AC",
             "nonAc": "Non-AC"
         },
+        "liveLeaderboard": {
+            "title": "Live Leaderboard",
+            "searchPlaceholder": "Search user...",
+            "table": {
+                "rank": "Rank",
+                "user": "User",
+                "score": "Score",
+                "progress": "Progress",
+                "loading": "Loading leaderboard...",
+                "empty": "No participants found"
+            },
+            "pagination": {
+                "page": "Page {page} of {totalPages}",
+                "previous": "Previous",
+                "next": "Next"
+            }
+        },
+        "participantDetail": {
+            "keyMetrics": "Key Metrics",
+            "totalScore": "Total Score",
+            "problemStatus": "Problem Status",
+            "submissionHistory": "Submission History",
+            "attempts": "{count} attempts",
+            "points": "{count} points",
+            "table": {
+                "problem": "Problem",
+                "status": "Status",
+                "language": "Language",
+                "loading": "Loading history...",
+                "empty": "No submissions found",
+                "loadingMore": "Loading more..."
+            }
+        },
+        "recentSubmissions": {
+            "title": "Submissions",
+            "viewAll": "View All",
+            "timeAgo": {
+                "second": "{count}s ago",
+                "minute": "{count}m ago",
+                "hour": "{count}h ago",
+                "day": "{count}d ago"
+            }
+        },
+        "verdictChart": {
+            "title": "Verdict Distribution"
+        },
+        "problemHealth": {
+            "title": "Problem Health",
+            "solved": "% Solved",
+            "difficulty": {
+                "easy": "Easy",
+                "medium": "Medium",
+                "hard": "Hard"
+            },
+            "table": {
+                "problem": "Problem",
+                "submissions": "Submissions",
+                "acRate": "AC Rate",
+                "avgTime": "Avg Time",
+                "avgMemory": "Avg Memory"
+            }
+        },
         "loadError": "Failed to load statistics"
     },
     "SubmissionDetail": {

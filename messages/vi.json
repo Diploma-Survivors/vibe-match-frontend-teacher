@@ -628,6 +628,68 @@
             "ac": "AC",
             "nonAc": "Không AC"
         },
+        "liveLeaderboard": {
+            "title": "Bảng xếp hạng trực tiếp",
+            "searchPlaceholder": "Tìm kiếm người dùng...",
+            "table": {
+                "rank": "Hạng",
+                "user": "Người dùng",
+                "score": "Điểm",
+                "progress": "Tiến độ",
+                "loading": "Đang tải bảng xếp hạng...",
+                "empty": "Không tìm thấy người tham gia"
+            },
+            "pagination": {
+                "page": "Trang {page} trên {totalPages}",
+                "previous": "Trước",
+                "next": "Sau"
+            }
+        },
+        "participantDetail": {
+            "keyMetrics": "Chỉ số chính",
+            "totalScore": "Tổng điểm",
+            "problemStatus": "Trạng thái bài tập",
+            "submissionHistory": "Lịch sử nộp bài",
+            "attempts": "{count} lần thử",
+            "points": "{count} điểm",
+            "table": {
+                "problem": "Bài tập",
+                "status": "Trạng thái",
+                "language": "Ngôn ngữ",
+                "loading": "Đang tải lịch sử...",
+                "empty": "Không tìm thấy bài nộp",
+                "loadingMore": "Đang tải thêm..."
+            }
+        },
+        "recentSubmissions": {
+            "title": "Bài nộp gần đây",
+            "viewAll": "Xem tất cả",
+            "timeAgo": {
+                "second": "{count} giây trước",
+                "minute": "{count} phút trước",
+                "hour": "{count} giờ trước",
+                "day": "{count} ngày trước"
+            }
+        },
+        "verdictChart": {
+            "title": "Phân bố kết quả"
+        },
+        "problemHealth": {
+            "title": "Sức khỏe bài tập",
+            "solved": "% Đã giải",
+            "difficulty": {
+                "easy": "Dễ",
+                "medium": "Trung bình",
+                "hard": "Khó"
+            },
+            "table": {
+                "problem": "Bài tập",
+                "submissions": "Bài nộp",
+                "acRate": "Tỷ lệ AC",
+                "avgTime": "TG TB",
+                "avgMemory": "BN TB"
+            }
+        },
         "loadError": "Tải thống kê thất bại"
     },
     "SubmissionDetail": {
