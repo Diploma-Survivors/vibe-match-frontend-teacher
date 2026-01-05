@@ -132,13 +132,13 @@ export function RecentSubmissionsWidget({
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Avatar className="w-6 h-6 border border-slate-200 dark:border-slate-700">
-                                        <AvatarImage src={sub.user.avatarUrl || ''} />
+                                        <AvatarImage src={sub.author.avatarUrl || ''} />
                                         <AvatarFallback className="text-[10px]">
-                                            {sub.user.username?.substring(0, 2).toUpperCase()}
+                                            {sub.author.username?.substring(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                                        {sub.user.username}
+                                        {sub.author.username}
                                     </span>
                                     <span className="text-xs font-mono text-slate-400">
                                         • Q{sub.problemId}

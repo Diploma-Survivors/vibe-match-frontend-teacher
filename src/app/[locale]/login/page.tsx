@@ -186,11 +186,11 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
-            {!isSignUp && (
+            {/* {!isSignUp && (
               <div className="flex justify-end">
                 <ForgotPasswordDialog />
               </div>
-            )}
+            )} */}
             {isSignUp && (
               <div className="space-y-2 relative">
                 <Input

@@ -36,7 +36,7 @@ export const fetchTopics = createAsyncThunk('metadata/fetchTopics', async () => 
 
 export const fetchLanguages = createAsyncThunk('metadata/fetchLanguages', async () => {
   const response = await LanguagesService.getAllProgrammingLanguages();
-  return response.data.data.data;
+  return response.data.data;
 });
 
 const metadataSlice = createSlice({

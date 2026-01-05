@@ -140,10 +140,10 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                         <span>{t('submittedBy')}</span>
                         <div className="flex items-center gap-1.5 font-medium text-foreground">
                             <Avatar className="h-5 w-5">
-                                <AvatarImage src={submission.user.avatarUrl || ''} />
-                                <AvatarFallback>{submission.user.username?.[0]?.toUpperCase()}</AvatarFallback>
+                                <AvatarImage src={submission.author.avatarUrl || ''} />
+                                <AvatarFallback>{submission.author.username?.[0]?.toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            {submission.user.fullName || submission.user.username}
+                            {submission.author.fullName || submission.author.username}
                         </div>
                         <span>•</span>
                         <span>{new Date(submission.submittedAt).toLocaleString()}</span>

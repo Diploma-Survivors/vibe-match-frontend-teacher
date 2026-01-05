@@ -1,21 +1,30 @@
 import type { UserProfile } from './user';
-import type { Problem } from './problems';
+import type { Problem, SortOrder } from './problems';
 
 export enum SubmissionStatus {
-  PENDING = 'Pending',
-  RUNNING = 'Running',
-  ACCEPTED = 'Accepted',
-  WRONG_ANSWER = 'Wrong Answer',
-  TIME_LIMIT_EXCEEDED = 'Time Limit Exceeded',
-  SIGSEGV = 'SIGSEGV',
-  SIGXFSZ = 'SIGXFSZ',
-  SIGFPE = 'SIGFPE',
-  SIGABRT = 'SIGABRT',
-  NZEC = 'NZEC',
-  RUNTIME_ERROR = 'Runtime Error',
-  COMPILATION_ERROR = 'Compilation Error',
-  UNKNOWN_ERROR = 'Unknown Error',
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  ACCEPTED = "ACCEPTED",
+  WRONG_ANSWER = "WRONG_ANSWER",
+  TIME_LIMIT_EXCEEDED = "TIME_LIMIT_EXCEEDED",
+  MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED",
+  RUNTIME_ERROR = "RUNTIME_ERROR",
+  COMPILATION_ERROR = "COMPILATION_ERROR",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR"
 }
+
+export const SubmissionStatusLabels : Record<SubmissionStatus, string> = {
+  PENDING: "Pending",
+  RUNNING: "Running",
+  ACCEPTED: "Accepted",
+  WRONG_ANSWER: "Wrong Answer",
+  TIME_LIMIT_EXCEEDED: "Time Limit Exceeded",
+  MEMORY_LIMIT_EXCEEDED: "Memory Limit Exceeded",
+  RUNTIME_ERROR: "Runtime Error",
+  COMPILATION_ERROR: "Compilation Error",
+  UNKNOWN_ERROR: "Unknown Error"
+}
+
 
 export interface TestCaseResult {
   testcaseId: number;
@@ -56,28 +65,47 @@ export interface Submission {
   languageId: number;
   sourceCode?: string;
   contestId?: number;
+  contest: {
+    id: number;
+    name: string;    
+  }
+  author: {
+    id: number;
+    username: string;
+    avatarUrl: string;
+    isPremium: boolean; 
+  }
 }
 
 export interface SubmissionFilters {
   status?: SubmissionStatus;
-  languageIds?: number[];
-  problemIds?: number[];
-  search?: string;
-  contestIds?: number[];
+  languageId?: number;
+  problemId?: number;
+  contestId?: number;
   userId?: number;
+  fromDate?: string;
+  toDate?: string;
 }
 
 export enum SubmissionSortBy {
   ID = 'id',
   SUBMITTED_AT = 'submittedAt',
+  RUNTIME_MS = 'runtimeMs',
+  MEMORY_KB = 'memoryKb',
 }
 
 export interface GetSubmissionListRequest {
   page?: number;
   limit?: number;
   sortBy?: SubmissionSortBy;
-  sortOrder?: string;
-  filters?: SubmissionFilters;
+  sortOrder?: SortOrder;
+  status?: SubmissionStatus;
+  languageId?: number;
+  problemId?: number;
+  contestId?: number;
+  userId?: number;
+  fromDate?: string;
+  toDate?: string;
 }
 
 export interface SubmissionMeta {

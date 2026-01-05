@@ -11,6 +11,7 @@ import {
 } from '@/types/submissions';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { SortOrder } from '@/types/problems';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -24,7 +25,7 @@ interface UseSubmissionsState {
 interface UseSubmissionsActions {
   handleFiltersChange: (newFilters: SubmissionFilters) => void;
   handleSortByChange: (newSortBy: SubmissionSortBy) => void;
-  handleSortOrderChange: (newSortOrder: 'asc' | 'desc') => void;
+  handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handlePageChange: (page: number) => void;
   handleReset: () => void;
   refresh: () => void;
@@ -34,7 +35,7 @@ interface UseSubmissionsReturn extends UseSubmissionsState, UseSubmissionsAction
   totalCount: number;
   filters: SubmissionFilters;
   sortBy: SubmissionSortBy;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: SortOrder;
 }
 
 export default function useSubmissions(): UseSubmissionsReturn {
@@ -50,17 +51,29 @@ export default function useSubmissions(): UseSubmissionsReturn {
   const [filters, setFilters] = useState<SubmissionFilters>(() => {
     const initialFilters: SubmissionFilters = {};
     
-    // Parse problemIds
-    const problemIds = searchParams.getAll('problemIds').map(Number).filter((n: number) => !isNaN(n));
-    if (problemIds.length > 0) initialFilters.problemIds = problemIds;
+    // Parse problemId
+    const problemId = searchParams.get('problemId');
+    if (problemId && !isNaN(Number(problemId))) initialFilters.problemId = Number(problemId);
 
-    // Parse contestIds
-    const contestIds = searchParams.getAll('contestIds').map(Number).filter((n: number) => !isNaN(n));
-    if (contestIds.length > 0) initialFilters.contestIds = contestIds;
+    // Parse contestId
+    const contestId = searchParams.get('contestId');
+    if (contestId && !isNaN(Number(contestId))) initialFilters.contestId = Number(contestId);
 
-    // Parse languageIds
-    const languageIds = searchParams.getAll('languageIds').map(Number).filter((n: number) => !isNaN(n));
-    if (languageIds.length > 0) initialFilters.languageIds = languageIds;
+    // Parse languageId
+    const languageId = searchParams.get('languageId');
+    if (languageId && !isNaN(Number(languageId))) initialFilters.languageId = Number(languageId);
+
+    // Parse userId
+    const userId = searchParams.get('userId');
+    if (userId && !isNaN(Number(userId))) initialFilters.userId = Number(userId);
+
+    // Parse fromDate
+    const fromDate = searchParams.get('fromDate');
+    if (fromDate) initialFilters.fromDate = fromDate;
+
+    // Parse toDate
+    const toDate = searchParams.get('toDate');
+    if (toDate) initialFilters.toDate = toDate;
 
     // Parse status
     const status = searchParams.get('status');
@@ -68,22 +81,18 @@ export default function useSubmissions(): UseSubmissionsReturn {
       initialFilters.status = status as SubmissionStatus;
     }
 
-    // Parse search
-    const search = searchParams.get('search');
-    if (search) initialFilters.search = search;
-
     return initialFilters;
   });
 
   const [sortBy, setSortBy] = useState<SubmissionSortBy>(SubmissionSortBy.ID);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   const [request, setRequest] = useState<GetSubmissionListRequest>({
     page: 1,
     limit: ITEMS_PER_PAGE,
     sortBy,
     sortOrder,
-    filters,
+    ...filters,
   });
 
   const fetchSubmissions = useCallback(async (requestParams: GetSubmissionListRequest) => {
@@ -120,9 +129,15 @@ export default function useSubmissions(): UseSubmissionsReturn {
   const handleFiltersChange = useCallback(
     (newFilters: SubmissionFilters) => {
       setFilters(newFilters);
-      updateRequest({ filters: newFilters, page: 1 });
+      setRequest((prev) => ({
+        page: 1,
+        limit: prev.limit,
+        sortBy: prev.sortBy,
+        sortOrder: prev.sortOrder,
+        ...newFilters,
+      }));
     },
-    [updateRequest]
+    []
   );
 
   const handleSortByChange = useCallback(
@@ -134,7 +149,7 @@ export default function useSubmissions(): UseSubmissionsReturn {
   );
 
   const handleSortOrderChange = useCallback(
-    (newSortOrder: 'asc' | 'desc') => {
+    (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
       updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
@@ -151,14 +166,14 @@ export default function useSubmissions(): UseSubmissionsReturn {
   const handleReset = useCallback(() => {
     setFilters({});
     setSortBy(SubmissionSortBy.ID);
-    setSortOrder('asc');
-    updateRequest({
-      filters: {},
-      sortBy: SubmissionSortBy.ID,
-      sortOrder: 'asc',
+    setSortOrder(SortOrder.ASC);
+    setRequest({
       page: 1,
+      limit: ITEMS_PER_PAGE,
+      sortBy: SubmissionSortBy.ID,
+      sortOrder: SortOrder.ASC,
     });
-  }, [updateRequest]);
+  }, []);
 
   const refresh = useCallback(() => {
     fetchSubmissions(request);

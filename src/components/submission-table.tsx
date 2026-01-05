@@ -40,6 +40,7 @@ import { DataTablePagination } from './ui/data-table-pagination';
 import { getLanguageName, getStatusColor, getStatusLabel } from '@/services/submissions-service';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { SortOrder } from '@/types/problems';
 
 interface SubmissionTableProps {
     submissions: Submission[];
@@ -47,9 +48,9 @@ interface SubmissionTableProps {
     isLoading: boolean;
     onPageChange: (page: number) => void;
     sortBy: SubmissionSortBy;
-    sortOrder: 'asc' | 'desc';
+    sortOrder: SortOrder;
     onSortByChange: (sortBy: SubmissionSortBy) => void;
-    onSortOrderChange: (sortOrder: 'asc' | 'desc') => void;
+    onSortOrderChange: (sortOrder: SortOrder) => void;
     languages: ProgrammingLanguage[];
 }
 
@@ -68,10 +69,10 @@ export default function SubmissionTable({
 
     const handleSort = (column: SubmissionSortBy) => {
         if (sortBy === column) {
-            onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc');
+            onSortOrderChange(sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC);
         } else {
             onSortByChange(column);
-            onSortOrderChange('asc');
+            onSortOrderChange(SortOrder.ASC);
         }
     };
 
@@ -89,6 +90,7 @@ export default function SubmissionTable({
                             <TableRow>
                                 <TableHead>{t('id')}</TableHead>
                                 <TableHead>{t('user')}</TableHead>
+                                <TableHead>{t('contest')}</TableHead>
                                 <TableHead>{t('problem')}</TableHead>
                                 <TableHead>{t('status')}</TableHead>
                                 <TableHead>{t('statistics')}</TableHead>
@@ -102,6 +104,7 @@ export default function SubmissionTable({
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-4 w-8" /></TableCell>
                                     <TableCell><Skeleton className="h-8 w-32" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                                     <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                                     <TableCell><Skeleton className="h-6 w-24" /></TableCell>
                                     <TableCell><Skeleton className="h-4 w-24" /></TableCell>
@@ -125,6 +128,7 @@ export default function SubmissionTable({
                         <TableRow>
                             <TableHead>{t('id')}</TableHead>
                             <TableHead>{t('user')}</TableHead>
+                            <TableHead>{t('contest')}</TableHead>
                             <TableHead>{t('problem')}</TableHead>
                             <TableHead>{t('status')}</TableHead>
                             <TableHead>{t('statistics')}</TableHead>
@@ -136,7 +140,7 @@ export default function SubmissionTable({
                     <TableBody>
                         {submissions.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={8} className="h-24 text-center">
+                                <TableCell colSpan={9} className="h-24 text-center">
                                     {t('noSubmissionsFound')}
                                 </TableCell>
                             </TableRow>
@@ -147,20 +151,24 @@ export default function SubmissionTable({
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <Avatar className="h-8 w-8">
-                                                <AvatarImage src={submission.user.avatarUrl || `https://api.dicebear.com/9.x/miniavs/svg?seed=${submission.user.username}`} />
+                                                <AvatarImage src={submission.author.avatarUrl} />
                                                 <AvatarFallback>
-                                                    {submission.user.fullName}
+                                                    <img
+                                                        src="/avatars/placeholder.png"
+                                                        alt={submission.author.username}
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium">
-                                                    {submission.user.fullName}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {submission.user.email}
+                                                    {submission.author.username}
                                                 </span>
                                             </div>
                                         </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="font-medium">{submission.contest?.name || 'N/A'}</span>
                                     </TableCell>
                                     <TableCell>
                                         <span className="font-medium">{submission.problem.title}</span>
@@ -175,14 +183,23 @@ export default function SubmissionTable({
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                                            <div className="flex items-center gap-1">
-                                                <Clock className="h-3 w-3" />
-                                                {submission.executionTime} ms
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <Cpu className="h-3 w-3" />
-                                                {(submission.memoryUsed / 1024).toFixed(1)} KB
-                                            </div>
+                                            {submission.status === SubmissionStatus.PENDING ? (
+                                                <div className="flex items-center gap-1">
+                                                    N/A
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />
+                                                        {submission.executionTime} ms
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Cpu className="h-3 w-3" />
+                                                        {(submission.memoryUsed / 1024).toFixed(1)} MB
+                                                    </div>
+                                                </>
+
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell>
