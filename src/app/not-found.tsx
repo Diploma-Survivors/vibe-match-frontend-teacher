@@ -1,6 +1,6 @@
 import { FileQuestion } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 export const metadata: Metadata = {
   title: 'Không tìm thấy trang | SolVibe',
