@@ -47,7 +47,7 @@ export function RecentSubmissionsWidget({
     const handleSubmissionClick = async (submissionId: number) => {
         try {
             const response = await SubmissionsService.getSubmissionById(submissionId);
-            setSubmissionDetail(response.data);
+            setSubmissionDetail(response.data.data);
             setSelectedSubmissionId(submissionId.toString());
             setIsModalOpen(true);
         } catch (error) {

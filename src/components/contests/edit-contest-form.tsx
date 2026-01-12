@@ -37,7 +37,7 @@ export default function EditContestForm({
             : '',
         durationMinutes: initialData.durationMinutes,
         status: initialData.status,
-        problems: initialData.problems?.map((p) => ({
+        problems: initialData.contestProblems?.map((p) => ({
             problemId: p.problem.id,
             orderIndex: p.orderIndex,
             points: p.points || 0,

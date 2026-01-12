@@ -63,11 +63,7 @@ export default function ContestsPage() {
 
         if (confirmed) {
             try {
-                // Mock API call
-                // await ContestsService.deleteContest(contest.id);
-
-                // Simulate delay
-                await new Promise((resolve) => setTimeout(resolve, 500));
+                await ContestsService.deleteContest(contest.id!);
 
                 toastService.success(t('deleteSuccess'));
                 refresh();

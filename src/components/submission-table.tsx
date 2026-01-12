@@ -168,7 +168,7 @@ export default function SubmissionTable({
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-medium">{submission.contest?.name || 'N/A'}</span>
+                                        <span className="font-medium">{submission.contest?.title || 'N/A'}</span>
                                     </TableCell>
                                     <TableCell>
                                         <span className="font-medium">{submission.problem.title}</span>

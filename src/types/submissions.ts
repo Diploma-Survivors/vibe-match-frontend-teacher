@@ -56,7 +56,6 @@ export interface Submission {
   totalTestcases: number;
   testcaseResults: TestCaseResult[];
   failedResult: FailedResult;
-  user: Partial<UserProfile>;
   problem: Partial<Problem>;
   compileError: string;
   runtimeError: string;
@@ -67,9 +66,15 @@ export interface Submission {
   contestId?: number;
   contest: {
     id: number;
-    name: string;    
+    title: string;    
   }
   author: {
+    id: number;
+    username: string;
+    avatarUrl: string;
+    isPremium: boolean; 
+  },
+  user: {
     id: number;
     username: string;
     avatarUrl: string;

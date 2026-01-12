@@ -37,7 +37,7 @@ export default function EditContestPage() {
 
                 // Map API response to Contest interface
                 setContest(contestData);
-                setSelectedProblems(contestData.problems.map((p) => ({
+                setSelectedProblems(contestData.contestProblems.map((p) => ({
                     ...p.problem,
                     points: p.points || 0,
                     orderIndex: p.orderIndex

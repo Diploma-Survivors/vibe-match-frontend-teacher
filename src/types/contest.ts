@@ -14,15 +14,10 @@ export interface Contest {
   participantCount?: number;
   maxParticipant?: number;
   durationMinutes?: number;
-  problems: {
-    problem: Problem;
-    orderIndex: number;
-    points?: number;
-  }[];
   createdBy?: string;
   createdAt?: string;
   status: ContestStatus; // derived field for UI convenience
-  contestProblems?: {
+  contestProblems: {
     problem: Problem;
     orderIndex: number;
     points?: number;

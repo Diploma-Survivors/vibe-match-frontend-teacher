@@ -78,7 +78,7 @@ export default function ViewContestPage() {
                 <div className="flex items-start justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-                            {contest.name}
+                            {contest.title}
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                             <span className="flex items-center gap-1">
@@ -126,14 +126,14 @@ export default function ViewContestPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {contest.problems.length === 0 ? (
+                            {contest.contestProblems.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={4} className="text-center py-8 text-slate-500">
                                         {t('problems.empty')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                contest.problems
+                                contest.contestProblems
                                     .sort((a, b) => a.orderIndex - b.orderIndex)
                                     .map((p) => (
                                         <TableRow key={p.problem.id}>

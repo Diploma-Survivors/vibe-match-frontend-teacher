@@ -22,7 +22,7 @@ export const SubmissionsService = {
   },
 
   getSubmissionById: async (id: number): Promise<AxiosResponse<ApiResponse<Submission>>> => {
-    const response = await clientApi.get(`/submissions/${id}`);
+    const response = await clientApi.get(`/submissions/${id}/can-view-all`);
     return response;
   },
 };

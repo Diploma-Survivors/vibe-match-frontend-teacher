@@ -23,6 +23,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { cn } from '@/lib/utils';
 import { toastService } from '@/services/toasts-service';
 import { useAppSelector } from '@/store/hooks';
+import { getStatusLabel } from '@/services/submissions-service';
 
 interface SubmissionDetailProps {
     submission: Submission | null;
@@ -31,6 +32,9 @@ interface SubmissionDetailProps {
 }
 
 export default function SubmissionDetail({ submission, isLoading, error }: SubmissionDetailProps) {
+
+    console.log(submission)
+    console.log(submission?.user)
     const { languages } = useAppSelector((state) => state.metadata);
     const t = useTranslations('SubmissionDetail');
 
@@ -133,17 +137,17 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                         <h1 className="text-2xl font-bold">{t('title', { id: submission.id })}</h1>
                         <Badge variant="outline" className={cn("px-3 py-1 flex items-center gap-1.5", getStatusColor(submission.status))}>
                             {getStatusIcon(submission.status)}
-                            {submission.status}
+                            {getStatusLabel(submission.status)}
                         </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                         <span>{t('submittedBy')}</span>
                         <div className="flex items-center gap-1.5 font-medium text-foreground">
                             <Avatar className="h-5 w-5">
-                                <AvatarImage src={submission.author.avatarUrl || ''} />
-                                <AvatarFallback>{submission.author.username?.[0]?.toUpperCase()}</AvatarFallback>
+                                <AvatarImage src={submission.user.avatarUrl || ''} />
+                                <AvatarFallback>{submission.user.username?.[0]?.toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            {submission.author.fullName || submission.author.username}
+                            {submission.user.username}
                         </div>
                         <span>•</span>
                         <span>{new Date(submission.submittedAt).toLocaleString()}</span>
@@ -156,12 +160,12 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                            {t('status.label')}
+                            {getStatusIcon(submission.status)}
+                            {getStatusLabel(submission.status)}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{submission.status}</div>
+                        <div className="text-2xl font-bold">{getStatusLabel(submission.status)}</div>
                         {/* Placeholder for sub-status info if any */}
                         <div className="text-xs text-muted-foreground mt-1">
                             {submission.status === SubmissionStatus.ACCEPTED ? t('status.allPassed') : t('status.checkDetails')}
@@ -177,7 +181,12 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{submission.executionTime} ms</div>
+                        {submission.status === SubmissionStatus.PENDING && (
+                            <div className="text-2xl font-bold">N/A</div>
+                        )}
+                        {submission.status !== SubmissionStatus.PENDING && (
+                            <div className="text-2xl font-bold">{submission.executionTime} ms</div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -189,7 +198,12 @@ export default function SubmissionDetail({ submission, isLoading, error }: Submi
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{(submission.memoryUsed / 1024).toFixed(1)} MB</div>
+                        {submission.status === SubmissionStatus.PENDING && (
+                            <div className="text-2xl font-bold">N/A</div>
+                        )}
+                        {submission.status !== SubmissionStatus.PENDING && (
+                            <div className="text-2xl font-bold">{(submission.memoryUsed / 1024).toFixed(1)} MB</div>
+                        )}
                     </CardContent>
                 </Card>
 

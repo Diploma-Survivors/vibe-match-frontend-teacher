@@ -24,17 +24,6 @@ async function createContest(
   return clientApi.post(url, contestDTO);
 }
 
-function mapContestToDTO(contest: Contest): ContestCreateRequest {
-  return {
-    ...contest,
-    problems: contest.problems.map((problem) => ({
-      problemId: problem.problem.id!,
-      order: problem.orderIndex,
-      score: problem.points || 0,
-    })),
-  };
-}
-
 async function getContestById(id: string) {
   const url = `/contests/${id}`;
   const response = await clientApi.get<ApiResponse<Contest>>(url);
@@ -44,7 +33,7 @@ async function getContestById(id: string) {
     if (contest.startTime && contest.endTime) {
       contest.durationMinutes = differenceInMinutes(new Date(contest.endTime), new Date(contest.startTime));
     }
-    contest.problems = contest.contestProblems ?? [];
+    contest.contestProblems = contest.contestProblems ?? [];
   }
   
   return response;
@@ -109,7 +98,7 @@ async function getSubmissionDetails(
 }
 
 async function getContests(params?: any) {
-  const url = '/contests';
+  const url = '/contests/admin';
   const response = await clientApi.get<ApiResponse<ContestListResponse>>(url, { params });
   
   if (response.data.data && Array.isArray(response.data.data.data)) {
@@ -150,9 +139,14 @@ async function getProblemHealth(contestId: number): Promise<AxiosResponse<ApiRes
     return response;
 }
 
+async function deleteContest(contestId: number): Promise<AxiosResponse<ApiResponse<void>>> {
+    const url = `/contests/${contestId}`;
+    const response = await clientApi.delete<ApiResponse<void>>(url);
+    return response;
+}
+
 export const ContestsService = {
   createContest,
-  mapContestToDTO,
   getContestById,
   updateContest,
   getContestSubmissionsOverview,
@@ -161,4 +155,5 @@ export const ContestsService = {
   getContestStatistics,
   getContestLeaderboard,
   getProblemHealth,
+  deleteContest,
 };

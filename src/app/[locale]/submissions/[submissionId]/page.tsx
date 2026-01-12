@@ -31,7 +31,7 @@ export default function SubmissionDetailPage() {
             try {
                 setIsLoading(true);
                 const response = await SubmissionsService.getSubmissionById(submissionId);
-                setSubmission(response.data);
+                setSubmission(response.data.data);
             } catch (err) {
                 setError(t('loadFailed'));
                 console.error(err);

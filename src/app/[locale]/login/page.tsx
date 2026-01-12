@@ -15,7 +15,7 @@ import { ForgotPasswordDialog } from '@/components/auth/forgot-password-dialog';
 import LanguageSwitcher from '@/components/language-switcher';
 import { toastService } from '@/services/toasts-service';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -33,6 +33,7 @@ export default function LoginPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || `/${locale}/dashboard`;
+  const router = useRouter();
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
@@ -70,12 +71,15 @@ export default function LoginPage() {
         const result = await signIn('credentials', {
           username: finalUsername,
           password: finalPassword,
-          redirect: true,
-          callbackUrl,
+          redirect: false,
         });
 
         if (result?.error) {
           toastService.error(result.error);
+        } else {
+          // Success: Redirect manually
+          router.push(callbackUrl);
+          router.refresh(); // Optional: ensures session cookies are recognized
         }
       } catch (error: any) {
         toastService.error(
@@ -86,14 +90,14 @@ export default function LoginPage() {
       const result = await signIn('credentials', {
         username: finalUsername,
         password: finalPassword,
-        redirect: true,
-        callbackUrl,
+        redirect: false,
       });
 
       if (result?.error) {
         toastService.error(result.error);
       } else {
-        window.location.href = callbackUrl;
+        router.push(callbackUrl);
+        router.refresh();
       }
     }
   };

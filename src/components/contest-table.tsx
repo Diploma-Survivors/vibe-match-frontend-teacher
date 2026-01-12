@@ -265,7 +265,7 @@ export default function ContestTable({
                                                     </>
                                                 )}
 
-                                                {hasPermission(PermissionEnum.CONTEST_DELETE) && (
+                                                {(contest.status === ContestStatus.DRAFT || contest.status === ContestStatus.SCHEDULED) && hasPermission(PermissionEnum.CONTEST_DELETE) && (
                                                     <DropdownMenuItem
                                                         className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
                                                         onClick={() => onDelete?.(contest)}
