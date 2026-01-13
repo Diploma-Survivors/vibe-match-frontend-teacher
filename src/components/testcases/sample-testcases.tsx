@@ -1,4 +1,4 @@
-import type { TestcaseSample } from '@/types/testcases';
+import type { SampleTestCase } from '@/types/testcases';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { TestCaseTextArea } from './testcase-textarea';
 
 interface SampleTestcasesProps {
-  readonly sampleTestcases?: TestcaseSample[];
-  readonly onChange: (samples: TestcaseSample[]) => void;
+  readonly sampleTestcases?: SampleTestCase[];
+  readonly onChange: (samples: SampleTestCase[]) => void;
   readonly errorMessage?: string;
   readonly isReadOnly?: boolean;
 }
@@ -19,14 +19,14 @@ export default function SampleTestcases({
   errorMessage,
 }: SampleTestcasesProps) {
   const [currentTestCases, setCurrentTestCases] =
-    useState<TestcaseSample[]>(sampleTestcases);
+    useState<SampleTestCase[]>(sampleTestcases);
 
   useEffect(() => {
     onChange(currentTestCases);
   }, [currentTestCases, onChange]);
 
   const addTestCase = () => {
-    const newTestCases = [...sampleTestcases, { input: '', output: '' }];
+    const newTestCases = [...sampleTestcases, { input: '', expectedOutput: '' }];
     setCurrentTestCases(newTestCases);
   };
 
@@ -37,7 +37,7 @@ export default function SampleTestcases({
 
   const handleTestCaseChange = (
     index: number,
-    field: 'input' | 'output',
+    field: 'input' | 'expectedOutput',
     value: string
   ) => {
     const newTestCases = [...currentTestCases];
@@ -74,7 +74,7 @@ export default function SampleTestcases({
         {currentTestCases.map((testCase, index) => {
           return (
             <div
-              key={index}
+              key={testCase.id}
               className="p-4 bg-gradient-to-r from-slate-50/50 to-blue-50/30 dark:from-slate-700/30 dark:to-blue-900/20 rounded-xl border border-slate-200/50 dark:border-slate-600/50 "
               style={{ marginBlockEnd: '1em' }}
             >
@@ -115,11 +115,11 @@ export default function SampleTestcases({
                   <TestCaseTextArea
                     isReadOnly={isReadOnly}
                     label="Đầu ra"
-                    value={testCase.output}
+                    value={testCase.expectedOutput}
                     placeholder="Nhập dữ liệu đầu ra..."
                     required
                     onChange={(val) =>
-                      handleTestCaseChange(index, 'output', val)
+                      handleTestCaseChange(index, 'expectedOutput', val)
                     }
                   />
                 </div>

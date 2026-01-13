@@ -1,229 +1,304 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
-import type { Contest } from '@/types/contest';
 import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Trophy,
-  Users,
+    Contest,
+    ContestMeta,
+    ContestSortBy,
+    ContestStatus,
+    CONTEST_STATUS_COLORS,
+    CONTEST_STATUS_LABELS,
+} from '@/types/contest';
+import { SortOrder } from '@/types/problems';
+import {
+    Edit,
+    Eye,
+    MoreHorizontal,
+    Trash2,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
+    Lock,
+    Unlock,
+    BarChart2,
 } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { format } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip } from './ui/tooltip';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+
+import { useApp } from '@/contexts/app-context';
+import { PermissionEnum } from '@/types/permission';
 
 interface ContestTableProps {
-  contests: Contest[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+    contests: Contest[];
+    meta: ContestMeta | null;
+    totalCount: number;
+    isLoading: boolean;
+    sortBy: ContestSortBy;
+    sortOrder: SortOrder;
+    onSortByChange: (sortBy: ContestSortBy) => void;
+    onSortOrderChange: (sortOrder: SortOrder) => void;
+    onPageChange: (page: number) => void;
+    onDelete?: (contest: Contest) => void;
+    onStatusChange?: (contest: Contest) => void;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'chưa bắt đầu':
-      return 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300';
-    case 'đang diễn ra':
-      return 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300';
-    case 'đã kết thúc':
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300';
-    default:
-      return 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900/30 dark:text-gray-300';
-  }
-};
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'chưa bắt đầu':
-      return <Calendar className="w-4 h-4" />;
-    case 'đang diễn ra':
-      return <Trophy className="w-4 h-4" />;
-    case 'đã kết thúc':
-      return <Users className="w-4 h-4" />;
-    default:
-      return <Calendar className="w-4 h-4" />;
-  }
-};
-
 export default function ContestTable({
-  contests,
-  currentPage,
-  totalPages,
-  onPageChange,
+    contests,
+    meta,
+    totalCount,
+    isLoading,
+    sortBy,
+    sortOrder,
+    onSortByChange,
+    onSortOrderChange,
+    onPageChange,
+    onDelete,
+    onStatusChange,
 }: ContestTableProps) {
-  return (
-    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
-      {/* Table Header */}
-      <div className="px-6 py-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50">
-        <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
-          🏆 Danh sách cuộc thi
-        </h3>
-      </div>
+    const t = useTranslations('ContestTable');
+    const { hasPermission } = useApp();
 
-      <div className="overflow-x-auto max-w-full">
-        <div className="min-w-[800px]">
-          <Table className="w-full">
-            <TableHeader>
-              <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
-                <TableHead className="w-16 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
-                  />
-                </TableHead>
-                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  ID
-                </TableHead>
-                <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3">
-                  Cuộc thi
-                </TableHead>
-                <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Số bài
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contests.map((contest, index) => (
-                <TableRow
-                  key={contest.id}
-                  className="border-b border-slate-100/50 dark:border-slate-700/30 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-all duration-200 group"
-                >
-                  <TableCell className="text-center px-4 py-4">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
-                    />
-                  </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
-                      <code className="text-green-700 dark:text-green-300 font-bold text-sm">
-                        {contest.id}
-                      </code>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-4 py-4">
-                    <div className="space-y-3">
-                      <Link href={`/contests/${contest.id}`}>
-                        <button
-                          type="button"
-                          className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
-                        >
-                          {contest.name}
-                        </button>
-                      </Link>
-                      {/* <div className="flex items-center gap-2">
-                        <div
-                          className={`${contest.accessRange === "public" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"} font-medium px-2 py-1 rounded-lg border text-xs inline-block`}
-                        >
-                          {contest.accessRange === "public"
-                            ? "Công khai"
-                            : "Riêng tư"}
-                        </div>
-                      </div> */}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="space-y-2">
-                      {/* <div
-                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusColor(contest.status)}`}
-                      >
-                        {getStatusIcon(contest.status)}
-                        {contest.status}
-                      </div> */}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex items-center justify-center w-12 h-8 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg border border-purple-200 dark:border-purple-700">
-                      <span className="font-bold text-purple-700 dark:text-purple-300 text-sm">
-                        {contest.problems.length}
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+    const handleSort = (column: ContestSortBy) => {
+        if (sortBy === column) {
+            onSortOrderChange(
+                sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
+            );
+        } else {
+            onSortByChange(column);
+            onSortOrderChange(SortOrder.ASC);
+        }
+    };
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between p-6 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/30 dark:bg-slate-700/10">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="w-10 h-10 p-0 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
+    const renderSortIcon = (column: ContestSortBy) => {
+        if (sortBy !== column) return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />;
+        return sortOrder === SortOrder.ASC ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+        ) : (
+            <ArrowDown className="ml-2 h-4 w-4" />
+        );
+    };
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum: number;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
+    if (isLoading) {
+        return (
+            <div className="space-y-4">
+                <div className="rounded-md border border-slate-200 dark:border-slate-700">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[80px]">{t('id')}</TableHead>
+                                <TableHead>{t('name')}</TableHead>
+                                <TableHead>{t('startTime')}</TableHead>
+                                <TableHead>{t('duration')}</TableHead>
+                                <TableHead>{t('status')}</TableHead>
+                                <TableHead className="text-right">{t('actions')}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                                    <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        );
+    }
 
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => onPageChange(pageNum)}
-                    className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
-                      currentPage === pageNum
-                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                        : 'border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
-                    }`}
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
+    return (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                        <TableRow>
+                            <TableHead
+                                className="w-[80px] cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                onClick={() => handleSort(ContestSortBy.ID)}
+                            >
+                                <div className="flex items-center">
+                                    {t('id')}
+                                </div>
+                            </TableHead>
+                            <TableHead>{t('name')}</TableHead>
+                            <TableHead
+                                className="cursor-pointer hover:text-primary transition-colors"
+                                onClick={() => handleSort(ContestSortBy.START_TIME)}
+                            >
+                                {t('startTime')}
+                                {sortBy === ContestSortBy.START_TIME && (
+                                    <span className="ml-1">{sortOrder === SortOrder.ASC ? '↑' : '↓'}</span>
+                                )}
+                            </TableHead>
+                            <TableHead>
+                                {t('duration')}
+                            </TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead>{t('participationCount')}</TableHead>
+                            <TableHead className="text-right">{t('actions')}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {contests.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="h-24 text-center text-slate-500">
+                                    {t('noContestsFound')}
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            contests.map((contest) => (
+                                <TableRow key={contest.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <TableCell className="font-medium">{contest.id}</TableCell>
+                                    <TableCell>
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">
+                                            {contest.title}
+                                        </div>
+                                        <div className="text-xs text-slate-500 truncate max-w-[300px]">
+                                            {contest.description}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {format(new Date(contest.startTime), 'PP p')}
+                                    </TableCell>
+                                    <TableCell>
+                                        {contest.durationMinutes} {t('mins')}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge
+                                            variant="secondary"
+                                            className={`${CONTEST_STATUS_COLORS[contest.status || ContestStatus.SCHEDULED]
+                                                } border-0`}
+                                        >
+                                            {CONTEST_STATUS_LABELS[contest.status || ContestStatus.SCHEDULED]}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        {contest.participantCount || 0}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {contest.status === ContestStatus.SCHEDULED || contest.status === ContestStatus.DRAFT ? (
+                                                    hasPermission(PermissionEnum.CONTEST_UPDATE) && (
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}/edit`} className="cursor-pointer">
+                                                                <Edit className="mr-2 h-4 w-4" />
+                                                                {t('edit')}
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    )
+                                                ) : (
+                                                    <>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}`} className="cursor-pointer">
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                {t('view')}
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/contests/${contest.id}/statistics`} className='cursor-pointer'>
+                                                                <BarChart2 className="mr-2 h-4 w-4" />
+                                                                {t('statistics')}
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    </>
+                                                )}
+
+                                                {hasPermission(PermissionEnum.CONTEST_UPDATE) && (
+                                                    <>
+                                                        {contest.status === ContestStatus.SCHEDULED && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.DRAFT })}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <Lock className="mr-2 h-4 w-4" />
+                                                                {t('draft')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {contest.status === ContestStatus.DRAFT && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.SCHEDULED })}
+                                                                className="cursor-pointer"
+                                                            >
+                                                                <Unlock className="mr-2 h-4 w-4" />
+                                                                {t('scheduled')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {contest.status === ContestStatus.RUNNING && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => onStatusChange?.({ ...contest, status: ContestStatus.CANCELLED })}
+                                                                className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                {t('cancel')}
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                    </>
+                                                )}
+
+                                                {(contest.status === ContestStatus.DRAFT || contest.status === ContestStatus.SCHEDULED) && hasPermission(PermissionEnum.CONTEST_DELETE) && (
+                                                    <DropdownMenuItem
+                                                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
+                                                        onClick={() => onDelete?.(contest)}
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        {t('delete')}
+                                                    </DropdownMenuItem>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="w-10 h-10 p-0 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Trang{' '}
-            <span className="font-bold text-slate-900 dark:text-slate-100">
-              {currentPage}
-            </span>{' '}
-            /{' '}
-            <span className="font-bold text-slate-900 dark:text-slate-100">
-              {totalPages}
-            </span>
-          </div>
+            {meta && (
+                <DataTablePagination
+                    currentPage={meta.page}
+                    totalPages={meta.totalPages}
+                    onPageChange={onPageChange}
+                    meta={{
+                        page: meta.page,
+                        limit: meta.limit,
+                        total: totalCount,
+                        hasPreviousPage: meta.hasPreviousPage,
+                        hasNextPage: meta.hasNextPage,
+                    }}
+                    entityName={t('entityName')}
+                />
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 }

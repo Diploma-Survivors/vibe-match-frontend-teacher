@@ -5,13 +5,19 @@ export interface TestCase {
   isSample: boolean;
 }
 
-export interface TestcaseSample {
+export interface SampleTestCase {
+  id?: number;
+  problem?: string;
   input: string;
-  output: string;
+  expectedOutput: string;
+  orderIndex?: number;
+  explanation?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateTestcaseRequest {
-  testcases: TestcaseSample[];
+  testcases: SampleTestCase[];
 }
 
 export interface CreateTestcaseFileResponse {
@@ -24,4 +30,9 @@ export interface CreateTestcaseFileResponse {
 export interface CreateTestcaseResponse {
   id: number;
   // Add other fields as returned by backend
+}
+
+export interface TestcaseInput {
+  input: string;
+  output: string;
 }
