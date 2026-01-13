@@ -25,7 +25,8 @@
         "dontHaveAccount": "Don't have an account? ",
         "passwordsDoNotMatch": "Passwords do not match",
         "registrationSuccess": "Registration successful! Logging in...",
-        "registrationFailed": "Registration failed"
+        "registrationFailed": "Registration failed",
+        "loginFailed": "Login failed, please try again!"
     },
     "Sidebar": {
         "overview": "OVERVIEW",
@@ -893,5 +894,16 @@
                 "failedToLoad": "Failed to load dashboard data"
             }
         }
+    },
+    "NotFound": {
+        "title": "Page Not Found | SolVibe",
+        "description": "The page you are looking for does not exist.",
+        "heading": "404",
+        "subheading": "Page Not Found",
+        "message": "The page you are looking for does not exist or has been moved."
+    },
+    "Loading": {
+        "title": "Loading application...",
+        "description": "Please wait while we initialize the system"
     }
 }

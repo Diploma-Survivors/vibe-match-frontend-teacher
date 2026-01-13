@@ -25,7 +25,8 @@
         "dontHaveAccount": "Chưa có tài khoản? ",
         "passwordsDoNotMatch": "Mật khẩu không khớp",
         "registrationSuccess": "Đăng ký thành công! Đang đăng nhập...",
-        "registrationFailed": "Đăng ký thất bại"
+        "registrationFailed": "Đăng ký thất bại",
+        "loginFailed": "Đăng nhập thất bại, vui lòng thử lại!"
     },
     "Sidebar": {
         "overview": "TỔNG QUAN",
@@ -889,5 +890,16 @@
                 "failedToLoad": "Không thể tải dữ liệu bảng điều khiển"
             }
         }
+    },
+    "NotFound": {
+        "title": "Không tìm thấy trang | SolVibe",
+        "description": "Trang bạn đang tìm kiếm không tồn tại.",
+        "heading": "404",
+        "subheading": "Không tìm thấy trang",
+        "message": "Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển."
+    },
+    "Loading": {
+        "title": "Đang tải ứng dụng...",
+        "description": "Vui lòng chờ trong khi chúng tôi khởi tạo hệ thống"
     }
 }

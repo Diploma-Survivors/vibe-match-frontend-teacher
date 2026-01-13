@@ -75,7 +75,7 @@ export default function LoginPage() {
         });
 
         if (result?.error) {
-          toastService.error(result.error);
+          toastService.error(t('loginFailed'));
         } else {
           // Success: Redirect manually
           router.push(callbackUrl);
@@ -94,7 +94,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toastService.error(result.error);
+        toastService.error(t('loginFailed'));
       } else {
         router.push(callbackUrl);
         router.refresh();
