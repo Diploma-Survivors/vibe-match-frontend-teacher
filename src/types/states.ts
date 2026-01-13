@@ -1,14 +1,10 @@
 export interface DecodedAccessToken {
-  userId: number;
+  sub: number;
   email?: string;
-  firstName?: string;
-  lastName?: string;
+  username?: string;
   roles?: string[];
-  sub: string;
-  iss: string;
   iat: number;
   exp: number;
-  aud?: string;
 }
 
 export interface UserInfo {

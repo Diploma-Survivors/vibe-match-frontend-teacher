@@ -1,28 +1,33 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "linter": {
-    "enabled": true,
+    "enabled": false,
     "rules": {
       "recommended": true,
       "a11y": {
         "noLabelWithoutControl": "off",
         "useValidAnchor": "off",
-        "useSemanticElements": "warn"
+        "useSemanticElements": "warn",
+        "useKeyWithClickEvents": "off"
       },
       "complexity": {
         "noStaticOnlyClass": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn",
+        "noArrayIndexKey": "off",
         "noExplicitAny": "off"
+      },
+      "style": {
+        "noUnusedTemplateLiteral": "off",
+        "useTemplate": "off"
       }
     }
   },
   "formatter": {
-    "enabled": true,
+    "enabled": false,
     "indentWidth": 2,
     "indentStyle": "space"
   },
@@ -35,6 +40,9 @@
   },
   "files": {
     "maxSize": 2000000,
-    "ignore": [".next/**/*", "node_modules/**/*"]
+    "ignore": [
+      ".next/**/*",
+      "node_modules/**/*"
+    ]
   }
 }

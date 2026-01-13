@@ -10,7 +10,7 @@ export function validateTestcaseFileFormat(file: File | null): {
   error?: string;
 } {
   if (!file) {
-    return { isValid: false, error: 'Không tìm thấy file.' };
+    return { isValid: false, error: 'File not found.' };
   }
 
   const hasValidType = AllowedTypes.includes(file.type);
@@ -24,7 +24,7 @@ export function validateTestcaseFileFormat(file: File | null): {
 
   return {
     isValid: false,
-    error: `Định dạng file không hợp lệ. Chỉ chấp nhận: ${AllowedExtensions.join(
+    error: `Invalid file format. Accepted formats: ${AllowedExtensions.join(
       ', '
     )}`,
   };
@@ -36,7 +36,7 @@ export function validateTestcaseFileContent(fileContent: string): {
   testcaseCount?: number;
 } {
   if (!fileContent || fileContent.trim() === '') {
-    return { isValid: false, error: 'File không được để trống.' };
+    return { isValid: false, error: 'File cannot be empty.' };
   }
 
   // Parse JSON content
@@ -46,7 +46,7 @@ export function validateTestcaseFileContent(fileContent: string): {
   } catch (error) {
     return {
       isValid: false,
-      error: `File JSON không hợp lệ: ${error instanceof Error ? error.message : 'Parse error'}`,
+      error: `Invalid JSON file: ${error instanceof Error ? error.message : 'Parse error'}`,
     };
   }
 
@@ -54,7 +54,7 @@ export function validateTestcaseFileContent(fileContent: string): {
   if (!Array.isArray(testcases)) {
     return {
       isValid: false,
-      error: 'File JSON phải chứa một mảng (array) các test case.',
+      error: 'JSON file must contain an array of test cases.',
     };
   }
 
@@ -62,7 +62,7 @@ export function validateTestcaseFileContent(fileContent: string): {
   if (testcases.length === 0) {
     return {
       isValid: false,
-      error: 'File phải chứa ít nhất một test case.',
+      error: 'File must contain at least one test case.',
     };
   }
 
@@ -75,22 +75,22 @@ export function validateTestcaseFileContent(fileContent: string): {
 
     // Required fields
     if (!testcase.input && testcase.input !== '') {
-      errors.push(`Test case #${index}: Thiếu field 'input' (bắt buộc).`);
+      errors.push(`Test case #${index}: Missing 'input' field (required).`);
     } else if (typeof testcase.input !== 'string') {
-      errors.push(`Test case #${index}: Field 'input' phải là string.`);
+      errors.push(`Test case #${index}: Field 'input' must be a string.`);
     }
 
     if (!testcase.output && testcase.output !== '') {
-      errors.push(`Test case #${index}: Thiếu field 'output' (bắt buộc).`);
+      errors.push(`Test case #${index}: Missing 'output' field (required).`);
     } else if (typeof testcase.output !== 'string') {
-      errors.push(`Test case #${index}: Field 'output' phải là string.`);
+      errors.push(`Test case #${index}: Field 'output' must be a string.`);
     } else if (testcase.output.trim() === '') {
-      warnings.push(`Test case #${index}: Field 'output' là chuỗi rỗng.`);
+      warnings.push(`Test case #${index}: Field 'output' is an empty string.`);
     }
 
     // Stop validation if too many errors
     if (errors.length >= 20) {
-      errors.push('... và có thể còn nhiều lỗi khác.');
+      errors.push('... and potentially more errors.');
       break;
     }
   }
@@ -99,7 +99,7 @@ export function validateTestcaseFileContent(fileContent: string): {
   if (errors.length > 0) {
     return {
       isValid: false,
-      error: `Tìm thấy ${errors.length} lỗi:\n${errors.join('\n')}`,
+      error: `Found ${errors.length} errors:\n${errors.join('\n')}`,
     };
   }
 

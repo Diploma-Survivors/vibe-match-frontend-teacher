@@ -1,0 +1,909 @@
+{
+    "HomePage": {
+        "title": "Welcome to Sol Vibe",
+        "about": "About"
+    },
+    "LocaleSwitcher": {
+        "label": "Change language",
+        "en": "English",
+        "vi": "Vietnamese"
+    },
+    "LoginPage": {
+        "welcome": "Welcome to sFinx",
+        "createAccount": "Create an account to get started",
+        "enterLogin": "Enter your login information to access your account",
+        "email": "Email",
+        "fullName": "Full Name",
+        "username": "Username",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "signUp": "Sign Up",
+        "login": "Login",
+        "orLoginWith": "Or login with",
+        "google": "Google",
+        "alreadyHaveAccount": "Already have an account? ",
+        "dontHaveAccount": "Don't have an account? ",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "registrationSuccess": "Registration successful! Logging in...",
+        "registrationFailed": "Registration failed",
+        "loginFailed": "Login failed, please try again!"
+    },
+    "Sidebar": {
+        "overview": "OVERVIEW",
+        "dashboard": "Dashboard",
+        "problemManagement": "PROBLEM MANAGEMENT",
+        "problemList": "Problem List",
+        "createNewProblem": "Create New Problem",
+        "manageTagsTopics": "Manage Tags/Topics",
+        "contestManagement": "CONTEST MANAGEMENT",
+        "contestList": "Contest List",
+        "createNewContest": "Create New Contest",
+        "submissionManagement": "SUBMISSION MANAGEMENT",
+        "manageSubmissions": "Manage Submissions",
+        "userManagement": "USER MANAGEMENT",
+        "userList": "User List",
+        "feedbackReports": "Feedback & Reports",
+        "systemAi": "SYSTEM & AI",
+        "manageAiPrompts": "Manage AI Prompts",
+        "generalSettings": "General Settings",
+        "logout": "Logout",
+        "noEmail": "No email",
+        "rolesAndPermissions": "Roles & Permissions"
+    },
+    "ContestsPage": {
+        "title": "Contest List",
+        "description": "Manage contests and competitions.",
+        "createContest": "Create new contest",
+        "deleteTitle": "Delete Contest",
+        "deleteMessage": "Are you sure you want to delete the contest \"{name}\"? This action cannot be undone.",
+        "deleteConfirm": "Delete",
+        "cancel": "Cancel",
+        "deleteSuccess": "Contest deleted successfully",
+        "deleteError": "Failed to delete contest",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "confirmActivateTitle": "Confirm Activate",
+        "confirmDeactivateTitle": "Confirm Deactivate",
+        "confirmActivateMessage": "Are you sure you want to activate the contest \"{name}\"?",
+        "confirmDeactivateMessage": "Are you sure you want to deactivate the contest \"{name}\"?",
+        "activateSuccess": "Contest activated successfully",
+        "deactivateSuccess": "Contest deactivated successfully",
+        "activateError": "Failed to activate contest",
+        "deactivateError": "Failed to deactivate contest",
+        "confirmScheduleTitle": "Confirm Schedule",
+        "confirmDraftTitle": "Confirm Draft",
+        "confirmCancelTitle": "Confirm Cancel",
+        "confirmScheduleMessage": "Are you sure you want to schedule the contest \"{name}\"?",
+        "confirmDraftMessage": "Are you sure you want to move the contest \"{name}\" to draft?",
+        "confirmCancelMessage": "Are you sure you want to cancel the contest \"{name}\"?",
+        "schedule": "Schedule",
+        "draft": "Draft",
+        "scheduleSuccess": "Contest scheduled successfully",
+        "draftSuccess": "Contest moved to draft successfully",
+        "cancelSuccess": "Contest cancelled successfully",
+        "scheduleError": "Failed to schedule contest",
+        "draftError": "Failed to move contest to draft",
+        "cancelError": "Failed to cancel contest"
+    },
+    "ProblemsPage": {
+        "title": "Problem List",
+        "description": "Manage problem with sFinx.",
+        "createProblem": "Create new problem",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "cancel": "Cancel",
+        "confirmActivateTitle": "Confirm Activate",
+        "confirmDeactivateTitle": "Confirm Deactivate",
+        "confirmActivateMessage": "Are you sure you want to activate the problem \"{title}\"?",
+        "confirmDeactivateMessage": "Are you sure you want to deactivate the problem \"{title}\"?",
+        "activateSuccess": "Problem activated successfully",
+        "deactivateSuccess": "Problem deactivated successfully",
+        "activateError": "Failed to activate problem",
+        "deactivateError": "Failed to deactivate problem"
+    },
+    "SubmissionsPage": {
+        "title": "Submission List",
+        "description": "View and manage all submissions."
+    },
+    "ContestTable": {
+        "id": "ID",
+        "name": "Name",
+        "startTime": "Start Time",
+        "duration": "Duration",
+        "status": "Status",
+        "visibility": "Visibility",
+        "actions": "Actions",
+        "noContestsFound": "No contests found.",
+        "mins": "mins",
+        "active": "Active",
+        "inactive": "Inactive",
+        "edit": "Edit",
+        "view": "View",
+        "statistics": "Statistics",
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "delete": "Delete",
+        "entityName": "contests",
+        "participationCount": "Participation Count",
+        "draft": "Draft",
+        "scheduled": "Schedule",
+        "cancel": "Cancel"
+    },
+    "ProblemTable": {
+        "selectMultiple": "Select multiple problems",
+        "selectCount": "Select {count} problems",
+        "selectProblem": "Select problem",
+        "select": "Select",
+        "id": "ID",
+        "title": "Title",
+        "difficulty": "Difficulty",
+        "status": "Status",
+        "acceptance": "ACCEPTANCE",
+        "tags": "TAGS",
+        "topics": "Topics",
+        "actions": "Actions",
+        "noProblemsFound": "No problems found",
+        "lastUpdated": "Last updated:",
+        "active": "Active",
+        "inactive": "Inactive",
+        "openMenu": "Open menu",
+        "edit": "Edit",
+        "statistics": "Statistics",
+        "viewSubmissions": "View Submissions",
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "delete": "Delete",
+        "entityName": "problems",
+        "premium": "Premium"
+    },
+    "SubmissionTable": {
+        "id": "ID",
+        "user": "User",
+        "contest": "Contest",
+        "problem": "Problem",
+        "status": "Status",
+        "statistics": "Statistics",
+        "language": "Language",
+        "submittedAt": "Submitted At",
+        "noSubmissionsFound": "No submissions found.",
+        "viewDetails": "View Details",
+        "delete": "Delete",
+        "entityName": "submissions"
+    },
+    "DataTablePagination": {
+        "summary": "Showing <bold>{start}</bold> - <bold>{end}</bold> of <bold>{total}</bold> {entityName}"
+    },
+    "ContestFilter": {
+        "searchPlaceholder": "Search contests...",
+        "sortByLabel": "Sort by:",
+        "sortByPlaceholder": "Sort by",
+        "id": "ID",
+        "startTime": "Start Time",
+        "duration": "Duration",
+        "status": "Status",
+        "selectStatus": "Select Status",
+        "dateRange": "Date Range",
+        "from": "From",
+        "to": "To",
+        "reset": "Reset",
+        "active": "Active",
+        "statusOptions": {
+            "Draft": "Draft",
+            "Scheduled": "Scheduled",
+            "Running": "Running",
+            "Ended": "Ended",
+            "Cancelled": "Cancelled"
+        },
+        "participantCount": "Participant Count"
+    },
+    "ProblemFilter": {
+        "searchPlaceholder": "Find ...",
+        "sortByLabel": "Sort by:",
+        "sortByPlaceholder": "Sort by",
+        "id": "ID",
+        "difficulty": "Difficulty",
+        "acceptance": "Acceptance",
+        "selectDifficulty": "Select Difficulty",
+        "status": "Status",
+        "allStatus": "All Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "topics": "Topics",
+        "searchTopics": "Search topics...",
+        "noTopicsFound": "No topics found",
+        "tags": "Tags",
+        "searchTags": "Search tags...",
+        "noTagsFound": "No tags found",
+        "reset": "Reset",
+        "difficultyOptions": {
+            "easy": "Easy",
+            "medium": "Medium",
+            "hard": "Hard"
+        },
+        "allTypes": "All Types",
+        "allDifficulties": "All Difficulties",
+        "premium": "Premium",
+        "free": "Free"
+    },
+    "SubmissionFilter": {
+        "searchPlaceholder": "Find ...",
+        "sortByLabel": "Sort by:",
+        "id": "ID",
+        "submittedAt": "Submitted At",
+        "runtimeMs": "Runtime (ms)",
+        "memoryKb": "Memory (KB)",
+        "problems": "Problems",
+        "searchProblems": "Search problems...",
+        "noProblemsFound": "No problems found",
+        "contests": "Contests",
+        "searchContests": "Search contests...",
+        "noContestsFound": "No contests found",
+        "languages": "Languages",
+        "searchLanguages": "Search languages...",
+        "noLanguagesFound": "No languages found",
+        "status": "Status",
+        "userId": "User",
+        "searchUsers": "Search users...",
+        "noUsersFound": "No users found",
+        "allStatuses": "All Statuses",
+        "reset": "Reset",
+        "statusOptions": {
+            "PENDING": "PENDING",
+            "RUNNING": "RUNNING",
+            "ACCEPTED": "ACCEPTED",
+            "WRONG_ANSWER": "WRONG_ANSWER",
+            "TIME_LIMIT_EXCEEDED": "TIME_LIMIT_EXCEEDED",
+            "MEMORY_LIMIT_EXCEEDED": "MEMORY_LIMIT_EXCEEDED",
+            "RUNTIME_ERROR": "RUNTIME_ERROR",
+            "COMPILATION_ERROR": "COMPILATION_ERROR",
+            "UNKNOWN_ERROR": "UNKNOWN_ERROR"
+        }
+    },
+    "TagsPage": {
+        "tagsList": "Tags List",
+        "topicsList": "Topics List",
+        "searchPlaceholder": "Search by name, slug...",
+        "allStatuses": "All Statuses",
+        "active": "Active",
+        "inactive": "Inactive",
+        "sortBy": "Sort by:",
+        "id": "ID",
+        "postCount": "Post Count",
+        "createdAt": "Created At",
+        "resetFilters": "Reset Filters",
+        "confirmDeleteTitle": "Are you sure?",
+        "confirmDeleteTagMessage": "This action cannot be undone. This will permanently delete the tag <span>{name}</span> and remove it from all associated problems.",
+        "confirmDeleteTopicMessage": "This action cannot be undone. This will permanently delete the topic <span>{name}</span> and remove it from all associated problems.",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "deleteTagSuccess": "Tag deleted successfully",
+        "deleteTagError": "Failed to delete tag",
+        "deleteTopicSuccess": "Topic deleted successfully",
+        "deleteTopicError": "Failed to delete topic",
+        "confirmActivateTitle": "Confirm Activate",
+        "confirmDeactivateTitle": "Confirm Deactivate",
+        "confirmActivateTagMessage": "Are you sure you want to activate the tag <span>{name}</span>?",
+        "confirmDeactivateTagMessage": "Are you sure you want to deactivate the tag <span>{name}</span>?",
+        "confirmActivateTopicMessage": "Are you sure you want to activate the topic <span>{name}</span>?",
+        "confirmDeactivateTopicMessage": "Are you sure you want to deactivate the topic <span>{name}</span>?",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "activateTagSuccess": "Tag activated successfully",
+        "deactivateTagSuccess": "Tag deactivated successfully",
+        "activateTagError": "Failed to activate tag",
+        "deactivateTagError": "Failed to deactivate tag",
+        "activateTopicSuccess": "Topic activated successfully",
+        "deactivateTopicSuccess": "Topic deactivated successfully",
+        "activateTopicError": "Failed to activate topic",
+        "deactivateTopicError": "Failed to deactivate topic"
+    },
+    "CreateTagDialog": {
+        "tagNameRequired": "Tag name is required",
+        "tagNameTooLong": "Tag name is too long",
+        "createTagSuccess": "Tag created successfully",
+        "createTagError": "Failed to create tag",
+        "createTagButton": "Create Tag",
+        "createTagTitle": "Create Tag",
+        "createTagDescription": "Add a new tag to categorize problems.",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Dynamic Programming",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "e.g. dynamic-programming",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Tag description",
+        "creating": "Creating...",
+        "create": "Create"
+    },
+    "EditTagDialog": {
+        "tagNameRequired": "Tag name is required",
+        "tagNameTooLong": "Tag name is too long",
+        "updateTagSuccess": "Tag updated successfully",
+        "updateTagError": "Failed to update tag",
+        "editTagTitle": "Edit Tag",
+        "editTagDescription": "Make changes to the tag here. Click save when you're done.",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Dynamic Programming",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "e.g. dynamic-programming",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Tag description",
+        "saving": "Saving...",
+        "saveChanges": "Save changes"
+    },
+    "CreateTopicDialog": {
+        "topicNameRequired": "Topic name is required",
+        "topicNameTooLong": "Topic name is too long",
+        "descriptionRequired": "Description is required",
+        "descriptionTooLong": "Description is too long",
+        "createTopicSuccess": "Topic created successfully",
+        "createTopicError": "Failed to create topic",
+        "createTopicButton": "Create Topic",
+        "createTopicTitle": "Create Topic",
+        "createTopicDescription": "Add a new topic to categorize problems.",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Algorithms",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "e.g. algorithms",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Topic description",
+        "creating": "Creating...",
+        "create": "Create"
+    },
+    "EditTopicDialog": {
+        "topicNameRequired": "Topic name is required",
+        "topicNameTooLong": "Topic name is too long",
+        "updateTopicSuccess": "Topic updated successfully",
+        "updateTopicError": "Failed to update topic",
+        "editTopicTitle": "Edit Topic",
+        "editTopicDescription": "Make changes to the topic here. Click save when you're done.",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Algorithms",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Topic description",
+        "saving": "Saving...",
+        "saveChanges": "Save changes"
+    },
+    "TagsTable": {
+        "tagId": "TAG ID",
+        "tagName": "TAG NAME",
+        "slug": "SLUG",
+        "postCount": "POST COUNT",
+        "status": "STATUS",
+        "createdDate": "CREATED DATE",
+        "actions": "ACTIONS",
+        "noTagsFound": "No tags found.",
+        "active": "Active",
+        "inactive": "Inactive",
+        "edit": "Edit",
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "delete": "Delete",
+        "entityName": "tags"
+    },
+    "TopicsTable": {
+        "topicId": "TOPIC ID",
+        "topicName": "TOPIC NAME",
+        "slug": "SLUG",
+        "postCount": "POST COUNT",
+        "status": "STATUS",
+        "createdDate": "CREATED DATE",
+        "actions": "ACTIONS",
+        "noTopicsFound": "No topics found.",
+        "active": "Active",
+        "inactive": "Inactive",
+        "edit": "Edit",
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "delete": "Delete",
+        "entityName": "topics"
+    },
+    "CreateProblemForm": {
+        "steps": {
+            "generalInfo": "General Information",
+            "description": "Problem Description",
+            "constraints": "Constraints",
+            "testCases": "Test Cases",
+            "solutionHints": "Solution & Hints"
+        },
+        "validation": {
+            "hintEmpty": "Hint content cannot be empty",
+            "testcaseFileRequired": "Testcase file is required",
+            "inputEmpty": "Input cannot be empty",
+            "outputEmpty": "Output cannot be empty",
+            "sampleTestCaseRequired": "At least one sample test case is required",
+            "solutionContentLength": "Official solution content must be longer than 16 characters"
+        },
+        "cancelDialog": {
+            "title": "Cancel creating problem",
+            "message": "Are you sure you want to cancel? Any unsaved changes will be lost.",
+            "yes": "Yes",
+            "no": "No"
+        },
+        "messages": {
+            "fixErrors": "Please fix the errors in the highlighted steps.",
+            "createSuccess": "Problem created successfully!",
+            "createError": "Failed to create problem. Please try again."
+        },
+        "buttons": {
+            "cancel": "Cancel",
+            "saving": "Saving...",
+            "saveProblem": "Save Problem"
+        },
+        "generalInfo": {
+            "titleLabel": "Problem Title",
+            "titlePlaceholder": "Example: Two Sum",
+            "difficultyLabel": "Difficulty",
+            "difficultyPlaceholder": "Select difficulty",
+            "premiumLabel": "Premium Content",
+            "premiumDescription": "Exclusive for premium members.",
+            "maxScoreLabel": "Max Score",
+            "timeLimitLabel": "Time Limit (ms)",
+            "memoryLimitLabel": "Memory Limit (KB)",
+            "topicsLabel": "Topics",
+            "topicsPlaceholder": "Select topics...",
+            "topicsSearchPlaceholder": "Search topics...",
+            "tagsLabel": "Tags",
+            "tagsPlaceholder": "Select tags...",
+            "tagsSearchPlaceholder": "Search tags...",
+            "similarProblemsLabel": "Similar Problems",
+            "problemPrefix": "Problem #",
+            "selectSimilarProblems": "Select Similar Problems"
+        },
+        "testCases": {
+            "instructionsTitle": "Instructions:",
+            "instructions": "You can enter sample test cases to display publicly as examples, and upload full test cases (Hidden Test Cases) for the automated grading system.",
+            "systemTestCasesLabel": "System Test Cases (Hidden)",
+            "systemTestCasesDescription": "File test case used to grade.",
+            "uploadClick": "Click to upload file",
+            "uploadDrag": "or drag and drop file here",
+            "uploadFormat": "Support .JSON format (Max 25MB)",
+            "uploadedJustNow": "Uploaded just now",
+            "sampleTestCasesLabel": "Sample Test Cases (Public)",
+            "addSampleTestCase": "Add Sample Test Case",
+            "examplePrefix": "Example",
+            "inputLabel": "INPUT",
+            "inputPlaceholder": "nums = [2,7,11,15], target = 9",
+            "outputLabel": "OUTPUT",
+            "outputPlaceholder": "[0,1]",
+            "explanationLabel": "Explanation (Optional)",
+            "explanationPlaceholder": "Because nums[0] + nums[1] == 9, we return [0, 1].",
+            "invalidFormat": "Invalid file format",
+            "invalidContent": "Invalid file content",
+            "validFileLoaded": "Valid testcase file loaded with {count} test cases.",
+            "rightClickToSave": "Right click, then click 'Save Link As' to download file.",
+            "removeFileConfirmTitle": "Are you sure you want to remove this file?",
+            "removeFileConfirmMessage": "This action cannot be undone.",
+            "removeFileConfirmYes": "Yes",
+            "removeFileConfirmNo": "No",
+            "fileRemovedSuccess": "File has been removed successfully.",
+            "fileRemovedError": "Failed to remove file. Please try again."
+        },
+        "solutionHints": {
+            "officialSolutionLabel": "Official Solution",
+            "officialSolutionDescription": "Enable to provide an official solution for this problem.",
+            "hintsLabel": "Hints",
+            "hintsDescription": "Provide hints to help users solve the problem.",
+            "addHint": "Add Hint",
+            "hintPrefix": "Hint",
+            "hintPlaceholder": "Enter hint #{index}...",
+            "noHints": "No hints added yet. Click \"Add Hint\" to start."
+        }
+    },
+    "EditProblemForm": {
+        "cancelDialog": {
+            "title": "Cancel editing problem",
+            "message": "Are you sure you want to cancel? Any unsaved changes will be lost.",
+            "yes": "Yes",
+            "no": "No"
+        },
+        "messages": {
+            "updateSuccess": "Problem updated successfully!",
+            "updateError": "Failed to update problem. Please try again.",
+            "loadError": "Failed to load problem data."
+        },
+        "buttons": {
+            "updateProblem": "Update Problem",
+            "updating": "Updating..."
+        }
+    },
+    "CreateProblemPage": {
+        "title": "Create New Problem",
+        "description": "Set up a multi-step programming problem with a detailed process."
+    },
+    "EditProblemPage": {
+        "title": "Edit Problem",
+        "description": "Update problem information and content."
+    },
+    "ProblemStatistics": {
+        "title": "Statistics",
+        "dateRange": {
+            "pick": "Pick a date range",
+            "label": "Date Range",
+            "from": "From",
+            "to": "To",
+            "placeholder": "Select date range",
+            "all": "All Time",
+            "last30d": "Last 30 Days",
+            "last7d": "Last 7 Days",
+            "custom": "Custom Range"
+        },
+        "buttons": {
+            "editProblem": "Edit Problem",
+            "allSubmissions": "Go to all submissions"
+        },
+        "kpi": {
+            "submissions": "Submissions",
+            "totalSubmissions": "Total Submissions",
+            "totalAccepted": "Total Accepted",
+            "acceptanceRate": "Acceptance Rate",
+            "solvers": "Solvers",
+            "totalAttempts": "Total Attempts",
+            "totalSolved": "Total Solveds",
+            "avgTime": "Average Time to Solved"
+        },
+        "verdict": {
+            "title": "Verdict Distribution"
+        },
+        "performance": {
+            "runtimeTitle": "Runtime Distribution (ms)",
+            "memoryTitle": "Memory Distribution (MB)",
+            "range": "RANGE",
+            "count": "COUNT",
+            "percentile": "PERCENTILE",
+            "beats": "Beats {percent}% of users"
+        },
+        "language": {
+            "title": "Language Statistics",
+            "searchPlaceholder": "Search language...",
+            "headers": {
+                "language": "Language",
+                "submissions": "Submissions",
+                "acRate": "AC Rate",
+                "avgRuntime": "Avg Runtime",
+                "avgMemory": "Avg Memory"
+            },
+            "noResults": "No languages found matching \"{search}\"",
+            "showing": "Showing {count} languages"
+        },
+        "errors": {
+            "loadFailed": "Failed to load statistics."
+        }
+    },
+    "CreateContestPage": {
+        "title": "Create New Contest",
+        "description": "Fill in the details to create a new contest.",
+        "form": {
+            "cancel": "Cancel",
+            "create": "Create Contest",
+            "creating": "Creating...",
+            "cancelTitle": "Cancel Contest Creation",
+            "cancelMessage": "Are you sure you want to cancel? All unsaved changes will be lost.",
+            "confirmCancel": "Yes, Cancel",
+            "keepEditing": "No, Keep Editing",
+            "success": "Contest created successfully",
+            "error": "Failed to create contest"
+        }
+    },
+    "EditContestPage": {
+        "title": "Edit Contest",
+        "description": "Update contest details and problems.",
+        "form": {
+            "cancel": "Cancel",
+            "update": "Update Contest",
+            "saving": "Saving...",
+            "cancelTitle": "Cancel Editing",
+            "cancelMessage": "Are you sure you want to cancel? All unsaved changes will be lost.",
+            "confirmCancel": "Yes, Cancel",
+            "keepEditing": "No, Keep Editing",
+            "success": "Contest updated successfully",
+            "error": "Failed to update contest",
+            "loadError": "Failed to load contest data"
+        }
+    },
+    "ViewContestPage": {
+        "back": "Back to Contests",
+        "minutes": "minutes",
+        "description": "Description",
+        "problems": {
+            "title": "Problems",
+            "order": "Order",
+            "problem": "Problem",
+            "difficulty": "Difficulty",
+            "points": "Points",
+            "empty": "No problems added to this contest yet."
+        },
+        "loadError": "Failed to load contest data"
+    },
+    "ContestStatistics": {
+        "header": {
+            "startedAt": "Started at",
+            "broadcast": "Broadcast Message",
+            "broadcastComingSoon": "Broadcast message feature coming soon!"
+        },
+        "metrics": {
+            "activeParticipants": "Active Participants",
+            "registered": "Registered",
+            "submissionRate": "Submission Rate",
+            "totalSubmissions": "Total Submissions",
+            "acceptanceRate": "Acceptance Rate",
+            "ac": "AC",
+            "nonAc": "Non-AC"
+        },
+        "liveLeaderboard": {
+            "title": "Live Leaderboard",
+            "searchPlaceholder": "Search user...",
+            "table": {
+                "rank": "Rank",
+                "user": "User",
+                "score": "Score",
+                "progress": "Progress",
+                "loading": "Loading leaderboard...",
+                "empty": "No participants found"
+            },
+            "pagination": {
+                "page": "Page {page} of {totalPages}",
+                "previous": "Previous",
+                "next": "Next"
+            }
+        },
+        "participantDetail": {
+            "keyMetrics": "Key Metrics",
+            "totalScore": "Total Score",
+            "problemStatus": "Problem Status",
+            "submissionHistory": "Submission History",
+            "attempts": "{count} attempts",
+            "points": "{count} points",
+            "table": {
+                "problem": "Problem",
+                "status": "Status",
+                "language": "Language",
+                "loading": "Loading history...",
+                "empty": "No submissions found",
+                "loadingMore": "Loading more..."
+            }
+        },
+        "recentSubmissions": {
+            "title": "Submissions",
+            "viewAll": "View All",
+            "timeAgo": {
+                "second": "{count}s ago",
+                "minute": "{count}m ago",
+                "hour": "{count}h ago",
+                "day": "{count}d ago"
+            }
+        },
+        "verdictChart": {
+            "title": "Verdict Distribution"
+        },
+        "problemHealth": {
+            "title": "Problem Health",
+            "solved": "% Solved",
+            "difficulty": {
+                "easy": "Easy",
+                "medium": "Medium",
+                "hard": "Hard"
+            },
+            "table": {
+                "problem": "Problem",
+                "submissions": "Submissions",
+                "acRate": "AC Rate",
+                "avgTime": "Avg Time",
+                "avgMemory": "Avg Memory"
+            }
+        },
+        "loadError": "Failed to load statistics"
+    },
+    "SubmissionDetail": {
+        "title": "Submission #{id}",
+        "submittedBy": "Submitted by",
+        "status": {
+            "label": "Status",
+            "allPassed": "All test cases passed",
+            "checkDetails": "Check details below"
+        },
+        "metrics": {
+            "runtime": "Runtime",
+            "memory": "Memory",
+            "language": "Language"
+        },
+        "sourceCode": {
+            "title": "SOURCE CODE",
+            "copy": "Copy",
+            "download": "Download",
+            "copySuccess": "Code copied to clipboard",
+            "downloadSuccess": "Code downloaded successfully"
+        },
+        "testCases": {
+            "title": "Test Case Results",
+            "total": "Total: {count}",
+            "passed": "Passed: {count}",
+            "caseTitle": "Test Case #{id}",
+            "errorMessage": "Error Message",
+            "unknownError": "Unknown runtime error occurred",
+            "expectedOutput": "Expected Output",
+            "actualOutput": "Actual Output"
+        },
+        "errors": {
+            "loadFailed": "Failed to load submission details",
+            "notFound": "Submission not found",
+            "title": "Error Loading Submission"
+        }
+    },
+    "RolesPage": {
+        "title": "Roles & Permissions",
+        "description": "Manage user roles and their associated permissions.",
+        "rolesTab": "Roles",
+        "permissionsTab": "Permissions",
+        "edit": "Edit",
+        "delete": "Delete"
+    },
+    "PermissionsTab": {
+        "searchPlaceholder": "Search permissions...",
+        "filterByResource": "Filter by Resource",
+        "allResources": "All Resources",
+        "filterByAction": "Filter by Action",
+        "allActions": "All Actions",
+        "id": "ID",
+        "resource": "Resource",
+        "action": "Action",
+        "description": "Description",
+        "lastUpdated": "Last Updated",
+        "loading": "Loading permissions...",
+        "noResults": "No permissions found matching your criteria."
+    },
+    "RolesTab": {
+        "confirmDelete": "Are you sure you want to delete the role \"{name}\"?",
+        "deleteFailed": "Failed to delete role",
+        "searchPlaceholder": "Search roles...",
+        "addNewRole": "Add New Role",
+        "id": "ID",
+        "roleName": "Role Name",
+        "priority": "Priority",
+        "type": "Type",
+        "permissions": "Permissions",
+        "actions": "Actions",
+        "loading": "Loading roles...",
+        "noResults": "No roles found.",
+        "system": "System",
+        "custom": "Custom",
+        "permissionsCount": "{count} Permissions assigned",
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete"
+    },
+    "RoleFormDialog": {
+        "createRole": "Create New Role",
+        "createRoleDescription": "Add a new role to the system. You can assign permissions later.",
+        "name": "Role Name",
+        "namePlaceholder": "e.g. Content Moderator",
+        "slug": "Slug",
+        "slugPlaceholder": "e.g. content-moderator",
+        "priority": "Priority",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the role's responsibilities...",
+        "cancel": "Cancel",
+        "create": "Create Role"
+    },
+    "EditRoleDrawer": {
+        "title": "Edit Role: {name}",
+        "successTitle": "Role Updated",
+        "successDescription": "Role details and permissions have been updated successfully.",
+        "errorTitle": "Update Failed",
+        "errorDescription": "Failed to update role. Please try again.",
+        "roleDetails": "Role Details",
+        "name": "Name",
+        "slug": "Slug",
+        "priority": "Priority",
+        "permissions": "Permissions",
+        "selected": "Selected",
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes",
+        "edit": "Edit",
+        "delete": "Delete"
+    },
+    "PermissionMatrix": {
+        "searchPermissions": "Search permissions..."
+    },
+    "Auth": {
+        "email": "Email",
+        "username": "Username",
+        "forgotPassword": "Forgot Password?",
+        "forgotPasswordTitle": "Forgot Password",
+        "forgotPasswordDescription": "Enter your email address and we'll send you a link to reset your password.",
+        "sendResetLink": "Send Reset Link",
+        "sending": "Sending...",
+        "forgotPasswordSuccess": "Reset link sent to your email",
+        "forgotPasswordError": "Failed to send reset link",
+        "verifyEmailTitle": "Verify Your Email",
+        "verifyEmailDescription": "Please verify your email address to continue using the application.",
+        "resendVerificationEmail": "Resend Verification Email",
+        "verificationEmailSent": "Verification email sent",
+        "verificationEmailError": "Failed to send verification email",
+        "userSettings": "User Settings",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        "changePasswordSuccess": "Password changed successfully",
+        "changePasswordError": "Failed to change password",
+        "saving": "Saving...",
+        "saveChanges": "Save Changes",
+        "resetPasswordTitle": "Reset Password",
+        "resetPasswordDescription": "Enter your new password below.",
+        "resetPasswordSuccess": "Password reset successfully",
+        "resetPasswordError": "Failed to reset password",
+        "verifyEmailSuccess": "Email verified successfully",
+        "verifyEmailError": "Failed to verify email",
+        "verifying": "Verifying...",
+        "backToLogin": "Back to login"
+    },
+    "admin": {
+        "dashboard": {
+            "title": "Dashboard",
+            "kpi": {
+                "userBase": "User Base",
+                "activeUsers": "{count} Active",
+                "problems": "Problems",
+                "activeProblems": "{count} Active",
+                "monthlyRevenue": "Monthly Revenue",
+                "revenueToday": "+${amount} Today",
+                "premiumHealth": "Premium Health",
+                "conversionRate": "{rate}% Conversion Rate"
+            },
+            "chart": {
+                "title": "Platform Trends",
+                "metrics": {
+                    "users": "Users",
+                    "submissions": "Submissions",
+                    "activeUsers": "Active Users"
+                },
+                "range": {
+                    "placeholder": "Select Range",
+                    "last7Days": "Last 7 Days",
+                    "last30Days": "Last 30 Days",
+                    "thisMonth": "This Month",
+                    "last1Year": "Last 1 Year",
+                    "custom": "Custom Range",
+                    "pickDate": "Pick a date range",
+                    "startDate": "Start Date",
+                    "endDate": "End Date"
+                }
+            },
+            "growth": {
+                "title": "User Growth",
+                "newUsersToday": "New Users Today",
+                "newUsersThisWeek": "New Users This Week",
+                "newUsersThisMonth": "New Users This Month"
+            },
+            "engagement": {
+                "title": "Engagement Metrics",
+                "dau": "Daily Active",
+                "wau": "Weekly Active",
+                "mau": "Monthly Active",
+                "avgSubmissionsPerUser": "Avg Submissions/User"
+            },
+            "revenue": {
+                "newPremiumToday": "New Premium Today",
+                "thisWeek": "this week",
+                "arpu": "Avg Revenue Per User",
+                "premiumConversion": "Premium Conversion"
+            },
+            "error": {
+                "failedToLoad": "Failed to load dashboard data"
+            }
+        }
+    },
+    "NotFound": {
+        "title": "Page Not Found | SolVibe",
+        "description": "The page you are looking for does not exist.",
+        "heading": "404",
+        "subheading": "Page Not Found",
+        "message": "The page you are looking for does not exist or has been moved."
+    },
+    "Loading": {
+        "title": "Loading application...",
+        "description": "Please wait while we initialize the system"
+    }
+}

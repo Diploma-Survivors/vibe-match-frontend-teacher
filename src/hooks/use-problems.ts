@@ -1,23 +1,23 @@
+'use client';
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
-  MatchMode,
-  type PageInfo,
-  type ProblemData,
+  type Problem,
   type ProblemEndpointType,
   type ProblemFilters,
   type ProblemListResponse,
+  type ProblemMeta,
   SortBy,
   SortOrder,
 } from '@/types/problems';
+import { HttpStatus } from '@/types/api';
 import { useCallback, useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = 20;
 
 interface UseProblemsState {
-  problems: ProblemData[];
-  pageInfo: PageInfo | null;
-  totalCount: number;
+  problems: Problem[];
+  meta: ProblemMeta | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -29,10 +29,12 @@ interface UseProblemsActions {
   handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handleSearch: () => void;
   handleReset: () => void;
-  handleLoadMore: () => void;
+  handlePageChange: (page: number) => void;
+  refresh: () => void;
 }
 
 interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
+  totalCount: number;
   // Request params (exposed for UI)
   filters: ProblemFilters;
   keyword: string;
@@ -46,8 +48,7 @@ export default function useProblems(
   // Main state to manage problems and loading/error states
   const [state, setState] = useState<UseProblemsState>({
     problems: [],
-    pageInfo: null,
-    totalCount: 0,
+    meta: null,
     isLoading: false,
     error: null,
   });
@@ -57,15 +58,15 @@ export default function useProblems(
   const [keyword, setKeyword] = useState<string>('');
 
   // state for sorting
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.ID);
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetProblemListRequest>({
-    first: ITEMS_PER_PAGE,
-    sortBy: sortBy || SortBy.TITLE,
+    page: 1,
+    limit: ITEMS_PER_PAGE,
+    sortBy: sortBy || SortBy.ID,
     sortOrder: sortOrder || SortOrder.ASC,
-    matchMode: MatchMode.ANY,
     filters: {
       ...filters,
     },
@@ -76,26 +77,16 @@ export default function useProblems(
     async (requestParams: GetProblemListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-        const axiosResponse = await ProblemsService.getProblemList(
+        
+        const response = await ProblemsService.getProblemList(
           requestParams,
-          endpointType
         );
-        const response: ProblemListResponse = axiosResponse?.data?.data;
-
-        // Extract problems from edges
-        const problemsData = response?.edges.map((edge) => ({
-          ...edge.node,
-        }));
-
         setState((prev) => ({
-          ...prev,
-          problems: requestParams.after
-            ? [...prev.problems, ...problemsData]
-            : problemsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
-          isLoading: false,
-        }));
+            ...prev,
+            problems: response?.data?.data?.data,
+            meta: response?.data?.data?.meta,
+            isLoading: false,
+          }));
       } catch (err) {
         console.error('Error fetching problems:', err);
         setState((prev) => ({
@@ -105,7 +96,7 @@ export default function useProblems(
         }));
       }
     },
-    [endpointType]
+    []
   );
 
   // Effect to fetch problems when request changes
@@ -115,11 +106,7 @@ export default function useProblems(
 
   // Helper function to update request
   const updateRequest = useCallback(
-    (updates: Partial<GetProblemListRequest>, clearProblems = false) => {
-      if (clearProblems) {
-        setState((prev) => ({ ...prev, problems: [] }));
-      }
-
+    (updates: Partial<GetProblemListRequest>) => {
       setRequest((prev) => ({
         ...prev,
         ...updates,
@@ -131,17 +118,31 @@ export default function useProblems(
   // handle filter, keyword changes
   const handleFiltersChange = useCallback((newFilters: ProblemFilters) => {
     setFilters(newFilters);
-  }, []);
+    // When filters change, reset to page 1
+    updateRequest({ filters: newFilters, page: 1 });
+  }, [updateRequest]);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
   }, []);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateRequest({
+        search: keyword.trim() || undefined,
+        page: 1,
+      });
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [keyword, updateRequest]);
+
   // handle sorting changes
   const handleSortByChange = useCallback(
     (newSortBy: SortBy) => {
       setSortBy(newSortBy);
-      updateRequest({ sortBy: newSortBy }, false);
+      updateRequest({ sortBy: newSortBy, page: 1 });
     },
     [updateRequest]
   );
@@ -149,69 +150,50 @@ export default function useProblems(
   const handleSortOrderChange = useCallback(
     (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
-      updateRequest({ sortOrder: newSortOrder }, false);
+      updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
     [updateRequest]
   );
 
-  // handle load more for pagination
-  const handleLoadMore = useCallback(() => {
-    if (state.isLoading || !state.pageInfo?.hasNextPage) {
-      return;
-    }
-    updateRequest(
-      {
-        after: state.pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      false
-    );
-  }, [state.isLoading, state.pageInfo, updateRequest]);
+  // handle page change
+  const handlePageChange = useCallback((page: number) => {
+    updateRequest({ page });
+  }, [updateRequest]);
 
-  // handle search
+  // handle search (now just forces a refresh if needed, but debounce handles typing)
   const handleSearch = useCallback(() => {
     const trimmedKeyword = keyword.trim();
-
-    updateRequest(
-      {
-        keyword: trimmedKeyword || undefined,
-        filters: {
-          ...filters,
-        },
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
+    updateRequest({
+      search: trimmedKeyword || undefined,
+      filters: { ...filters },
+      page: 1,
+    });
   }, [keyword, filters, updateRequest]);
 
-  // handle reset
   const handleReset = useCallback(() => {
     setFilters({});
     setKeyword('');
+    setSortBy(SortBy.ID);
+    setSortOrder(SortOrder.ASC);
 
-    updateRequest(
-      {
-        keyword: undefined,
-        filters: {},
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
+    updateRequest({
+      search: undefined,
+      filters: {},
+      page: 1,
+      sortBy: SortBy.ID,
+      sortOrder: SortOrder.ASC,
+    });
   }, [updateRequest]);
+
+  const refresh = useCallback(() => {
+    fetchProblems(request);
+  }, [fetchProblems, request]);
 
   return {
     // State
     problems: state.problems,
-    pageInfo: state.pageInfo,
-    totalCount: state.totalCount,
+    meta: state.meta,
+    totalCount: state.meta?.total || 0,
     isLoading: state.isLoading,
     error: state.error,
 
@@ -228,6 +210,7 @@ export default function useProblems(
     handleSortOrderChange,
     handleSearch,
     handleReset,
-    handleLoadMore,
+    handlePageChange,
+    refresh,
   };
 }
