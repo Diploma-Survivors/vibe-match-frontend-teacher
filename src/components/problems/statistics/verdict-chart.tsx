@@ -43,11 +43,20 @@ export function VerdictChart({ verdicts }: VerdictChartProps) {
                             ))}
                         </Pie>
                         <Tooltip
-                            formatter={(value: number, name: string, props: any) => [
-                                `${value.toLocaleString()} (${props.payload.percentage}%)`,
-                                name
-                            ]}
+                            formatter={(value, name, props) => {
+                                const safeValue = typeof value === 'number' ? value : 0;
+                                const percentage =
+                                    typeof props === 'object' && props?.payload?.percentage
+                                        ? props.payload.percentage
+                                        : 0;
+
+                                return [
+                                    `${safeValue.toLocaleString()} (${percentage}%)`,
+                                    name,
+                                ];
+                            }}
                         />
+
                         <Legend
                             layout="vertical"
                             verticalAlign="middle"
