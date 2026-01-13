@@ -8,7 +8,7 @@ interface CreateContestState extends ContestFormValues {
 }
 
 const initialState: CreateContestState = {
-  name: '',
+  title: '',
   description: '',
   startTime: '',
   durationMinutes: 60,

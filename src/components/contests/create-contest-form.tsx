@@ -25,7 +25,7 @@ export default function CreateContestForm({ onSubmit, isSubmitting }: CreateCont
     const t = useTranslations('CreateContestPage.form');
 
     const defaultValues = {
-        name: draft.name,
+        name: draft.title,
         description: draft.description,
         startTime: draft.startTime,
         durationMinutes: draft.durationMinutes,

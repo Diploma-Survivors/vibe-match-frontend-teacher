@@ -47,56 +47,6 @@ async function updateContest(
   return clientApi.put(url, contestDTO);
 }
 
-async function getContestSubmissionsOverview(
-  request: SubmissionsOverviewRequest
-): Promise<SubmissionsOverviewResponse> {
-  const { contestId, filters, ...restParams } = request;
-  const url = `/contests/${contestId}/submissions/overview`;
-
-  // Build params with nested filters structure, excluding undefined values
-  const params: Record<string, any> = {};
-
-  // Only add defined values from restParams
-  for (const [key, value] of Object.entries(restParams)) {
-    if (value !== undefined) {
-      params[key] = value;
-    }
-  }
-
-  if (filters?.username) {
-    params['filters.username'] = filters.username;
-  }
-
-  const response = await clientApi.get<
-    ApiResponse<SubmissionsOverviewResponse>
-  >(url, {
-    params,
-  });
-  return response.data.data;
-}
-
-async function getSubmissionDetails(
-  contestParticipationId: number,
-  problemId: number,
-  params?: {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-    sortOrder?: 'asc' | 'desc';
-  }
-): Promise<SubmissionDetailsResponse> {
-  const url = `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}`;
-
-  const response = await clientApi.get<ApiResponse<SubmissionDetailsResponse>>(
-    url,
-    {
-      params,
-    }
-  );
-  return response.data.data;
-}
-
 async function getContests(params?: any) {
   const url = '/contests/admin';
   const response = await clientApi.get<ApiResponse<ContestListResponse>>(url, { params });
@@ -149,8 +99,6 @@ export const ContestsService = {
   createContest,
   getContestById,
   updateContest,
-  getContestSubmissionsOverview,
-  getSubmissionDetails,
   getContests,
   getContestStatistics,
   getContestLeaderboard,
